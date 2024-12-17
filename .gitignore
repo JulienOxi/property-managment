@@ -1,0 +1,9 @@
+# Symfony Standard Edition
+/app/config/parameters.yml
+/app/config/parameters.php
+/var/
+/vendor/
+/public/bundles/
+/node_modules/
+/.env
+.env.*
