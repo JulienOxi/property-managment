@@ -45,7 +45,7 @@ Cette application web permet de gérer des biens immobiliers en Suisse. Elle off
 
 1. **Cloner le repository**
    ```bash
-   git clone <url-du-repository>
+   git clone https://github.com/JulienOxi/property-managment.git
    cd gestion-immobiliere
    ```
 
