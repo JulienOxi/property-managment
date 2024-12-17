@@ -6,3 +6,7 @@
 /node_modules/
 /env
 /env.*
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
