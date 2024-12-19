@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\AccessControlRepository;
+use App\Enum\AccessRole;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\AccessControlRepository;
 
 #[ORM\Entity(repositoryClass: AccessControlRepository::class)]
 class AccessControl
@@ -18,7 +19,7 @@ class AccessControl
     private ?User $grantedUser = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $role = null;
+    private AccessRole $role = null;
 
     public function getId(): ?int
     {
@@ -42,7 +43,7 @@ class AccessControl
         return $this->role;
     }
 
-    public function setRole(string $role): static
+    public function setRole(AccessRole $role): static
     {
         $this->role = $role;
 
