@@ -19,7 +19,7 @@ class AccessControl
     private ?User $grantedUser = null;
 
     #[ORM\Column(length: 50)]
-    private AccessRole $role = null;
+    private AccessRole $role;
 
     public function getId(): ?int
     {

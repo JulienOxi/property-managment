@@ -20,20 +20,8 @@ class UserProfile
     #[ORM\Column(length: 100)]
     private ?string $lastname = null;
 
-    #[ORM\Column(length: 25, nullable: true)]
-    private ?string $mobilePhone = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $street = null;
-
-    #[ORM\Column(length: 10, nullable: true)]
-    private ?string $streetNumber = null;
-
-    #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $zipCode = null;
-
-    #[ORM\Column(length: 100)]
-    private ?string $city = null;
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Address $address = null;
 
     public function getId(): ?int
     {
@@ -64,62 +52,14 @@ class UserProfile
         return $this;
     }
 
-    public function getMobilePhone(): ?string
+    public function getAddress(): ?Address
     {
-        return $this->mobilePhone;
+        return $this->address;
     }
 
-    public function setMobilePhone(?string $mobilePhone): static
+    public function setAddress(?Address $address): static
     {
-        $this->mobilePhone = $mobilePhone;
-
-        return $this;
-    }
-
-    public function getStreet(): ?string
-    {
-        return $this->street;
-    }
-
-    public function setStreet(string $street): static
-    {
-        $this->street = $street;
-
-        return $this;
-    }
-
-    public function getStreetNumber(): ?string
-    {
-        return $this->streetNumber;
-    }
-
-    public function setStreetNumber(?string $streetNumber): static
-    {
-        $this->streetNumber = $streetNumber;
-
-        return $this;
-    }
-
-    public function getZipCode(): ?int
-    {
-        return $this->zipCode;
-    }
-
-    public function setZipCode(int $zipCode): static
-    {
-        $this->zipCode = $zipCode;
-
-        return $this;
-    }
-
-    public function getCity(): ?string
-    {
-        return $this->city;
-    }
-
-    public function setCity(string $city): static
-    {
-        $this->city = $city;
+        $this->address = $address;
 
         return $this;
     }
