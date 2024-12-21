@@ -44,9 +44,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: AccessControl::class, mappedBy: 'grantedUser', orphanRemoval: true)]
     private Collection $accessControls;
 
+    /**
+     * @var Collection<int, PropertyRent>
+     */
+    #[ORM\OneToMany(targetEntity: PropertyRent::class, mappedBy: 'createdBy', orphanRemoval: true)]
+    private Collection $propertyRents;
+
     public function __construct()
     {
         $this->accessControls = new ArrayCollection();
+        $this->propertyRents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -160,6 +167,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($accessControl->getGrantedUser() === $this) {
                 $accessControl->setGrantedUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PropertyRent>
+     */
+    public function getPropertyRents(): Collection
+    {
+        return $this->propertyRents;
+    }
+
+    public function addPropertyRent(PropertyRent $propertyRent): static
+    {
+        if (!$this->propertyRents->contains($propertyRent)) {
+            $this->propertyRents->add($propertyRent);
+            $propertyRent->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removePropertyRent(PropertyRent $propertyRent): static
+    {
+        if ($this->propertyRents->removeElement($propertyRent)) {
+            // set the owning side to null (unless already changed)
+            if ($propertyRent->getCreatedBy() === $this) {
+                $propertyRent->setCreatedBy(null);
             }
         }
 

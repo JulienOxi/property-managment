@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Enum\AccessRole;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\AccessControlRepository;
 
@@ -20,6 +22,15 @@ class AccessControl
 
     #[ORM\Column(length: 50)]
     private AccessRole $role;
+
+    #[ORM\ManyToOne(inversedBy: 'AccessControl')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Property $property = null;
+
+    public function __construct()
+    {
+        $this->properties = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -46,6 +57,18 @@ class AccessControl
     public function setRole(AccessRole $role): static
     {
         $this->role = $role;
+
+        return $this;
+    }
+
+    public function getProperty(): ?Property
+    {
+        return $this->property;
+    }
+
+    public function setProperty(?Property $property): static
+    {
+        $this->property = $property;
 
         return $this;
     }
