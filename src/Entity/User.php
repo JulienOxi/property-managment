@@ -50,10 +50,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: PropertyRent::class, mappedBy: 'createdBy', orphanRemoval: true)]
     private Collection $propertyRents;
 
+    /**
+     * @var Collection<int, UploadFile>
+     */
+    #[ORM\OneToMany(targetEntity: UploadFile::class, mappedBy: 'updatedBy')]
+    private Collection $uploadFiles;
+
     public function __construct()
     {
         $this->accessControls = new ArrayCollection();
         $this->propertyRents = new ArrayCollection();
+        $this->uploadFiles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -197,6 +204,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($propertyRent->getCreatedBy() === $this) {
                 $propertyRent->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UploadFile>
+     */
+    public function getUploadFiles(): Collection
+    {
+        return $this->uploadFiles;
+    }
+
+    public function addUploadFile(UploadFile $uploadFile): static
+    {
+        if (!$this->uploadFiles->contains($uploadFile)) {
+            $this->uploadFiles->add($uploadFile);
+            $uploadFile->setUpdatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUploadFile(UploadFile $uploadFile): static
+    {
+        if ($this->uploadFiles->removeElement($uploadFile)) {
+            // set the owning side to null (unless already changed)
+            if ($uploadFile->getUpdatedBy() === $this) {
+                $uploadFile->setUpdatedBy(null);
             }
         }
 
