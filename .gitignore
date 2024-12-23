@@ -12,3 +12,5 @@
 ###< symfony/asset-mapper ###
 .env
 .env.dev
+composer.phar
+composer.bat
