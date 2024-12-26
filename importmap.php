@@ -16,4 +16,11 @@ return [
         'path' => './assets/app.js',
         'entrypoint' => true,
     ],
+    'material-icons' => [
+        'version' => '1.13.12',
+    ],
+    'material-icons/iconfont/material-icons.min.css' => [
+        'version' => '1.13.12',
+        'type' => 'css',
+    ],
 ];

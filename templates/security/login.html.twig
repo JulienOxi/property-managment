@@ -1,41 +1,66 @@
-{% extends 'base.html.twig' %}
+{% extends 'security_base.html.twig' %}
 
 {% block title %}Log in!{% endblock %}
 
 {% block body %}
-    <form method="post">
-        {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-        {% endif %}
 
-        {% if app.user %}
-            <div class="mb-3">
-                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
-            </div>
-        {% endif %}
+<main>
+    <div class="md:grid md:grid-cols-3 h-screen">
 
-        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-        <label for="username">Email</label>
-        <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
-        <label for="password">Password</label>
-        <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+    <!--login-->
+    <div class="">
+        <div class="ml-2 mt-2 text-xl font-thin">Property Manager App</div>
+        <div class="content-center mx-12 h-[90vh]">
+            
+            <form method="post">
+                {% if error %}
+                    <div class="bg-red-600 w-full text-center text-white rounded">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
 
-        <input type="hidden" name="_csrf_token"
-               value="{{ csrf_token('authenticate') }}"
-        >
+                {% if app.user %}
+                    <div class="mb-3">
+                        You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                    </div>
+                {% endif %}
 
-        {#
-            Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-            See https://symfony.com/doc/current/security/remember_me.html
+                <div class="my-3 py-2 text-2xl text-center text-gray-600 font-bold">Hello, welcome back</div>
+                
+                <div class="text-end">
+                    <a href="{{path('app_register')}}" class="text-blue-600 font-thin">Pas encore de compte ? Inscription</a>
+                </div>
 
-            <div class="checkbox mb-3">
-                <input type="checkbox" name="_remember_me" id="_remember_me">
-                <label for="_remember_me">Remember me</label>
-            </div>
-        #}
+                <hr class="h-50">
 
-        <button class="btn btn-lg btn-primary" type="submit">
-            Sign in
-        </button>
-    </form>
+                <label class="font-thin" for="username">Email</label>
+                <input type="email" value="{{ last_username }}" name="_username" id="username" class="input-base" autocomplete="email" required autofocus>
+                <label class="font-thin" for="password">Password</label>
+                <input type="password" name="_password" id="password" class="input-base" autocomplete="current-password" required>
+
+                <input type="hidden" name="_csrf_token"
+                    value="{{ csrf_token('authenticate') }}"
+                >
+
+                {#
+                    Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
+                    See https://symfony.com/doc/current/security/remember_me.html
+
+                    <div class="checkbox mb-3">
+                        <input type="checkbox" name="_remember_me" id="_remember_me">
+                        <label for="_remember_me">Remember me</label>
+                    </div>
+                #}
+
+                <button class="mt-8 py-2 appearance-none w-full border rounded-md border-gray-300 bg-cyan-400 hover:bg-cyan-500" type="submit">
+                    Sign in
+                </button>
+            </form>    
+        </div>
+    </div>
+
+        <!--image-->
+        <div class="hidden md:block bg-cover bg-center col-span-2" style="background-image: url({{ asset('media/login.jpg') }})"></div>
+
+    </div>
+</main>
+    
 {% endblock %}

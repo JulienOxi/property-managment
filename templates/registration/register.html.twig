@@ -1,0 +1,57 @@
+{% extends 'security_base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+
+<main>
+    <div class="md:grid md:grid-cols-3 h-screen">
+
+    <!--login-->
+    <div class="">
+        <div class="ml-2 mt-2 text-xl font-thin">Property Manager App</div>
+        <div class="content-center mx-12 h-[90vh]">
+
+    {# les erreurs #}
+    {% for flash_error in app.flashes('verify_email_error') %}
+        <div class="bg-red-600 w-full text-center text-white rounded" role="alert">{{ flash_error }}</div>
+    {% endfor %}    
+    <div class="bg-red-600 w-full text-center text-white rounded" role="alert">{{ form_errors(registrationForm) }}</div>
+
+        <div class="my-3 py-2 text-2xl text-center text-gray-600 font-bold">Enregistrement nouvel utilisateur</div>
+                <div class="text-end">
+                    <a href="{{path('app_login')}}" class="text-blue-600 font-thin">Déjà membre, login</a>
+                </div>        
+    {{ form_errors(registrationForm) }}
+
+    {{ form_start(registrationForm) }}
+        {{ form_label(registrationForm.email) }}
+        {{ form_widget(registrationForm.email) }}
+        <div class="text-red-500 text-sm">{{ form_errors(registrationForm.email) }}</div>
+        {{ form_label(registrationForm.profile.firstname) }}
+        {{ form_widget(registrationForm.profile.firstname) }}
+        <div class="text-red-500 text-sm">{{ form_errors(registrationForm.profile.firstname) }}</div>      
+        {{ form_label(registrationForm.profile.lastname) }}
+        {{ form_widget(registrationForm.profile.lastname) }}
+        <div class="text-red-500 text-sm">{{ form_errors(registrationForm.profile.lastname) }}</div>              
+        {{form_label(registrationForm.plainPassword.first)}}
+        {{ form_widget(registrationForm.plainPassword.first) }}
+        <div class="text-red-500 text-sm">{{ form_errors(registrationForm.plainPassword.first) }}</div>
+        {{form_label(registrationForm.plainPassword.second)}}
+        {{ form_widget(registrationForm.plainPassword.second) }}   
+        <div class="text-red-500 text-sm">{{ form_errors(registrationForm.plainPassword.second) }}</div>
+        {# {{ form_row(registrationForm.agreeTerms) }} #}
+
+        <button type="submit" class="mt-8 py-2 appearance-none w-full border rounded-md border-gray-300 bg-cyan-400 hover:bg-cyan-500">Let's go</button>
+    {{ form_end(registrationForm) }}            
+        </div>
+    </div>
+
+        <!--image-->
+        <div class="hidden md:block bg-cover bg-center col-span-2" style="background-image: url({{ asset('media/registration.jpg') }})"></div>
+    </div>
+</main>
+    
+{% endblock %}
+
+
