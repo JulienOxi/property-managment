@@ -7,25 +7,15 @@
         {% block stylesheets %}
         {% endblock %}
 
+        {{ importmap('app') }}
+
         {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
+
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     
     <body class="bg-gray-200">
-
-            {% set flashs = {1 : 'success', 2 :'primary', 3 : 'secondary', 4 :'danger', 5 :'warning', 6 :'info', 7 :'light', 8 :'dark'} %}
-
-            <div id="alert">
-              {% for flash in flashs %}
-                {% for message in app.flashes(flash) %}
-                  <div class="alert alert-{{flash}} mt-3" >
-                  {{ message }}
-                  </div>
-                {% endfor %}
-              {% endfor %}
-            </div> 
 
         {% block body %}{% endblock %}
     </body>

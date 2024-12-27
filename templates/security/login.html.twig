@@ -17,6 +17,16 @@
                     <div class="bg-red-600 w-full text-center text-white rounded">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                 {% endif %}
 
+            {% set flashs = {1 : 'green', 2 :'yellow', 3 : 'red'} %}
+
+              {% for flash in flashs %}
+                {% for message in app.flashes(flash) %}
+                  <div class="bg-{{flash}}-600 w-full text-center text-white rounded" >
+                  {{ message }}
+                  </div>
+                {% endfor %}
+              {% endfor %}              
+
                 {% if app.user %}
                     <div class="mb-3">
                         You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
@@ -31,14 +41,12 @@
 
                 <hr class="h-50">
 
-                <label class="font-thin" for="username">Email</label>
-                <input type="email" value="{{ last_username }}" name="_username" id="username" class="input-base" autocomplete="email" required autofocus>
+                <label class="font-thin" for="email">Email</label>
+                <input type="email" value="{{ last_username }}" name="_email" id="email" class="input-base" autocomplete="email" required autofocus>
                 <label class="font-thin" for="password">Password</label>
                 <input type="password" name="_password" id="password" class="input-base" autocomplete="current-password" required>
 
-                <input type="hidden" name="_csrf_token"
-                    value="{{ csrf_token('authenticate') }}"
-                >
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
                 {#
                     Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.

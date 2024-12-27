@@ -15,9 +15,8 @@ class UserChecker implements UserCheckerInterface{
         if (!$user instanceof User) {
             return;
         }
-
-        // if(!$user->getCompany()->isActive()){
-        //     throw new CustomUserMessageAccountStatusException('Login impossible, votre entreprise est désactivée.');   
+        // if(!$user->isVerified()){
+        //     throw new CustomUserMessageAccountStatusException('Login impossible, votre adresse email n\'a pas étée validée veuillez controller vos email.');   
         // }
     }
 
@@ -26,6 +25,5 @@ class UserChecker implements UserCheckerInterface{
         if (!$user instanceof User) {
             return;
         }
-
     }
 }

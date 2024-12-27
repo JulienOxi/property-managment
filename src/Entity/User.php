@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -14,7 +15,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -23,6 +24,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180)]
     private ?string $email = null;
+
+    #[ORM\Column(length: 255, nullable:true)]
+    private ?string $authCode = null;
 
     /**
      * @var list<string> The user roles
@@ -255,5 +259,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->isVerified = $isVerified;
 
         return $this;
+    }
+
+    //***** Two factor *******/
+/**
+     * Return true if the user should do two-factor authentication.
+     */
+    public function isEmailAuthEnabled(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Return user email address.
+     */
+    public function getEmailAuthRecipient(): string
+    {
+        return $this->email;
+    }
+
+    /**
+     * Return the authentication code.
+     */
+    public function getEmailAuthCode(): string|null
+    {
+        if(null === $this->authCode){
+            throw new \LogicException('The email authentication was not set');            
+        }
+
+        return $this->authCode;
+    }
+
+    /**
+     * Set the authentication code.
+     */
+    public function setEmailAuthCode(string $authCode): void
+    {
+        $this->authCode = $authCode;
     }
 }

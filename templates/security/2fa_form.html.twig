@@ -1,21 +1,16 @@
 {% extends 'security_base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Authentification email{% endblock %}
 
 {% block body %}
-            {# Let the user select the authentication method #}
-            {# <p>{{ "choose_provider"|trans({}, 'SchebTwoFactorBundle') }}:
-                {% for provider in availableTwoFactorProviders %}
-                    <a href="{{ path("2fa_login", {"preferProvider": provider}) }}">{{ provider }}</a>
-                {% endfor %}
-            </p> #}
-            {# Display current two-factor provider #}
-            
-            <form class="form" action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="post">
-                <main class="main-content mt-0">
-                    <div class="page-header align-items-start min-vh-100" style="background-image: url('{{ asset("img/login-background.jpg") }}');">
-                    <span class="mask bg-gradient-dark opacity-6"></span>
-                    <div class="container my-auto">
+
+<main>
+    <div class="md:grid md:grid-cols-3 h-screen">
+
+    <!--login-->
+    <div class="">
+        <div class="ml-2 mt-2 text-xl font-thin">Property Manager App</div>
+        <div class="content-center mx-12 h-[90vh]">
 {% if authenticationError %}
     <div class="row">
         <div class="col-lg-6 col-md-8 col-12 mx-auto">
@@ -24,85 +19,73 @@
             </div>
         </div>
     </div>
-{% endif %}
-                        <div class="row">
-                        <div class="col-lg-5 col-md-8 col-12 mx-auto">
+{% endif %}        
+            
+            <form class="form" action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="post">
 
-                            <div class="card z-index-0 fadeIn3 fadeInBottom">
-                            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                                <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
-                                <h4 class="text-white font-weight-bolder text-center mt-2 mb-0">Authentification à deux facteurs (2FA)</h4>
-                                <p class="text-white text-sm text-center">Code Email</p>
-                                <div class="row mt-3">
-                                </div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <form role="form" class="text-start">
-                                <div class="input-group input-group-dynamic mb-4" id="codeGroup">
-                                    <label for="_auth_code" class="form-label">Code</label>
-                                    <input
-                                        id="_auth_code"
-                                        type="text"
-                                        name="{{ authCodeParameterName }}"
-                                        autocomplete="one-time-code"
-                                        class="form-control"
-                                        required
-                                        {#
-                                        https://www.twilio.com/blog/html-attributes-two-factor-authentication-autocomplete
-                                        If your 2fa methods are using numeric codes only, add these attributes for better user experience:
-                                        inputmode="numeric"
-                                        pattern="[0-9]*"
-                                        #}
-                                    />
-                                </div>
-                                {% if displayTrustedOption %}
-                                <div class="form-check form-switch d-flex align-items-center mb-3">
-                                    <input id="_trusted" type="checkbox" name="{{ trustedParameterName }}" class="form-check-input" />
-                                    <label class="form-check-label mb-0 ms-3" for="_trusted">Se souvenir de moi</label>
-                                </div>
-                                {% endif %}
-                                {% if isCsrfProtectionEnabled %}
-                                    <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
-                                {% endif %}
-                                <div class="text-center">
-                                    <button type="submit" class="btn bg-gradient-info w-100 my-4 mb-2">Login</button>
-                                </div>
-                                <p class="mt-4 text-sm text-center">
-                                    <a href="{{ logoutPath }}" class="btn btn-outline-danger text-danger">{{ "cancel"|trans({}, 'SchebTwoFactorBundle') }}</a>
-                                </p>
-                                </form>
-                            </div>
-                            </div>
-                        </div>
-                        </div>
+                <div class="my-3 py-2 text-xl text-center text-gray-600 font-bold">Veuillez saisir votre code reçu par email</div>
+
+                <hr class="h-50">
+
+                    <label for="_auth_code" class="form-label">Code</label>
+                    <input
+                        id="_auth_code"
+                        type="text"
+                        name="{{ authCodeParameterName }}"
+                        autocomplete="one-time-code"
+                        class="input-base"
+                        required
+                        {#
+                        https://www.twilio.com/blog/html-attributes-two-factor-authentication-autocomplete
+                        If your 2fa methods are using numeric codes only, add these attributes for better user experience:
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        #}
+                    />
+                    {% if displayTrustedOption %}
+                    <div class="form-check form-switch d-flex align-items-center mb-3">
+                        <input id="_trusted" type="checkbox" name="{{ trustedParameterName }}" class="form-check-input" />
+                        <label class="form-check-label mb-0 ms-3" for="_trusted">Se souvenir de moi</label>
                     </div>
-                    </div>
-                </main>
-            </form>
+                    {% endif %}
+
+                        <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
+
+                    <button class="mt-8 py-2 appearance-none w-full border rounded-md border-gray-300 bg-cyan-400 hover:bg-cyan-500" type="submit">
+                        Valider
+                    </button>
+                    <a href="{{ logoutPath }}" class="mt-8 py-2 text-center appearance-none w-full border rounded-md border-gray-300 bg-red-400 hover:bg-red-500">{{ "cancel"|trans({}, 'SchebTwoFactorBundle') }}</a>
+            </form>    
+        </div>
+    </div>
+
+        <!--image-->
+        <div class="hidden md:block bg-cover bg-center col-span-2" style="background-image: url({{ asset('media/2fa.jpg') }})"></div>
+
+    </div>
+</main>
+    
 {% endblock %}
 
 {% block javascripts %}
   <script>
-  const code = document.getElementById("_auth_code");
-  const codeGroup = document.getElementById("codeGroup");
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("_auth_code");
 
-  // As per the HTML Specification
+  // Expression régulière pour un code à 6 chiffres
   const codeRegExp = /^\d{6}$/;
 
-  // password input eventListener
-  // email input eventListener
-  code.addEventListener("input", () => {
-    const codeIsValid = codeRegExp.test(code.value);
+  input.addEventListener("input", () => {
+    const codeIsValid = codeRegExp.test(input.value);
+
     if (codeIsValid) {
-      codeGroup.classList.add("is-valid")
-    }else{
-      codeGroup.classList.remove("is-valid")
+      input.classList.remove("focus:border-red-700");
+      input.classList.add("focus:border-green-700");
+    } else {
+      input.classList.remove("focus:border-green-700");
+      input.classList.add("focus:border-red-700");
     }
   });
-
+});
 </script>
 {% endblock %}
-
-
-
