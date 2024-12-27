@@ -3,6 +3,6 @@
 namespace App\Enum;
 
 enum TransactionType: string {
-    case Income = 'income';   // Entrée d'argent.
-    case Expense = 'expense'; // Sortie d'argent.
+    case INCOME = 'income';   // Entrée d'argent.
+    case EXPENSE = 'expense'; // Sortie d'argent.
 }

@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
-use App\Enum\MortgageType;
-use App\Enum\PropertyType;
-use App\Repository\PropertyRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Enum\MortgageEnum;
+use App\Enum\PropertyEnum;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\PropertyRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: PropertyRepository::class)]
 class Property
@@ -24,8 +24,8 @@ class Property
     #[ORM\Column(length: 255)]
     private ?string $description = null;
 
-    #[ORM\Column(enumType: PropertyType::class)]
-    private ?PropertyType $type = null;
+    #[ORM\Column(enumType: PropertyEnum::class)]
+    private ?PropertyEnum $type = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
@@ -40,7 +40,7 @@ class Property
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $mortgageRate = null;
 
-    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true, enumType: MortgageType::class)]
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true, enumType: MortgageEnum::class)]
     private ?array $mortgageType = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
@@ -120,12 +120,12 @@ class Property
         return $this;
     }
 
-    public function getType(): ?PropertyType
+    public function getType(): ?PropertyEnum
     {
         return $this->type;
     }
 
-    public function setType(PropertyType $type): static
+    public function setType(PropertyEnum $type): static
     {
         $this->type = $type;
 
@@ -181,7 +181,7 @@ class Property
     }
 
     /**
-     * @return MortgageType[]|null
+     * @return MortgageEnum[]|null
      */
     public function getMortgageType(): ?array
     {

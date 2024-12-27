@@ -2,7 +2,7 @@
 namespace App\Enum;
 
 enum PropertyRentType: string {
-    case rent = 'Loyer';
-    case charges = 'Charges';
-    case parking = 'Parking';
+    case RENT = 'Loyer';
+    case CHARGES = 'Charges';
+    case PARKING = 'Parking';
 }
