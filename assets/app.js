@@ -10,25 +10,47 @@ import './styles/app.css';
 //exemple :   validateInput("_postal_code", '/^\d{5}$/');
 
 // Fonction pour valider un champ d'entrée basé sur une expression régulière
-function validateInput(inputId, regex) {
-    const input = document.getElementById(inputId);
-    
-    // if (!input) return; // Assurez-vous que l'élément existe
 
 
-    input.addEventListener("input", () => {
-    const isValid = regex.test(input.value);
+window.validateInput = function(inputId, regex, capitalize = true){
 
-    // Ajouter ou supprimer les classes en fonction de la validité
-    input.classList.toggle("focus:border-green-700", isValid);
-    input.classList.toggle("focus:border-red-700", !isValid);
+    const elem = document.getElementById(inputId);
+  
+    console.log('test input 1');
+    //test avec le regex
+    const isValid = regex.test(elem.value);
+    //on load check
+    window.addEventListener("load", () => {
+      //test avec le regex  
+      if(isValid){
+        elem.classList.add("focus:border-green-700");
+      }
 
-    //ajoute le regex au input
-    let stringRegex = String(regex);
-    let regexHTML = stringRegex.slice(1,-1);
-    elem.setAttribute("pattern", regexHTML);
-
+        //ajoute le regex au input
+        let stringRegex = String(regex);
+        let regexHTML = stringRegex.slice(1,-1);
+        elem.setAttribute("pattern", regexHTML);      
     });
-};
+  
+    // Event listner
+    elem.addEventListener("input", () => {
+        console.log('test input');
+      //test avec le regex
+      const isValid = regex.test(elem.value);
+      if(capitalize){
+        //on met la première lettre en majuscule
+        let str = elem.value.charAt(0).toUpperCase() + elem.value.slice(1);
+        elem.value = str;
+      }
+  
+      if (isValid) {
+            elem.classList.add("focus:border-green-700");
+            elem.classList.remove("focus:border-red-700");
+        }else{
+            elem.classList.add("focus:border-red-700");
+            elem.classList.remove("focus:border-green-700");
+        }
+    });
+  };
 
 

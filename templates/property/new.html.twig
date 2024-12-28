@@ -17,10 +17,13 @@
     </div>
 {% endblock %}
 
-{% block scripts %}
+{% block javascripts %}
 <script>
+
 document.addEventListener("DOMContentLoaded", () => {
-    validateInput('property_address_zipCode', /^\d{4}$/)
+    const cityRegex = /^[A-Z][-a-zA-ZÀ-ú\s]{2,}$/;
+    validateInput('property_address_zipCode', /^\d{4}$/, false)
+    validateInput('property_address_city', cityRegex)
 });
 </script>
 {% endblock %}
