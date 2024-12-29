@@ -17,6 +17,8 @@ final class PropertyController extends AbstractController
     #[Route(name: 'app_property_index', methods: ['GET'])]
     public function index(PropertyRepository $propertyRepository): Response
     {
+
+        // dd($propertyRepository->findAll());
         return $this->render('property/index.html.twig', [
             'properties' => $propertyRepository->findAll(),
         ]);

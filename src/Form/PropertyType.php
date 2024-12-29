@@ -20,9 +20,11 @@ class PropertyType extends AbstractType
             ->add('description', TextareaType::class)
             ->add('type', ChoiceType::class, [
                 'choices' => array_combine(
-                    array_map(fn(PropertyEnum $type) => $type->value, PropertyEnum::cases()), // Labels
-                    PropertyEnum::cases() // Values
-            )])
+                    array_map(fn(PropertyEnum $type) => $type->value, PropertyEnum::cases()), // Labels (ex: "Appartement", "Maison")
+                    PropertyEnum::cases() // Values (ex: "Appartement", "Maison")
+                ),
+                'placeholder' => 'Sélectionnez un type de propriété', // Optionnel, pour une valeur vide
+            ])
             ->add('purchasePrice')
             ->add('purchaseDate', null, [
                 'widget' => 'single_text',

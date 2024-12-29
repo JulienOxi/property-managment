@@ -18,7 +18,7 @@ class Property
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 100)]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -40,8 +40,8 @@ class Property
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $mortgageRate = null;
 
-    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true, enumType: MortgageEnum::class)]
-    private ?array $mortgageType = null;
+    #[ORM\Column(enumType: MortgageEnum::class, nullable: true)]
+    private ?MortgageEnum $mortgageType = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $mortgageEndDate = null;
@@ -120,9 +120,9 @@ class Property
         return $this;
     }
 
-    public function getType(): ?PropertyEnum
+    public function getType(): ?string
     {
-        return $this->type;
+        return $this->type?->value;
     }
 
     public function setType(PropertyEnum $type): static
@@ -183,12 +183,12 @@ class Property
     /**
      * @return MortgageEnum[]|null
      */
-    public function getMortgageType(): ?array
+    public function getMortgageType(): ?string
     {
-        return $this->mortgageType;
+        return $this->mortgageType?->value;;
     }
 
-    public function setMortgageType(?array $mortgageType): static
+    public function setMortgageType(?MortgageEnum $mortgageType): static
     {
         $this->mortgageType = $mortgageType;
 
