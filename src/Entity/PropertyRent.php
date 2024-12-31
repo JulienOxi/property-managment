@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
+use App\Enum\PropertyRentEnum;
 use App\Enum\PropertyRentType;
-use App\Repository\PropertyRentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\PropertyRentRepository;
 
 #[ORM\Entity(repositoryClass: PropertyRentRepository::class)]
 class PropertyRent
@@ -18,11 +19,8 @@ class PropertyRent
     #[ORM\Column(length: 255)]
     private ?string $description = null;
 
-    #[ORM\Column(enumType: PropertyRentType::class)]
-    private ?PropertyRentType $type = null;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 7, scale: 2)]
-    private ?string $price = null;
+    #[ORM\Column(enumType: PropertyRentEnum::class)]
+    private ?PropertyRentEnum $type = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 7, scale: 2)]
     private ?string $monthlyPrice = null;
@@ -31,7 +29,7 @@ class PropertyRent
     private ?Property $property = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $CreatedAt = null;
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'propertyRents')]
     #[ORM\JoinColumn(nullable: false)]
@@ -61,26 +59,14 @@ class PropertyRent
         return $this;
     }
 
-    public function getType(): ?PropertyRentType
+    public function getType(): ?PropertyRentEnum
     {
         return $this->type;
     }
 
-    public function setType(PropertyRentType $type): static
+    public function setType(PropertyRentEnum $type): static
     {
         $this->type = $type;
-
-        return $this;
-    }
-
-    public function getPrice(): ?string
-    {
-        return $this->price;
-    }
-
-    public function setPrice(string $price): static
-    {
-        $this->price = $price;
 
         return $this;
     }
@@ -111,12 +97,12 @@ class PropertyRent
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->CreatedAt;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $CreatedAt): static
+    public function setcreatedAt(\DateTimeImmutable $createdAt): static
     {
-        $this->CreatedAt = $CreatedAt;
+        $this->createdAt = $createdAt;
 
         return $this;
     }

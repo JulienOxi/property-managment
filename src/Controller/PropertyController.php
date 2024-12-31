@@ -18,7 +18,6 @@ final class PropertyController extends AbstractController
     public function index(PropertyRepository $propertyRepository): Response
     {
 
-        // dd($propertyRepository->findAll());
         return $this->render('property/index.html.twig', [
             'properties' => $propertyRepository->findAll(),
         ]);
@@ -49,6 +48,7 @@ final class PropertyController extends AbstractController
     {
         return $this->render('property/show.html.twig', [
             'property' => $property,
+            'uploads' => null
         ]);
     }
 

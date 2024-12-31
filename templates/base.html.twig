@@ -45,6 +45,14 @@
             <span class="material-symbols-outlined mr-2">apartment</span>
             <a href="{{ path('app_property_index') }}">Bien immobilier</a>
           </li>
+          <li class="p-4 flex items-center hover:bg-gray-700 transition">
+            <span class="material-symbols-outlined mr-2">group</span>
+            <a href="{{ path('app_tenant_index') }}">Locataire</a>
+          </li>     
+          <li class="p-4 flex items-center hover:bg-gray-700 transition">
+            <span class="material-symbols-outlined mr-2">assured_workload</span>
+            <a href="{{ path('app_property_rent_index') }}">Loyer</a>
+          </li>                
         </ul>
       </nav>
     </aside>
@@ -53,7 +61,7 @@
     <div class="flex-1 flex flex-col">
       <!-- Header -->
       <header class="bg-white shadow p-4 flex justify-between items-center">
-        <h1 class="hidden text-2xl font-semibold sm:block"></h1>
+        <h1 class="hidden text-xl font-semibold md:block">{% block pageName %}{% endblock %}</h1>
 
         <div class="flex items-center gap-6">
 

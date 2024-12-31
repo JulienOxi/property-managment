@@ -1,13 +1,57 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Property{% endblock %}
+{% block pageName %}Modifier une propriété{% endblock %}
+{% block title %}NModifier une propriété{% endblock %}
 
 {% block body %}
-    <h1>Edit Property</h1>
+    <div class="flex items-center justify-center min-h-screen bg-gray-100">
+        <div class="w-full max-w-2xl p-6 bg-white rounded-lg shadow-lg">
+            <h1 class="text-xl font-semibold text-center text-gray-800 mb-5 md:text-2xl">{{property.type.name}} - {{property.address.zipCode}} {{property.address.city}} </h1>
 
-    {{ include('property/_form.html.twig', {'button_label': 'Update'}) }}
+            <div class="bg-gray-50 p-4 rounded-md mb-6">
+                {# <p class="text-gray-600">Veuillez remplir les informations ci-dessous :</p> #}
+            </div>
 
-    <a href="{{ path('app_property_index') }}">back to list</a>
+            {{ include('property/_form.html.twig') }}
 
-    {{ include('property/_delete_form.html.twig') }}
+        </div>
+    </div>
+
+    {{ include('property/_delete_form.html.twig') }}  
 {% endblock %}
+
+{% block javascripts %}
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const nameRegex = /^[A-Z][-a-zA-ZÀ-ú\s]{2,100}$/;
+    const descriptionRegex = /^[-a-zA-ZÀ-ú\s]{5,255}$/;
+    const ewidRegex = /^[0-9]{2,255}$/;
+    const egidRegex = /^[0-9]{2,255}$/;
+    const tauxHypoRegex = /^(10(?:[.,]0{1,2})?|[0-9](?:[.,][0-9]{1,2})?)$/;
+    const purchasePriceRegex = /^(10(?:[.,]0{1,2})?|[0-9](?:[0-9']{0,2}(?:[0-9]{3})?)*(?:[.,][0-9]{1,2})?)$/;
+    const cityRegex = /^[A-Z][-a-zA-ZÀ-ú\s]{2,100}$/;
+    const streetRegex = /^[A-Z][-a-zA-ZÀ-ú\s]{2,255}$/;
+    const streetNumberRegex = /^[A-Z][-a-zA-ZÀ-ú\s]{1,10}$/;
+    const zipCodeRegex = /^\d{4}$/;
+
+    validateInput('property_name', nameRegex, false)
+    validateInput('property_description', descriptionRegex, false)
+    validateInput('property_EWID', ewidRegex, false)
+    validateInput('property_EGID', egidRegex, false)
+
+    validateInput('property_mortgageRate', tauxHypoRegex, false)
+    validateInput('property_purchasePrice', purchasePriceRegex, false)
+
+    validateInput('property_address_street', streetRegex)
+    validateInput('property_address_streetNumber', streetNumberRegex, false)
+    validateInput('property_address_zipCode', zipCodeRegex, false)
+    validateInput('property_address_city', cityRegex)
+
+
+});
+</script>
+{% endblock %}
+
+

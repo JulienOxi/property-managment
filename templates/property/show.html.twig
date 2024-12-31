@@ -1,62 +1,82 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Property{% endblock %}
+{% set pageName = "Détail de la propriété" %}
+
+{% block title %}{{property.type.value}} - {{property.address.city}}{% endblock %}
+{% block pageName %}{{pageName}}{% endblock %}
 
 {% block body %}
-    <h1>Property</h1>
+<div class="container mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ property.id }}</td>
-            </tr>
-            <tr>
-                <th>Name</th>
-                <td>{{ property.name }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ property.description }}</td>
-            </tr>
-            <tr>
-                <th>Type</th>
-                <td>{{ property.type }}</td>
-            </tr>
-            <tr>
-                <th>PurchasePrice</th>
-                <td>{{ property.purchasePrice }}</td>
-            </tr>
-            <tr>
-                <th>PurchaseDate</th>
-                <td>{{ property.purchaseDate ? property.purchaseDate|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>MortgageRate</th>
-                <td>{{ property.mortgageRate }}</td>
-            </tr>
-            <tr>
-                <th>MortgageType</th>
-                <td>{{ property.mortgageType }}</td>
-            </tr>
-            <tr>
-                <th>MortgageEndDate</th>
-                <td>{{ property.mortgageEndDate ? property.mortgageEndDate|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>EWID</th>
-                <td>{{ property.EWID }}</td>
-            </tr>
-            <tr>
-                <th>EGID</th>
-                <td>{{ property.EGID }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="bg-white shadow-md rounded-lg p-6 grid grid-cols-2 xl:grid-cols-4 gap-6">
+        <!-- Card Section -->
+        <div class="col-span-2">
+            <div class="grid gap-4">
+                <div class="bg-gray-50 p-4 rounded-lg shadow hover:shadow-md">
+                    <div class="flex justify-between">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Description</h2>
+                        <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">{{ property.type.value }}</span>
+                    </div>                      
+                    <p class="text-gray-600">{{ property.description }}</p>                  
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg shadow hover:shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-2">Details</h2>
+                    <div class="md:grid md:grid-cols-2 md:gap-2 md:ml-3">
+                        <div>
+                            <p class="text-lime-500 font-semibold">Prix d'achat</p>
+                            <p class="ml-4 font-thin">{{ property.purchasePrice|format_currency('CHF') }}</p>
+                        </div>
+                        <div>
+                            <p class="text-lime-500 font-semibold">Date d'achat</p>
+                            <p class="ml-4 font-thin">{{ property.purchaseDate ? property.purchaseDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-lime-500 font-semibold">Taux hypotéquaire</p>
+                            <p class="ml-4 font-thin">{{ property.mortgageRate }}</p>
+                        </div>
+                        <div>
+                            <p class="text-lime-500 font-semibold">Type de taux</p>
+                            <p class="ml-4 font-thin">{{ property.mortgageType.value }}</p>
+                        </div>
+                        <div>
+                            <p class="text-lime-500 font-semibold">Fin de l'hypotèque</p>
+                            <p class="ml-4 font-thin">{{ property.mortgageEndDate ? property.mortgageEndDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-lime-500 font-semibold">EWID</p>
+                            <p class="ml-4 font-thin">{{ property.EWID }}</p>
+                        </div>
+                        <div>
+                            <p class="text-lime-500 font-semibold">EGID</p>
+                            <p class="ml-4 font-thin">{{ property.EGID }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <a href="{{ path('app_property_index') }}">back to list</a>
+        <!-- Gallery Section -->
+        <div class="bg-gray-50 p-4 rounded-lg shadow col-span-2 hover:shadow-md">
+            <h3 class="text-xl font-medium mb-4">Image Gallery</h3>
+            <div class="relative">
+                <div class="flex overflow-x-scroll gap-4">
+                    {% for image in uploads %}
+                        <img src="{{ asset(image.path) }}" alt="{{ image.alt }}" class="h-40 w-full rounded-lg object-cover shadow">
+                    {% else %}
+                        <p class="text-gray-500">No images available.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <a href="{{ path('app_property_edit', {'id': property.id}) }}">edit</a>
-
-    {{ include('property/_delete_form.html.twig') }}
+    <div class="mt-6 flex justify-between">
+        <a href="{{ path('app_property_index') }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">Back to list</a>
+        <div>
+            <a href="{{ path('app_property_edit', {'id': property.id}) }}" class="px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 mr-2">Edit</a>
+            {{ include('property/_delete_form.html.twig') }}
+        </div>
+    </div>
+</div>
 {% endblock %}

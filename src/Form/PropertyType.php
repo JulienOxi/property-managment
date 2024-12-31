@@ -19,11 +19,10 @@ class PropertyType extends AbstractType
             ->add('name')
             ->add('description', TextareaType::class)
             ->add('type', ChoiceType::class, [
-                'choices' => array_combine(
-                    array_map(fn(PropertyEnum $type) => $type->value, PropertyEnum::cases()), // Labels (ex: "Appartement", "Maison")
-                    PropertyEnum::cases() // Values (ex: "Appartement", "Maison")
-                ),
-                'placeholder' => 'Sélectionnez un type de propriété', // Optionnel, pour une valeur vide
+                'choices' => PropertyEnum::cases(), // Liste des enums
+                'choice_label' => fn(PropertyEnum $type) => $type->value, // Affichage du label
+                'choice_value' => fn(?PropertyEnum $type) => $type?->name, // Utilisation du nom de l'enum pour la valeur
+                'placeholder' => 'Sélectionnez un type de propriété', // Optionnel
             ])
             ->add('purchasePrice')
             ->add('purchaseDate', null, [
@@ -31,10 +30,11 @@ class PropertyType extends AbstractType
             ])
             ->add('mortgageRate')
             ->add('mortgageType', ChoiceType::class, [
-                'choices' => array_combine(
-                    array_map(fn(MortgageEnum $type) => $type->value, MortgageEnum::cases()), // Labels
-                    MortgageEnum::cases() // Values
-            )])
+                    'choices' => MortgageEnum::cases(), // Liste des enums
+                    'choice_label' => fn(MortgageEnum $type) => $type->value, // Affichage du label
+                    'choice_value' => fn(?MortgageEnum $type) => $type?->name, // Utilisation du nom de l'enum pour la valeur
+                    'placeholder' => 'Type de taux', // Optionnel
+                ])
             ->add('mortgageEndDate', null, [
                 'widget' => 'single_text',
             ])

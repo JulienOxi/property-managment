@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% set pageName = "Liste des locataires" %}
+{% block title %}{{pageName}}{% endblock %}
+{% block pageName %}{{pageName}}{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for tenant in tenants %}
+                <div class="bg-gray-200 shadow-md rounded-lg overflow-hidden border-4 border-white hover:border-gray-50">
+                    <div class="p-4">
+                        <h2 class="text-xl font-semibold">{{ tenant.firstname }} {{ tenant.lastname }}</h2>
+                        <p class="text-gray-600"></p>
+                        <div class="mt-2">
+                            <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ tenant.email }}</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4">
+                        <ul>
+                            <li><strong>Numéro de téléphone:</strong> {{ tenant.phonenumber }}</li>
+                            <li><strong>Date d'entrée:</strong> {{ tenant.rentalStartDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") }}</li>
+                            <li><strong>Fin de bail:</strong> {{ tenant.rentalEndDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") }}</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 flex justify-between">
+                        <a href="{{ path('app_tenant_show', {'id': tenant.id}) }}" class="inline-block border-2 border-gray-500 text-gray-500 font-semibold pt-1 pb-0 px-4 rounded hover:bg-gray-400"><span class="material-symbols-outlined">visibility</span></a>
+                        prolonger
+                        <a href="{{ path('app_tenant_edit', {'id': tenant.id}) }}" class="inline-block border-2 border-gray-500 text-gray-500 font-semibold pt-1 pb-0 px-4 rounded hover:bg-gray-400"><span class="material-symbols-outlined">edit</span></a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-span-full text-center text-gray-600">
+                    <p>No records found</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-6">
+            <a href="{{ path('app_tenant_new') }}" class="inline-block bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">Créer un nouveau locataire</a>
+        </div>
+    </div>
+{% endblock %}

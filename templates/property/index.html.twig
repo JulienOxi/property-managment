@@ -1,34 +1,43 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste de biens immobilier{% endblock %}
+{% set pageName = "Liste des biens immobilier" %}
+{% block title %}{{pageName}}{% endblock %}
+{% block pageName %}{{pageName}}{% endblock %}
 
 {% block body %}
     <div class="container mx-auto p-4">
-
+        <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for property in properties %}
-                <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <div class="bg-gray-200 shadow-md rounded-lg overflow-hidden border-4 border-white hover:border-gray-50">
                     <div class="p-4">
                         <h2 class="text-xl font-semibold">{{ property.name }}</h2>
                         <p class="text-gray-600">{{ property.description }}</p>
                         <div class="mt-2">
-                            <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ property.type }}</span>
+                            <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ property.type.value }}</span>
                         </div>
                     </div>
-                    <div class="bg-gray-100 p-4">
+                    <div class="bg-white p-4">
                         <ul>
-                            <li><strong>Purchase Price:</strong> {{ property.purchasePrice }}</li>
-                            <li><strong>Purchase Date:</strong> {{ property.purchaseDate ? property.purchaseDate|date('Y-m-d') : 'N/A' }}</li>
-                            <li><strong>Mortgage Rate:</strong> {{ property.mortgageRate }}</li>
-                            <li><strong>Mortgage Type:</strong> {{ property.mortgageType }}</li>
-                            <li><strong>Mortgage End Date:</strong> {{ property.mortgageEndDate ? property.mortgageEndDate|date('Y-m-d') : 'N/A' }}</li>
-                            <li><strong>EWID:</strong> {{ property.EWID }}</li>
-                            <li><strong>EGID:</strong> {{ property.EGID }}</li>
+                            <li><strong>Prix d'achat:</strong> {{ property.purchasePrice|format_currency('CHF') }}</li>
+                            <li><strong>Date d'achat:</strong> {{ property.purchaseDate ? property.purchaseDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</li>
+                            <li><strong>Taux hypothécaire:</strong> {{ property.mortgageRate }}%</li>
+                            <li><strong>Type d'hypothèque:</strong> {{ property.mortgageType.value }}</li>
+                            <li><strong>Fin de l'hypothèque:</strong> {{ property.mortgageEndDate ? property.mortgageEndDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</li>
+                            <li><hr class="m-2"></li>
+                            {% set rentTotal = 0 %}
+                            {% for property_rent in property.propertyRents %}
+                                {% set rentTotal = rentTotal + property_rent.monthlyPrice %}
+                            {% endfor %}
+                            <li><strong>Loyer mensuel:</strong> {{ rentTotal }} CHF</li>
+                            {% for tenant in property.tenants %}
+                                <li><strong>Locataire:</strong> {{ tenant.firstname }} {{ tenant.lastname }}</li>
+                            {% endfor %}
                         </ul>
                     </div>
                     <div class="p-4 flex justify-between">
-                        <a href="{{ path('app_property_show', {'id': property.id}) }}" class="inline-block bg-lime-500 text-white font-semibold py-1 px-3 rounded hover:bg-lime-600"><span class="material-symbols-outlined">visibility</span></a>
-                        <a href="{{ path('app_property_edit', {'id': property.id}) }}" class="inline-block bg-teal-500 text-white font-semibold py-1 px-3 rounded hover:bg-teal-600"><span class="material-symbols-outlined">edit</span></a>
+                        <a href="{{ path('app_property_show', {'id': property.id}) }}" class="inline-block border-2 border-gray-500 text-gray-500 font-semibold pt-1 pb-0 px-4 rounded hover:bg-gray-400"><span class="material-symbols-outlined">visibility</span></a>
+                        <a href="{{ path('app_property_edit', {'id': property.id}) }}" class="inline-block border-2 border-gray-500 text-gray-500 font-semibold pt-1 pb-0 px-4 rounded hover:bg-gray-400"><span class="material-symbols-outlined">edit</span></a>
                     </div>
                 </div>
             {% else %}

@@ -120,9 +120,9 @@ class Property
         return $this;
     }
 
-    public function getType(): ?string
+    public function getType(): ?PropertyEnum
     {
-        return $this->type?->value;
+        return $this->type;
     }
 
     public function setType(PropertyEnum $type): static
@@ -183,9 +183,9 @@ class Property
     /**
      * @return MortgageEnum[]|null
      */
-    public function getMortgageType(): ?string
+    public function getMortgageType(): ?MortgageEnum
     {
-        return $this->mortgageType?->value;;
+        return $this->mortgageType;
     }
 
     public function setMortgageType(?MortgageEnum $mortgageType): static

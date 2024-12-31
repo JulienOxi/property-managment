@@ -1,0 +1,53 @@
+{{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+
+<div class="md:grid md:grid-cols-3 md:gap-4">
+
+    <div class="md:col-span-3">
+        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.description, {'attr': {'class': 'input-base'}}) }}
+    </div>  
+    <div>
+        {{ form_label(form.type, 'Type de charge', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.type, {'attr': {'class': 'input-base'}}) }}
+    </div>        
+    <div>
+        {{ form_label(form.monthlyPrice, 'Montant mensuel', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.monthlyPrice, {'attr': {'class': 'input-base'}}) }}
+    </div>    
+    <div>
+        {{ form_label(form.createdAt, 'A partir du', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.createdAt, {'attr': {'class': 'input-base'}}) }}
+    </div>
+    <div>
+        {{ form_label(form.endedAt, 'Jusqu\'au', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.endedAt, {'attr': {'class': 'input-base'}}) }}
+    </div>
+
+    <div class="relative flex py-5 items-center col-span-3">
+    <div class="flex-grow border-t border-gray-400"></div>
+    <span class="flex-shrink mx-4 text-gray-400">Hypotèque et achat</span>
+    <div class="flex-grow border-t border-gray-400"></div>
+    </div>
+
+
+
+    <div>
+        {{ form_label(form.property, 'Proprieté', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.property, {'attr': {'class': 'input-base'}}) }}
+    </div>
+
+    <div>
+        {{ form_label(form.tenant, 'Locataire', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.tenant, {'attr': {'class': 'input-base'}}) }}
+    </div> 
+
+</div>
+
+<div>
+    <button class="mt-4 py-2 px-4 bg-blue-600 text-white font-bold rounded hover:bg-blue-700">
+        {{ button_label|default('Enregistrer') }}
+    </button>
+    <button onclick="history.back()" class="mt-4 py-2 px-4 bg-red-600 text-white font-bold rounded hover:bg-red-700">Annuler</button>
+</div>
+
+{{ form_end(form) }}

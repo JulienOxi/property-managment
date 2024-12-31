@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New PropertyRent{% endblock %}
+
+{% block body %}
+    <h1>Create new PropertyRent</h1>
+
+    {{ include('property_rent/_form.html.twig') }}
+
+    <a href="{{ path('app_property_rent_index') }}">back to list</a>
+{% endblock %}

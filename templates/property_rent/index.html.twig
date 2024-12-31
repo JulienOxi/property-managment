@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% set pageName = "Loyer" %}
+{% block title %}{{pageName}}{% endblock %}
+{% block pageName %}{{pageName}}{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-6">
+    <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+{% for property in propertys %}
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-2">{{ property.description }}</h2>
+        <p class="text-gray-600 mb-4">Type: <span class="font-medium">{{ property.type.name }}</span></p>
+        <p class="text-gray-600 mb-4">Price: <span class="font-medium"> CHF</span></p>
+
+        <h3 class="text-lg font-bold mt-4 mb-2">Rents:</h3>
+        <ul class="divide-y divide-gray-200">
+            {% set has_rents = false %}
+            {% for property_rent in property_rents %}
+                {% if property_rent.property == property %}
+                    {% set has_rents = true %}
+                    <li class="py-2">
+                        <p class="text-gray-800">Monthly Price: <span class="font-medium">{{ property_rent.monthlyPrice }} €</span></p>
+                        <p class="text-sm text-gray-500">Start: {{ property_rent.createdAt ? property_rent.CreatedAt|date('Y-m-d') : 'N/A' }}</p>
+                        <p class="text-sm text-gray-500">End: {{ property_rent.endedAt ? property_rent.endedAt|date('Y-m-d') : 'N/A' }}</p>
+
+                        <div class="mt-2">
+                            <a href="{{ path('app_property_rent_show', {'id': property_rent.id}) }}" 
+                               class="text-blue-500 hover:underline text-sm mr-2">View</a>
+                            <a href="{{ path('app_property_rent_edit', {'id': property_rent.id}) }}" 
+                               class="text-green-500 hover:underline text-sm">Edit</a>
+                        </div>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            {% if not has_rents %}
+                <li class="py-2 text-gray-500">No rents found for this property.</li>
+            {% endif %}
+        </ul>
+    </div>
+{% else %}
+    <p class="col-span-full text-center text-gray-500">No properties found.</p>
+{% endfor %}
+
+</div>
+</div>
+{% endblock %}
