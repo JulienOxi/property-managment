@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
-use App\Enum\FinancialCategoryType;
-use App\Enum\TransactionType;
+use App\Enum\FinancialCategoryEnum;
+use App\Enum\TransactionEnum;
 use App\Repository\FinancialEntryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,11 +16,11 @@ class FinancialEntry
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(enumType: TransactionType::class)]
-    private ?TransactionType $type = null;
+    #[ORM\Column(enumType: TransactionEnum::class)]
+    private ?TransactionEnum $type = null;
 
-    #[ORM\Column(enumType: FinancialCategoryType::class)]
-    private ?FinancialCategoryType $category = null;
+    #[ORM\Column(enumType: FinancialCategoryEnum::class)]
+    private ?FinancialCategoryEnum $category = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $amount = null;
@@ -45,29 +45,32 @@ class FinancialEntry
     #[ORM\Column]
     private ?\DateTimeImmutable $paidAt = null;
 
+    public function __construct(){
+        $this->createdAt = new \DateTimeImmutable();
+    }
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getType(): ?TransactionType
+    public function getType(): ?TransactionEnum
     {
         return $this->type;
     }
 
-    public function setType(TransactionType $type): static
+    public function setType(TransactionEnum $type): static
     {
         $this->type = $type;
 
         return $this;
     }
 
-    public function getCategory(): ?FinancialCategoryType
+    public function getCategory(): ?FinancialCategoryEnum
     {
         return $this->category;
     }
 
-    public function setCategory(FinancialCategoryType $category): static
+    public function setCategory(FinancialCategoryEnum $category): static
     {
         $this->category = $category;
 
@@ -139,7 +142,7 @@ class FinancialEntry
         return $this->isPaid;
     }
 
-    public function setPaid(bool $isPaid): static
+    public function setIsPaid(bool $isPaid): static
     {
         $this->isPaid = $isPaid;
 

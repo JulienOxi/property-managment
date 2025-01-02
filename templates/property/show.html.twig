@@ -6,58 +6,128 @@
 {% block pageName %}{{pageName}}{% endblock %}
 
 {% block body %}
+
+        {% set months = { 
+            1 : 'Janvier',
+            2 : 'Février',
+            3 : 'Mars',
+            4 : 'Avril',
+            5 : 'Mai',
+            6 : 'Juin',
+            7 : 'Juillet',
+            8 : 'Août',
+            9 : 'Spetembre',
+            10 : 'Octobre',
+            11 : 'Novembre',
+            12 : 'Décembre'
+            } 
+        %}
+
 <div class="container mx-auto p-6">
     <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
 
-    <div class="bg-white shadow-md rounded-lg p-6 grid grid-cols-2 xl:grid-cols-4 gap-6">
+    <div class="bg-white shadow-md rounded-lg p-6 grid grid-cols-2 xl:grid-cols-6 gap-6">
         <!-- Card Section -->
         <div class="col-span-2">
             <div class="grid gap-4">
+            {# description #}
                 <div class="bg-gray-50 p-4 rounded-lg shadow hover:shadow-md">
                     <div class="flex justify-between">
                         <h2 class="text-xl font-semibold text-gray-700 mb-2">Description</h2>
                         <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">{{ property.type.value }}</span>
                     </div>                      
+                    <p class="text-gray-600 text-sm">{{ property.name }}</p>                  
                     <p class="text-gray-600">{{ property.description }}</p>                  
                 </div>
+            {# Locataire #}
                 <div class="bg-gray-50 p-4 rounded-lg shadow hover:shadow-md">
-                    <h2 class="text-xl font-semibold text-gray-700 mb-2">Details</h2>
-                    <div class="md:grid md:grid-cols-2 md:gap-2 md:ml-3">
-                        <div>
-                            <p class="text-lime-500 font-semibold">Prix d'achat</p>
-                            <p class="ml-4 font-thin">{{ property.purchasePrice|format_currency('CHF') }}</p>
-                        </div>
-                        <div>
-                            <p class="text-lime-500 font-semibold">Date d'achat</p>
-                            <p class="ml-4 font-thin">{{ property.purchaseDate ? property.purchaseDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
-                        </div>
-                        <div>
-                            <p class="text-lime-500 font-semibold">Taux hypotéquaire</p>
-                            <p class="ml-4 font-thin">{{ property.mortgageRate }}</p>
-                        </div>
-                        <div>
-                            <p class="text-lime-500 font-semibold">Type de taux</p>
-                            <p class="ml-4 font-thin">{{ property.mortgageType.value }}</p>
-                        </div>
-                        <div>
-                            <p class="text-lime-500 font-semibold">Fin de l'hypotèque</p>
-                            <p class="ml-4 font-thin">{{ property.mortgageEndDate ? property.mortgageEndDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
-                        </div>
-                        <div>
-                            <p class="text-lime-500 font-semibold">EWID</p>
-                            <p class="ml-4 font-thin">{{ property.EWID }}</p>
-                        </div>
-                        <div>
-                            <p class="text-lime-500 font-semibold">EGID</p>
-                            <p class="ml-4 font-thin">{{ property.EGID }}</p>
-                        </div>
-                    </div>
+                    <div class="flex justify-between">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Locataire</h2>
+                        <span class="inline-block bg-green-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">Loué</span>
+                    </div>               
+                    {% for tenant in property.tenants %}
+                        <p class="text-gray-600">{{ tenant.firstname }} {{ tenant.lastname }}</p>   
+                        <p class="ml-4 font-thin">{{ tenant.phoneNumber }}</p>
+                        <p class="ml-4 font-thin">{{ tenant.email }}</p>
+                    {% endfor %}       
                 </div>
             </div>
         </div>
-
+        {# loyers #}
+        <div class="bg-gray-50 p-4 rounded-lg shadow col-span-2 xl:col-span-4 hover:shadow-md">
+            <div class="flex justify-between">
+                <h2 class="text-xl font-semibold text-gray-700 mb-2">Loyers</h2>
+                <p>< ></p>
+                <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">Janvier | 2024</span>
+            </div>   
+            <div class="relative">
+                <div class="flex overflow-x-auto gap-4">
+                    <table border="1" class="table-auto w-full border-separate border border-black">
+                    <thead>
+                        <tr>
+                            <th class="text-sm bg-green-200 px-2"></th>
+                            <th class="text-sm bg-green-200 px-2">Locataire</th>
+                            <th class="text-sm bg-green-200 px-2">Loyer</th>
+                            <th class="text-sm bg-green-200 px-2">Charges</th>
+                            <th class="text-sm bg-green-200 px-2">Parking</th>
+                            <th class="text-sm bg-green-200 px-2">Total</th>
+                            <th class="text-sm bg-orange-200 px-2">Charges PPE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    {% for month in months %}
+                        <tr>
+                            <td class="text-sm">{{ month }}</td>
+                        </tr>
+                    {% endfor %}
+                        {# {% for rent in property.propertyRents %}
+                            <tr>
+                                <td>{% if rent.type.name == 'RENT' %}{{rent.monthlyPrice}}{% endif %}</td>
+                                <td>{% if rent.type.name == 'CHARGES' %}{{rent.monthlyPrice}}{% endif %}</td>
+                                <td>{% if rent.type.name == 'PARKING' %}{{rent.monthlyPrice}}{% endif %}</td>
+                            </tr>
+                        {% endfor %} #}
+                    </table>
+                </div>
+            </div>
+        </div>
+    {# Détail appartement #}
+        <div class="bg-gray-50 p-4 rounded-lg shadow col-span-2 hover:shadow-md xl:col-span-6" >
+            <h2 class="text-xl font-semibold text-gray-700 mb-2">Details</h2>
+            <div class="md:grid md:grid-cols-2 md:gap-2 md:ml-3">
+                <div>
+                    <p class="text-lime-500 font-semibold">Prix d'achat</p>
+                    <p class="ml-4 font-thin">{{ property.purchasePrice|format_currency('CHF') }}</p>
+                </div>
+                <div>
+                    <p class="text-lime-500 font-semibold">Date d'achat</p>
+                    <p class="ml-4 font-thin">{{ property.purchaseDate ? property.purchaseDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
+                </div>
+                <div>
+                    <p class="text-lime-500 font-semibold">Taux hypotéquaire</p>
+                    <p class="ml-4 font-thin">{{ property.mortgageRate }}</p>
+                </div>
+                <div>
+                    <p class="text-lime-500 font-semibold">Type de taux</p>
+                    <p class="ml-4 font-thin">{{ property.mortgageType.value }}</p>
+                </div>
+                <div>
+                    <p class="text-lime-500 font-semibold">Fin de l'hypotèque</p>
+                    <p class="ml-4 font-thin">{{ property.mortgageEndDate ? property.mortgageEndDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
+                </div>
+                <div>
+                    <p class="text-lime-500 font-semibold">EWID</p>
+                    <p class="ml-4 font-thin">{{ property.EWID }}</p>
+                </div>
+                <div>
+                    <p class="text-lime-500 font-semibold">EGID</p>
+                    <p class="ml-4 font-thin">{{ property.EGID }}</p>
+                </div>
+            </div>
+        </div>
         <!-- Gallery Section -->
-        <div class="bg-gray-50 p-4 rounded-lg shadow col-span-2 hover:shadow-md">
+        <div class="bg-gray-50 p-4 rounded-lg shadow col-span-2 hover:shadow-md xl:col-span-3">
             <h3 class="text-xl font-medium mb-4">Image Gallery</h3>
             <div class="relative">
                 <div class="flex overflow-x-scroll gap-4">
@@ -69,7 +139,21 @@
                 </div>
             </div>
         </div>
+        {# documents #}
+        <div class="bg-gray-50 p-4 rounded-lg shadow col-span-2 hover:shadow-md xl:col-span-3">
+            <h3 class="text-xl font-medium mb-4">Documents</h3>
+            <div class="relative">
+                <div class="flex overflow-x-scroll gap-4">
+                    {% for image in uploads %}
+                        <img src="{{ asset(image.path) }}" alt="{{ image.alt }}" class="h-40 w-full rounded-lg object-cover shadow">
+                    {% else %}
+                        <p class="text-gray-500">No documents available.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
+    
 
     <div class="mt-6 flex justify-between">
         <a href="{{ path('app_property_index') }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">Back to list</a>

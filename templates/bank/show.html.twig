@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bank{% endblock %}
+
+{% block body %}
+    <h1>Bank</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ bank.id }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ bank.name }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ bank.email }}</td>
+            </tr>
+            <tr>
+                <th>Website</th>
+                <td>{{ bank.website }}</td>
+            </tr>
+            <tr>
+                <th>Bic</th>
+                <td>{{ bank.bic }}</td>
+            </tr>
+            <tr>
+                <th>Iban</th>
+                <td>{{ bank.iban }}</td>
+            </tr>
+            <tr>
+                <th>ClearingNumber</th>
+                <td>{{ bank.clearingNumber }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ bank.createdAt ? bank.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ bank.updatedAt ? bank.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_bank_index') }}">back to list</a>
+
+    <a href="{{ path('app_bank_edit', {'id': bank.id}) }}">edit</a>
+
+    {{ include('bank/_delete_form.html.twig') }}
+{% endblock %}

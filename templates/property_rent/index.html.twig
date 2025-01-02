@@ -23,7 +23,7 @@
                 {% if property_rent.property == property %}
                     {% set has_rents = true %}
                     <li class="py-2">
-                        <p class="text-gray-800">Monthly Price: <span class="font-medium">{{ property_rent.monthlyPrice }} €</span></p>
+                        <p class="text-gray-800">Monthly Price: <span class="font-medium">{{ property_rent.monthlyPrice }} CHF</span></p>
                         <p class="text-sm text-gray-500">Start: {{ property_rent.createdAt ? property_rent.CreatedAt|date('Y-m-d') : 'N/A' }}</p>
                         <p class="text-sm text-gray-500">End: {{ property_rent.endedAt ? property_rent.endedAt|date('Y-m-d') : 'N/A' }}</p>
 
@@ -46,5 +46,9 @@
 {% endfor %}
 
 </div>
+
+        <div class="mt-6">
+            <a href="{{ path('app_property_rent_new') }}" class="inline-block bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">AJouter un loyer</a>
+        </div>
 </div>
 {% endblock %}

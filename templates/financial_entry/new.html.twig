@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New FinancialEntry{% endblock %}
+
+{% block body %}
+    <h1>Create new FinancialEntry</h1>
+
+    {{ include('financial_entry/_form.html.twig') }}
+
+    <a href="{{ path('app_financial_entry_index') }}">back to list</a>
+{% endblock %}

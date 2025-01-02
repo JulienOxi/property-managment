@@ -39,7 +39,7 @@
             <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18m-9 5h9" />
             </svg>
-            <a href="#">Home</a>
+            <a href="{{ path('app_home') }}">Home</a>
           </li>
           <li class="p-4 flex items-center hover:bg-gray-700 transition">
             <span class="material-symbols-outlined mr-2">apartment</span>
@@ -52,7 +52,15 @@
           <li class="p-4 flex items-center hover:bg-gray-700 transition">
             <span class="material-symbols-outlined mr-2">assured_workload</span>
             <a href="{{ path('app_property_rent_index') }}">Loyer</a>
-          </li>                
+          </li>      
+          <li class="p-4 flex items-center hover:bg-gray-700 transition">
+            <span class="material-symbols-outlined mr-2">attach_money</span>
+            <a href="{{ path('app_financial_entry_index') }}">Entrée financière</a>
+          </li>           
+          <li class="p-4 flex items-center hover:bg-gray-700 transition">
+            <span class="material-symbols-outlined mr-2">corporate_fare</span>
+            <a href="{{ path('app_bank_index') }}">Banque</a>
+          </li>  
         </ul>
       </nav>
     </aside>
@@ -99,6 +107,13 @@
       </header>
       <!-- Main Section -->
       <main class="p-4">
+      
+    {% for message in app.flashes('success') %}
+      <div class="w-full flex justify-center bg-lime-500 px-5 mt-2 rounded-lg" id="alert">
+        <div class="py-2 font-bold text-gray-900">{{ message }}</div>
+      </div>
+    {% endfor %}
+
 {% block body %}{% endblock %}
       </main>
     </div>
@@ -111,3 +126,14 @@
   </footer>
 </body>
 </html>
+
+<script>
+        // Supprimer la div alert après 4 secondes
+        setTimeout(() => {
+            const alert = document.getElementById('alert');
+            if(alert){
+              alert.classList.add('hidden');
+            }
+        }, 4000);
+</script>
+

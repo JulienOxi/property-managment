@@ -1,0 +1,47 @@
+{{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+
+<div class="md:grid md:grid-cols-3 md:gap-4">
+
+    <div class="md:col-span-2">
+        {{ form_label(form.type, 'Type', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.type, {'attr': {'class': 'input-base'}}) }}
+    </div>  
+
+    <div class="md:col-span-3">
+        {{ form_label(form.category, 'Category', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.category, {'attr': {'class': 'input-base'}}) }}
+    </div>
+
+    <div class="md:col-span-3">
+        {{ form_label(form.amount, 'Montant', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.amount, {'attr': {'class': 'input-base'}}) }}
+    </div>  
+
+    <div>
+        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.description, {'attr': {'class': 'input-base'}}) }}
+    </div>
+    <div>
+        {{ form_label(form.isPaid, 'Payé', {'label_attr': {'class': ''}}) }}
+        {{ form_widget(form.isPaid, {'attr': {'class': 'hover:bg-red-900'}}) }}
+    </div>    
+    <div>
+        {{ form_label(form.paidAt, 'Payé le', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.paidAt, {'attr': {'class': 'input-base'}}) }}
+    </div>
+
+    <div>
+        {{ form_label(form.property, 'Bien immobilier', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.property, {'attr': {'class': 'input-base'}}) }}
+    </div>
+
+</div>
+
+<div>
+    <button class="mt-4 py-2 px-4 bg-blue-600 text-white font-bold rounded hover:bg-blue-700">
+        {{ button_label|default('Enregistrer') }}
+    </button>
+    <button onclick="history.back()" class="mt-4 py-2 px-4 bg-red-600 text-white font-bold rounded hover:bg-red-700">Annuler</button>
+</div>
+
+{{ form_end(form) }}

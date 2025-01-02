@@ -1,46 +1,86 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Tenant{% endblock %}
+{% set pageName = "Information locataire" %}
+{% block title %}{{pageName}}{% endblock %}
+{% block pageName %}{{pageName}}{% endblock %}
 
 {% block body %}
-    <h1>Tenant</h1>
+<div class="container mx-auto py-8">
+    <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
+    
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Informations personnelles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-sm font-medium text-gray-500">Prénom</p>
+                <p class="text-lg text-gray-800">{{ tenant.firstname }}</p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Nom</p>
+                <p class="text-lg text-gray-800">{{ tenant.lastname }}</p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Email</p>
+                <p class="text-lg text-gray-800">{{ tenant.email }}</p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Téléphone</p>
+                <p class="text-lg text-gray-800">{{ tenant.phoneNumber }}</p>
+            </div>
+        </div>
+    </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ tenant.id }}</td>
-            </tr>
-            <tr>
-                <th>Firstname</th>
-                <td>{{ tenant.firstname }}</td>
-            </tr>
-            <tr>
-                <th>Lastname</th>
-                <td>{{ tenant.lastname }}</td>
-            </tr>
-            <tr>
-                <th>Email</th>
-                <td>{{ tenant.email }}</td>
-            </tr>
-            <tr>
-                <th>PhoneNumber</th>
-                <td>{{ tenant.phoneNumber }}</td>
-            </tr>
-            <tr>
-                <th>RentalStartDate</th>
-                <td>{{ tenant.rentalStartDate ? tenant.rentalStartDate|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>RentalEndDate</th>
-                <td>{{ tenant.rentalEndDate ? tenant.rentalEndDate|date('Y-m-d') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Informations sur la location</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-sm font-medium text-gray-500">Début de bail</p>
+                <p class="text-lg text-gray-800">{{ tenant.rentalStartDate ? tenant.rentalStartDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Fin de bail</p>
+                <p class="text-lg text-gray-800">{{ tenant.rentalEndDate ? tenant.rentalEndDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
+            </div>
+        </div>
+    </div>
 
-    <a href="{{ path('app_tenant_index') }}">back to list</a>
+    {% if tenant.propertyRents %}
+    {% for rent in tenant.propertyRents %}
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Loyer actuel</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-sm font-medium text-gray-500">Montant mensuel</p>
+                <p class="text-lg text-gray-800">{{ rent.monthlyPrice | number_format(2, ',', ' ') }} CHF</p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Description</p>
+                <p class="text-lg text-gray-800">{{ rent.description }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
 
-    <a href="{{ path('app_tenant_edit', {'id': tenant.id}) }}">edit</a>
+    {% if tenant.property %}
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Appartement</h2>
+        <div>
+            <p class="text-sm font-medium text-gray-500">Nom</p>
+            <p class="text-lg text-gray-800">{{ tenant.property.name }}</p>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-500">Adresse</p>
+            <p class="text-lg text-gray-800">{{ tenant.property.address.street }} {{ tenant.property.address.streetNumber }}</p>
+            <p class="text-lg text-gray-800">{{ tenant.property.address.zipCode }} {{ tenant.property.address.city }}</p>
+        </div>
+    </div>
+    {% endif %}
 
-    {{ include('tenant/_delete_form.html.twig') }}
+    <div class="mt-8 flex space-x-4">
+        <a href="{{ path('app_tenant_index') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md shadow hover:bg-gray-300">Retour à la liste</a>
+        <a href="{{ path('app_tenant_edit', {'id': tenant.id}) }}" class="px-4 py-2 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600">Modifier</a>
+        {{ include('tenant/_delete_form.html.twig', {class: 'px-4 py-2 bg-red-500 text-white rounded-md shadow hover:bg-red-600'}) }}
+    </div>
+</div>
 {% endblock %}
