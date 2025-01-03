@@ -26,7 +26,7 @@ class PropertyRentType extends AbstractType
                 )
             ])
             ->add('monthlyPrice')
-            ->add('createdAt', null, [
+            ->add('fromAt', null, [
                 'widget' => 'single_text',
             ])
             ->add('endedAt', null, [

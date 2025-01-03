@@ -42,6 +42,13 @@ class PropertyRent
     #[ORM\JoinColumn(nullable: false)]
     private ?Tenant $tenant = null;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $fromAt = null;
+
+    public function __construct(){
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -139,6 +146,18 @@ class PropertyRent
     public function setTenant(?Tenant $tenant): static
     {
         $this->tenant = $tenant;
+
+        return $this;
+    }
+
+    public function getFromAt(): ?\DateTimeImmutable
+    {
+        return $this->fromAt;
+    }
+
+    public function setFromAt(\DateTimeImmutable $fromAt): static
+    {
+        $this->fromAt = $fromAt;
 
         return $this;
     }

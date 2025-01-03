@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Property;
 use App\Entity\FinancialEntry;
 use App\Form\FinancialEntryType;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\FinancialEntryRepository;
+use App\Repository\PropertyRepository;
+use App\Service\DateService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -86,17 +89,45 @@ final class FinancialEntryController extends AbstractController
         return $this->redirectToRoute('app_financial_entry_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/generate/from_property_rent', name: 'app_financial_entry_generate_from_property_rent', methods: ['POST'])]
-    public function grnerateFromPropertyRent(Request $request, CsrfTokenManagerInterface $csrfTokenManager): Response
+    
+    #[Route('/generate/from_property_rent/{property_id}', name: 'app_financial_entry_generate_from_property_rent', methods: ['POST'])]
+    public function grnerateFromPropertyRent(FinancialEntryRepository $financialEntryRepository, Request $request, CsrfTokenManagerInterface $csrfTokenManager, EntityManagerInterface $em, DateService $dateService, int $property_id = 0): Response
     {
+        //si property_id == 0 on met à jour tous les loyer
         $token = $request->request->get('_csrf_token');
+
+        $property = $em->getRepository(Property::class)->find($property_id);
+        if (!$property && $property_id != 0) {
+            throw $this->createNotFoundException('Property not found');
+        }
 
         // Vérifier si le token est valide
         if (!$csrfTokenManager->isTokenValid(new \Symfony\Component\Security\Csrf\CsrfToken('generate_from_property_rent_form', $token))) {
             throw $this->createAccessDeniedException('Invalid CSRF token');
         }
-        // Logique si le token est valide
-        $this->addFlash('success', 'Form submitted successfully!');
-        return $this->redirectToRoute('app_financial_entry_index', [], Response::HTTP_SEE_OTHER);
+
+        //pour chaque type de loyer dont la date inclus celle d'ajourd'hui
+            //On récupère l'entier des jours
+                //on regarde si l'entrée existe déjà -> exemple : parking pour le mois de juillet 2024
+
+                $actualRent = []; //contrat de Loyer qui sont d'actualité (entre 2 dates)
+                $fullMonth = []; //nombre de mois dans l'intérval
+                foreach ($property->getPropertyRents() as $key => $rent) {
+                    $dates = $dateService->returnDatesBetweenTwo($rent->getFromAt(), $rent->getEndedAt(), 'Y-m-d');
+                    if(in_array(date('Y-m-d'), $dates)){
+                        $actualRent[$key] =  $rent;
+                        $fullMonth[$key] = $dateService->countFullMonthsBetweenDates($rent->getFromAt(), $rent->getEndedAt());
+                    }
+                }
+                //on récupère les loyer d'actualité pour rechercher les entrées financière
+                foreach ($actualRent as $key => $rent) {
+                    $financialEntryRepository->findBetweenTwoDates($rent->getFromAt(), $rent->getEndedAt());
+                }
+                
+
+        $this->addFlash('success', 'Les loyers on correctement été générer !');
+        $route = $request->headers->get('referer');
+
+        return $this->redirect($route);
     }
 }

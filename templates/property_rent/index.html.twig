@@ -24,10 +24,10 @@
                     {% set has_rents = true %}
                     <li class="py-2">
                         <p class="text-gray-800">Monthly Price: <span class="font-medium">{{ property_rent.monthlyPrice }} CHF</span></p>
-                        <p class="text-sm text-gray-500">Start: {{ property_rent.createdAt ? property_rent.CreatedAt|date('Y-m-d') : 'N/A' }}</p>
+                        <p class="text-sm text-gray-500">Start: {{ property_rent.createdAt ? property_rent.fromAt|date('Y-m-d') : 'N/A' }}</p>
                         <p class="text-sm text-gray-500">End: {{ property_rent.endedAt ? property_rent.endedAt|date('Y-m-d') : 'N/A' }}</p>
 
-                        <div class="mt-2">
+                        <div class="mt-2 flex justify-between">
                             <a href="{{ path('app_property_rent_show', {'id': property_rent.id}) }}" 
                                class="text-blue-500 hover:underline text-sm mr-2">View</a>
                             <a href="{{ path('app_property_rent_edit', {'id': property_rent.id}) }}" 
@@ -40,6 +40,14 @@
                 <li class="py-2 text-gray-500">No rents found for this property.</li>
             {% endif %}
         </ul>
+        {% if has_rents %}
+        <div class="flex justify-center pt-2">
+            <form method="POST" action="{{ path('app_financial_entry_generate_from_property_rent', {'property_id' : property.id }) }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="bg-lime-500 text-white px-4 py-2 rounded shadow hover:bg-lime-600">Générer les loyers</button>
+            </form>
+        </div>
+        {% endif %}
     </div>
 {% else %}
     <p class="col-span-full text-center text-gray-500">No properties found.</p>
