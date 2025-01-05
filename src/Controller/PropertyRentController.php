@@ -31,7 +31,7 @@ final class PropertyRentController extends AbstractController
             foreach ($property->getPropertyRents() as $key => $rent) {
                 $dates = $dateService->returnDatesBetweenTwo($rent->getFromAt(), $rent->getEndedAt(), 'Y-m-d');
                 if(in_array(date('Y-m-d'), $dates)){
-                    if ($rent->getType()->name != 'CHARGES_DEPOSIT') {
+                    if ($rent->getType()->name != 'CHARGES_DEPOSIT') { // On ne prend pas en compte les charges
                         $property->setTotalRents($property->getTotalRents() + $rent->getMonthlyPrice());
                     }
                 }
