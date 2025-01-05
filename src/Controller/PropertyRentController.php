@@ -31,7 +31,9 @@ final class PropertyRentController extends AbstractController
             foreach ($property->getPropertyRents() as $key => $rent) {
                 $dates = $dateService->returnDatesBetweenTwo($rent->getFromAt(), $rent->getEndedAt(), 'Y-m-d');
                 if(in_array(date('Y-m-d'), $dates)){
-                    $property->setTotalRents($property->getTotalRents() + $rent->getMonthlyPrice());
+                    if ($rent->getType()->name != 'CHARGES_DEPOSIT') {
+                        $property->setTotalRents($property->getTotalRents() + $rent->getMonthlyPrice());
+                    }
                 }
             }  
         }
@@ -62,14 +64,6 @@ final class PropertyRentController extends AbstractController
         return $this->render('property_rent/new.html.twig', [
             'property_rent' => $propertyRent,
             'form' => $form,
-        ]);
-    }
-
-    #[Route('/{id}', name: 'app_property_rent_show', methods: ['GET'])]
-    public function show(PropertyRent $propertyRent): Response
-    {
-        return $this->render('property_rent/show.html.twig', [
-            'property_rent' => $propertyRent,
         ]);
     }
 

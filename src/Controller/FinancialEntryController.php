@@ -4,17 +4,19 @@ namespace App\Controller;
 
 use App\Entity\Property;
 use App\Service\DateService;
+use App\Service\EnumService;
 use App\Enum\TransactionEnum;
 use App\Entity\FinancialEntry;
 use App\Form\FinancialEntryType;
 use App\Enum\FinancialCategoryEnum;
 use App\Repository\PropertyRepository;
-use App\Service\EnumService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\FinancialEntryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -64,15 +66,27 @@ final class FinancialEntryController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_financial_entry_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, FinancialEntry $financialEntry, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, FinancialEntry $financialEntry, EntityManagerInterface $entityManager, RequestStack $requestStack): Response
     {
+        $session = $request->getSession(); 
         $form = $this->createForm(FinancialEntryType::class, $financialEntry);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_financial_entry_index', [], Response::HTTP_SEE_OTHER);
+            $referer = $session->get('referer', null); // Rediriger vers le referer si disponible, sinon vers une route par défaut 
+            if ($referer) 
+            { 
+                    return new RedirectResponse($referer); 
+            } else { 
+                return $this->redirectToRoute('app_financial_entry_index', [], Response::HTTP_SEE_OTHER);
+            }
+        }else{
+                // Enregistrer le referer dans la session 
+                $request = $requestStack->getCurrentRequest(); 
+                $referer = $request->headers->get('referer');
+                $session->set('referer', $referer);
         }
 
         return $this->render('financial_entry/edit.html.twig', [
@@ -129,6 +143,7 @@ final class FinancialEntryController extends AbstractController
                 }
 
                 $createdEntry = 0;
+                $createdDeposit = 0;
                 //on récupère les entrée dejà payé/validée
                 foreach ($actualRent as $key => $rent) {
                     foreach ($fullMonth[$key] as $monthsAndYear) {//récupère le type de loyer $key::RENT|PARKING|CHARGE et tous les mois
@@ -136,31 +151,52 @@ final class FinancialEntryController extends AbstractController
                             //defini la periode de recherche (entre le 25 du mois d'avant et le 5 du mois en cours)
                             $withinRentPaymentDates = $dateService->withinRentPaymentPeriod($monthAndYear['month'], $monthAndYear['year']);
                             //on regarde si on trouve une entrée dans le laps de temps dans la même catégory et le même type
-                            $financialEntry = $financialEntryRepository->findOneBetweenTwoDates($withinRentPaymentDates['start'], $withinRentPaymentDates['end'], TransactionEnum::INCOME, $enumService->mapPropertyRentToFinancialCategory($key));
+                            $financialEntry = $financialEntryRepository->findOneBetweenTwoDates($rent->getproperty(), $withinRentPaymentDates['start'], $withinRentPaymentDates['end'], TransactionEnum::INCOME, $enumService->mapPropertyRentToFinancialCategory($key));
+                            $financialDeposit = $financialEntryRepository->findOneBetweenTwoDates($rent->getproperty(),$withinRentPaymentDates['start'], $withinRentPaymentDates['end'], TransactionEnum::EXPENSE, FinancialCategoryEnum::CHARGES_DEPOSIT);
+
                             //si il n'y a pas de loyer on le créer
-                            if(!$financialEntry){
+                            if(!$financialEntry && $enumService->mapPropertyRentToFinancialCategory($key) != FinancialCategoryEnum::CHARGES_DEPOSIT){
                                 $financialEntry = new FinancialEntry();
                                 $financialEntry->setType(TransactionEnum::INCOME);
-                                $financialEntry->setPaidAt(new \DateTimeImmutable('01.'.$monthAndYear['month'].' '.$monthAndYear['year']));
+                                $financialEntry->setPaidAt(new \DateTimeImmutable('01.'.$monthAndYear['month'].'.'.$monthAndYear['year']));
                                 $financialEntry->setCategory($enumService->mapPropertyRentToFinancialCategory($key));
                                 $financialEntry->setAmount($rent->getMonthlyPrice());
                                 $financialEntry->setDescription($rent->getType()->value.' '.$monthAndYear['month'].' '.$monthAndYear['year']);
                                 $financialEntry->setProperty($rent->getProperty());
                                 $financialEntry->setCreatedBy($this->getUser());
-                                $financialEntry->setIsPaid(false);
+                                $financialEntry->setIsPaid(true);
                                 $financialEntry->setTenant($rent->getTenant());
+                                $financialEntry->setBank($rent->getProperty()->getBank());
 
                                 $em->persist($financialEntry);
                                 $createdEntry++;
+                            }
+                            //si il n'y a pas de charges on les crée
+                            if(!$financialDeposit && $enumService->mapPropertyRentToFinancialCategory($key) == FinancialCategoryEnum::CHARGES_DEPOSIT){
+                                $financialDeposit = new FinancialEntry();
+                                $financialDeposit->setType(TransactionEnum::EXPENSE);
+                                $financialDeposit->setPaidAt(new \DateTimeImmutable('01.'.$monthAndYear['month'].'.'.$monthAndYear['year']));
+                                $financialDeposit->setCategory(FinancialCategoryEnum::CHARGES_DEPOSIT);
+                                $financialDeposit->setAmount($rent->getMonthlyPrice());
+                                $financialDeposit->setDescription($rent->getType()->value.' '.$monthAndYear['month'].' '.$monthAndYear['year']);
+                                $financialDeposit->setProperty($rent->getProperty());
+                                $financialDeposit->setCreatedBy($this->getUser());
+                                $financialDeposit->setIsPaid(true);
+                                $financialDeposit->setTenant($rent->getTenant());
+                                $financialDeposit->setBank($rent->getProperty()->getBank());
+
+                                $em->persist($financialDeposit);
+                                $createdDeposit++;
                             }
                         }
                     }
                 }
 
                 //si il y a des loyer à créer on flush
-                if($createdEntry > 0){
+                if($createdEntry > 0 || $createdDeposit > 0){
                     $em->flush();
                     $this->addFlash('success', $createdEntry.' loyers on correctement été générer !');
+                    $this->addFlash('success', $createdDeposit.' acomptes de charges on correctement été générer !');
                 }else{
                     $this->addFlash('warning', 'Aucun loyer à genérer !');
                 }

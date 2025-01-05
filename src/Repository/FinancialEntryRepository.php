@@ -2,8 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\Property;
+use App\Enum\TransactionEnum;
 use App\Entity\FinancialEntry;
 use Doctrine\ORM\Query\Parameter;
+use App\Enum\FinancialCategoryEnum;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -21,13 +24,15 @@ class FinancialEntryRepository extends ServiceEntityRepository
        /**
         * @return FinancialEntry Returns an array of FinancialEntry objects
         */
-        public function findOneBetweenTwoDates($dateFrom, $dateEnded, $type, $category): ?FinancialEntry
+        public function findOneBetweenTwoDates(Property $property, $dateFrom, $dateEnded, $type, $category): ?FinancialEntry
         {
             return $this->createQueryBuilder('f')
                 ->where('f.paidAt BETWEEN :dateFrom AND :dateEnded')
+                ->andWhere('f.property = :property')
                 ->andwhere('f.type = :type')
                 ->andWhere('f.category = :category')
                 ->setParameters(new ArrayCollection([
+                    new Parameter('property', $property),   
                     new Parameter('dateFrom', $dateFrom),
                     new Parameter('dateEnded', $dateEnded),
                     new Parameter('type', $type),
@@ -39,14 +44,32 @@ class FinancialEntryRepository extends ServiceEntityRepository
         }
 
         /**
-         * Retourne toutes les entrée financière pour une propriété et un année donnée
-         * @param mixed $property
-         * @param mixed $year
+         * Retourne toutes les entrée financière pour une propriété et un année donnée (loyer ou charge)
+         * Summary of findEntryByPropertyAndYear
+         * @param \App\Entity\Property $property
+         * @param int $year
+         * @param bool $deposit //true pour les charges, false pour les loyers
          * @return mixed
          */
-        public function findEntryByPropertyAndYear($property, $year): ?array
+        public function findEntryByPropertyAndYear(Property $property, int $year, bool $deposit = false): ?array
         {
-            return $this->createQueryBuilder('f')
+            if ($deposit) {
+                return $this->createQueryBuilder('f')
+                    ->where('f.property = :property')
+                    ->andWhere('f.paidAt LIKE :year')
+                    ->andWhere('f.type LIKE :type')
+                    ->andWhere('f.category LIKE :category')
+                    ->setParameters(new ArrayCollection([
+                        new Parameter('property', $property),
+                        new Parameter('year', '%'.$year.'%'),
+                        new Parameter('type', TransactionEnum::EXPENSE),
+                        new Parameter('category', FinancialCategoryEnum::CHARGES_DEPOSIT),
+                    ]))
+                    ->getQuery()
+                    ->getResult()
+                ;
+            }else{
+                return $this->createQueryBuilder('f')
                 ->where('f.property = :property')
                 ->andWhere('f.paidAt LIKE :year')
                 ->setParameters(new ArrayCollection([
@@ -57,5 +80,7 @@ class FinancialEntryRepository extends ServiceEntityRepository
                 ->getResult()
             ;
         }
+            }
+
         
 }

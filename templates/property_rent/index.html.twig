@@ -24,12 +24,15 @@
                     {% if property_rent.property == property %}
                         {% set has_rents = true %}
                         <li class="py-2">
-                            <p class="text-gray-800">Prix Mensuel : <span class="font-medium">{{ property_rent.monthlyPrice }} CHF</span></p>
+                            <div class="flex justify-between ">
+                                <span class="font-medium">{{ property_rent.monthlyPrice }} CHF /mois</span>
+                                {% if property_rent.type.name == 'CHARGES_DEPOSIT' %}{% set bgColor = 'bg-red-200' %}{% else %}{% set bgColor = 'bg-lime-200' %}{% endif %}
+                                 <span class="{{ bgColor }} inline-block text-xs text-green-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ property_rent.type.value }}</span>
+                            </div>
                             <p class="text-sm text-gray-500">Début : {{ property_rent.createdAt ? property_rent.fromAt|date('Y-m-d') : 'N/A' }}</p>
                             <p class="text-sm text-gray-500">Fin : {{ property_rent.endedAt ? property_rent.endedAt|date('Y-m-d') : 'N/A' }}</p>
 
-                            <div class="mt-2 flex justify-between">
-                                <a href="{{ path('app_property_rent_show', {'id': property_rent.id}) }}" class="bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-600">Voir</a>
+                            <div class="mt-2 flex justify-start">
                                 <a href="{{ path('app_property_rent_edit', {'id': property_rent.id}) }}" class="bg-green-500 text-white text-sm px-2 py-1 rounded hover:bg-green-600">Éditer</a>
                             </div>
                         </li>

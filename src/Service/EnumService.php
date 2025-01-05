@@ -13,6 +13,7 @@ class EnumService{
             'RENT' => FinancialCategoryEnum::RENT, 
             'PARKING' => FinancialCategoryEnum::PARKING, 
             'CHARGES' => FinancialCategoryEnum::CHARGES, 
+            'CHARGES_DEPOSIT' => FinancialCategoryEnum::CHARGES_DEPOSIT, 
         };
     }
 }

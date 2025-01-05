@@ -57,8 +57,12 @@
         <div class="bg-gray-50 p-4 rounded-lg shadow col-span-2 xl:col-span-4 hover:shadow-md">
             <div class="flex justify-between">
                 <h2 class="text-xl font-semibold text-gray-700 mb-2">Loyers</h2>
-                <p>< ></p>
-                <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">Année | 2024</span>
+                <div class="flex justify-between gap-2">
+                    <a href="{{path('app_property_show', {'id': property.id, 'year': year - 1})}}"><<</a>
+                    <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">Année | {{year}}</span>
+                    <a href="{{path('app_property_show', {'id': property.id, 'year': year + 1})}}">>></a>
+                </div>
+                <div class="flex justify-between gap-2"></div>
             </div>   
             <div class="relative">
                 <div class="flex overflow-x-auto gap-4">
@@ -98,7 +102,9 @@
                                 {% if rentKey in financialEntrys|keys %}
                                     {% set selectedEntry = financialEntrys[rentKey] %}
                                     {% set total = total + selectedEntry.amount %}
-                                    <td class="text-sm">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</td>
+                                    <td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }}">
+                                        <a href="{{path('app_financial_entry_edit', {'id': selectedEntry.id})}}">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</a>
+                                    </td>
                                 {% else %}
                                     <td></td>
                                 {% endif %}
@@ -107,7 +113,9 @@
                                 {% if chargesKey in financialEntrys|keys %}
                                     {% set selectedEntry = financialEntrys[chargesKey] %}
                                     {% set total = total + selectedEntry.amount %}
-                                    <td class="text-sm">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</td>
+                                    <td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }}">
+                                        <a href="{{path('app_financial_entry_edit', {'id': selectedEntry.id})}}">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</a>
+                                    </td>
                                 {% else %}
                                     <td></td>
                                 {% endif %}
@@ -116,16 +124,26 @@
                                 {% if parkingKey in financialEntrys|keys %}
                                     {% set selectedEntry = financialEntrys[parkingKey] %}
                                     {% set total = total + selectedEntry.amount %}
-                                    <td class="text-sm">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</td>
+                                    <td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }}">
+                                        <a href="{{path('app_financial_entry_edit', {'id': selectedEntry.id})}}">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</a>
+                                    </td>
                                 {% else %}
                                     <td></td>
                                 {% endif %}
                                 {% if total > 0 %}
-                                <td class="text-sm">{{ total|number_format(2, '.', '\'') }}</td>
+                                <td class="text-sm text-center">{{ total|number_format(2, '.', '\'') }}</td>
                                 {% else %}
                                     <td></td>
                                 {% endif %}
+                                    {% set chargesKey = formattedKey ~ '-CHARGES_DEPOSIT' %}
+                                {% if chargesKey in financialDeposit|keys %}
+                                    {% set selectedEntry = financialDeposit[chargesKey] %}
+                                    <td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }}">
+                                        <a href="{{path('app_financial_entry_edit', {'id': selectedEntry.id})}}">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</a>
+                                    </td>
+                                {% else %}
                                     <td></td>
+                                {% endif %}
                             </tr>
                         {% endfor %}
 
@@ -137,6 +155,10 @@
         <div class="bg-gray-50 p-4 rounded-lg shadow col-span-2 hover:shadow-md xl:col-span-6" >
             <h2 class="text-xl font-semibold text-gray-700 mb-2">Details</h2>
             <div class="md:grid md:grid-cols-2 md:gap-2 md:ml-3">
+                <div class="col-span-2">
+                    <p class="text-lime-500 font-semibold">Banque</p>
+                    <p class="ml-4 font-thin">{{ property.bank.name }}</p>
+                </div>            
                 <div>
                     <p class="text-lime-500 font-semibold">Prix d'achat</p>
                     <p class="ml-4 font-thin">{{ property.purchasePrice|format_currency('CHF') }}</p>

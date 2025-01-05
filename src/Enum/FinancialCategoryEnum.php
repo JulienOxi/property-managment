@@ -10,6 +10,7 @@ enum FinancialCategoryEnum: string {
     case MISCELLANEOUS_INCOME = 'Revenu divers';
 
     // Sorties financières
+    case CHARGES_DEPOSIT = 'Acompte de charges'; 
     case WATER = 'Eau';
     case HEATER = 'Chauffage';
     case MORTAGE = 'Hypotèque';

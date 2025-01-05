@@ -45,20 +45,29 @@ final class PropertyController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_property_show', methods: ['GET'])]
-    public function show(Property $property, FinancialEntryRepository $financialEntryRepository): Response
+    public function show(Request $request, Property $property, FinancialEntryRepository $financialEntryRepository): Response
     {
-        $financialEntrys = $financialEntryRepository->findEntryByPropertyAndYear($property, date('Y'));
+
+        $year = $request->get('year') ?? date('Y');
+        $financialEntrys = $financialEntryRepository->findEntryByPropertyAndYear($property, $year); //selection des loyers
+        $financialDeposit = $financialEntryRepository->findEntryByPropertyAndYear($property, $year, true); //selection des charges
 
         //modification de la clef en nom du mois
         $shortFinancialEntrys = [];
         foreach ($financialEntrys as $key => $value) {
             $shortFinancialEntrys[$value->getPaidAt()->format('m').'-'.$value->getCategory()->name] = $value;
         }
+        $shortFinancialDeposit = [];
+        foreach ($financialDeposit as $key => $value) {
+            $shortFinancialDeposit[$value->getPaidAt()->format('m').'-'.$value->getCategory()->name] = $value;
+        }
 
         return $this->render('property/show.html.twig', [
+            'year' => $year,
             'property' => $property,
             'uploads' => null,
             'financialEntrys' => $shortFinancialEntrys,
+            'financialDeposit' => $shortFinancialDeposit,
         ]);
     }
 

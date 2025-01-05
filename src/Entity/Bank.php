@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\BankRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -41,6 +43,17 @@ class Bank
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $createdBy = null;
+
+    /**
+     * @var Collection<int, FinancialEntry>
+     */
+    #[ORM\OneToMany(targetEntity: FinancialEntry::class, mappedBy: 'bank')]
+    private Collection $financialEntries;
+
+    public function __construct()
+    {
+        $this->financialEntries = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -151,6 +164,36 @@ class Bank
     public function setCreatedBy(?User $createdBy): static
     {
         $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FinancialEntry>
+     */
+    public function getFinancialEntries(): Collection
+    {
+        return $this->financialEntries;
+    }
+
+    public function addFinancialEntry(FinancialEntry $financialEntry): static
+    {
+        if (!$this->financialEntries->contains($financialEntry)) {
+            $this->financialEntries->add($financialEntry);
+            $financialEntry->setBank($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFinancialEntry(FinancialEntry $financialEntry): static
+    {
+        if ($this->financialEntries->removeElement($financialEntry)) {
+            // set the owning side to null (unless already changed)
+            if ($financialEntry->getBank() === $this) {
+                $financialEntry->setBank(null);
+            }
+        }
 
         return $this;
     }

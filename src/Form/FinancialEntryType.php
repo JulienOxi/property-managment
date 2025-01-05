@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\Bank;
 use App\Entity\User;
 use App\Entity\Property;
 use App\Enum\TransactionEnum;
@@ -41,6 +42,10 @@ class FinancialEntryType extends AbstractType
             ])
             ->add('property', EntityType::class, [
                 'class' => Property::class,
+                'choice_label' => 'name',
+            ])
+            ->add('bank', EntityType::class, [
+                'class' => Bank::class,
                 'choice_label' => 'name',
             ])
         ;
