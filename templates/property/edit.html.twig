@@ -1,7 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block pageName %}Modifier une propriété{% endblock %}
-{% block title %}NModifier une propriété{% endblock %}
+{% set pageName = 'Modifier une propriété' %}
+{% block pageName %}{{ pageName }}{% endblock %}
+{% block title %}{{ pageName }}{% endblock %}
 
 {% block body %}
     <div class="flex items-center justify-center min-h-screen bg-gray-100">
@@ -26,7 +27,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     const nameRegex = /^([A-Z]|[0-9]+)[-a-zA-ZÀ-ú\s]{2,100}$/;
-    const descriptionRegex = /^([A-Z]|[0-9]+)[-a-zA-ZÀ-ú\s]{5,255}$/;
+    const descriptionRegex = /^([A-Z]|[0-9]+)[-a-zA-ZÀ-ú\s]{5,100000}$/;
     const ewidRegex = /^[0-9]{2,255}$/;
     const egidRegex = /^[0-9]{2,255}$/;
     const tauxHypoRegex = /^(10(?:[.,]0{1,2})?|[0-9](?:[.,][0-9]{1,2})?)$/;

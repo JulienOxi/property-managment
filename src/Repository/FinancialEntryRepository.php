@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\FinancialEntry;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<FinancialEntry>
@@ -16,28 +18,44 @@ class FinancialEntryRepository extends ServiceEntityRepository
         parent::__construct($registry, FinancialEntry::class);
     }
 
-    //    /**
-    //     * @return FinancialEntry[] Returns an array of FinancialEntry objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('f.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+       /**
+        * @return FinancialEntry Returns an array of FinancialEntry objects
+        */
+        public function findOneBetweenTwoDates($dateFrom, $dateEnded, $type, $category): ?FinancialEntry
+        {
+            return $this->createQueryBuilder('f')
+                ->where('f.paidAt BETWEEN :dateFrom AND :dateEnded')
+                ->andwhere('f.type = :type')
+                ->andWhere('f.category = :category')
+                ->setParameters(new ArrayCollection([
+                    new Parameter('dateFrom', $dateFrom),
+                    new Parameter('dateEnded', $dateEnded),
+                    new Parameter('type', $type),
+                    new Parameter('category', $category),
+                ]))
+                ->getQuery()
+                ->getOneOrNullResult()
+            ;
+        }
 
-    //    public function findOneBySomeField($value): ?FinancialEntry
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        /**
+         * Retourne toutes les entrée financière pour une propriété et un année donnée
+         * @param mixed $property
+         * @param mixed $year
+         * @return mixed
+         */
+        public function findEntryByPropertyAndYear($property, $year): ?array
+        {
+            return $this->createQueryBuilder('f')
+                ->where('f.property = :property')
+                ->andWhere('f.paidAt LIKE :year')
+                ->setParameters(new ArrayCollection([
+                    new Parameter('property', $property),
+                    new Parameter('year', '%'.$year.'%'),
+                ]))
+                ->getQuery()
+                ->getResult()
+            ;
+        }
+        
 }

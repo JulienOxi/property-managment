@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Property;
 use App\Form\PropertyType;
+use App\Repository\FinancialEntryRepository;
 use App\Repository\PropertyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,11 +45,20 @@ final class PropertyController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_property_show', methods: ['GET'])]
-    public function show(Property $property): Response
+    public function show(Property $property, FinancialEntryRepository $financialEntryRepository): Response
     {
+        $financialEntrys = $financialEntryRepository->findEntryByPropertyAndYear($property, date('Y'));
+
+        //modification de la clef en nom du mois
+        $shortFinancialEntrys = [];
+        foreach ($financialEntrys as $key => $value) {
+            $shortFinancialEntrys[$value->getPaidAt()->format('m').'-'.$value->getCategory()->name] = $value;
+        }
+
         return $this->render('property/show.html.twig', [
             'property' => $property,
-            'uploads' => null
+            'uploads' => null,
+            'financialEntrys' => $shortFinancialEntrys,
         ]);
     }
 

@@ -3,12 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\Property;
+use App\Service\DateService;
+use App\Enum\TransactionEnum;
 use App\Entity\FinancialEntry;
 use App\Form\FinancialEntryType;
+use App\Enum\FinancialCategoryEnum;
+use App\Repository\PropertyRepository;
+use App\Service\EnumService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\FinancialEntryRepository;
-use App\Repository\PropertyRepository;
-use App\Service\DateService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -91,7 +94,7 @@ final class FinancialEntryController extends AbstractController
 
     
     #[Route('/generate/from_property_rent/{property_id}', name: 'app_financial_entry_generate_from_property_rent', methods: ['POST'])]
-    public function grnerateFromPropertyRent(FinancialEntryRepository $financialEntryRepository, Request $request, CsrfTokenManagerInterface $csrfTokenManager, EntityManagerInterface $em, DateService $dateService, int $property_id = 0): Response
+    public function grnerateFromPropertyRent(FinancialEntryRepository $financialEntryRepository, Request $request, CsrfTokenManagerInterface $csrfTokenManager, EntityManagerInterface $em, DateService $dateService, EnumService $enumService, int $property_id = 0): Response
     {
         //si property_id == 0 on met à jour tous les loyer
         $token = $request->request->get('_csrf_token');
@@ -104,28 +107,63 @@ final class FinancialEntryController extends AbstractController
         // Vérifier si le token est valide
         if (!$csrfTokenManager->isTokenValid(new \Symfony\Component\Security\Csrf\CsrfToken('generate_from_property_rent_form', $token))) {
             throw $this->createAccessDeniedException('Invalid CSRF token');
-        }
-
-        //pour chaque type de loyer dont la date inclus celle d'ajourd'hui
-            //On récupère l'entier des jours
-                //on regarde si l'entrée existe déjà -> exemple : parking pour le mois de juillet 2024
+        }        
+        
+        // Résumé logique
+        
+        //     Récupère tous les contrats de location pour une propriété.
+        //     Identifie ceux qui sont actuellement actifs en fonction des dates.
+        //     Calcule le nombre de mois pleins pour chaque contrat actif jusque à aujourd'hui.
+        //     Recherche un paiements financiers effectués entre 2 dates avec les type et catégories appropriées.
+        //     Vérifie si les paiements sont corrects (en temps voulu et pour des catégories spécifiques).
+        //     Créer eventuellement un loyer.
 
                 $actualRent = []; //contrat de Loyer qui sont d'actualité (entre 2 dates)
                 $fullMonth = []; //nombre de mois dans l'intérval
                 foreach ($property->getPropertyRents() as $key => $rent) {
                     $dates = $dateService->returnDatesBetweenTwo($rent->getFromAt(), $rent->getEndedAt(), 'Y-m-d');
-                    if(in_array(date('Y-m-d'), $dates)){
-                        $actualRent[$key] =  $rent;
-                        $fullMonth[$key] = $dateService->countFullMonthsBetweenDates($rent->getFromAt(), $rent->getEndedAt());
+                    if(in_array(date('Y-m-d'), $dates)){ //on check si l'entrée est d'actualité
+                        $actualRent[$rent->getType()->name] =  $rent;
+                        $fullMonth[$rent->getType()->name] = $dateService->countFullMonthsBetweenDates($rent->getFromAt(), new \DateTimeImmutable('+1 month'));
                     }
                 }
-                //on récupère les loyer d'actualité pour rechercher les entrées financière
-                foreach ($actualRent as $key => $rent) {
-                    $financialEntryRepository->findBetweenTwoDates($rent->getFromAt(), $rent->getEndedAt());
-                }
-                
 
-        $this->addFlash('success', 'Les loyers on correctement été générer !');
+                $createdEntry = 0;
+                //on récupère les entrée dejà payé/validée
+                foreach ($actualRent as $key => $rent) {
+                    foreach ($fullMonth[$key] as $monthsAndYear) {//récupère le type de loyer $key::RENT|PARKING|CHARGE et tous les mois
+                        foreach($monthsAndYear as $monthAndYear){ //récupère tous les mois de l'intervalle
+                            //defini la periode de recherche (entre le 25 du mois d'avant et le 5 du mois en cours)
+                            $withinRentPaymentDates = $dateService->withinRentPaymentPeriod($monthAndYear['month'], $monthAndYear['year']);
+                            //on regarde si on trouve une entrée dans le laps de temps dans la même catégory et le même type
+                            $financialEntry = $financialEntryRepository->findOneBetweenTwoDates($withinRentPaymentDates['start'], $withinRentPaymentDates['end'], TransactionEnum::INCOME, $enumService->mapPropertyRentToFinancialCategory($key));
+                            //si il n'y a pas de loyer on le créer
+                            if(!$financialEntry){
+                                $financialEntry = new FinancialEntry();
+                                $financialEntry->setType(TransactionEnum::INCOME);
+                                $financialEntry->setPaidAt(new \DateTimeImmutable('01.'.$monthAndYear['month'].' '.$monthAndYear['year']));
+                                $financialEntry->setCategory($enumService->mapPropertyRentToFinancialCategory($key));
+                                $financialEntry->setAmount($rent->getMonthlyPrice());
+                                $financialEntry->setDescription($rent->getType()->value.' '.$monthAndYear['month'].' '.$monthAndYear['year']);
+                                $financialEntry->setProperty($rent->getProperty());
+                                $financialEntry->setCreatedBy($this->getUser());
+                                $financialEntry->setIsPaid(false);
+                                $financialEntry->setTenant($rent->getTenant());
+
+                                $em->persist($financialEntry);
+                                $createdEntry++;
+                            }
+                        }
+                    }
+                }
+
+                //si il y a des loyer à créer on flush
+                if($createdEntry > 0){
+                    $em->flush();
+                    $this->addFlash('success', $createdEntry.' loyers on correctement été générer !');
+                }else{
+                    $this->addFlash('warning', 'Aucun loyer à genérer !');
+                }
         $route = $request->headers->get('referer');
 
         return $this->redirect($route);

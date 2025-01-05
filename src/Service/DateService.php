@@ -93,6 +93,13 @@ function returnDatesBetweenTwo($date1, $date2, $format = 'd-m-Y', $week_end = tr
     return $dates;
  }    
 
+    /**
+     * Compte le nombre de mois complets entre deux dates
+     * @param \DateTimeImmutable $startDate
+     * @param \DateTimeImmutable $endDate
+     * @throws \InvalidArgumentException
+     * @return array months -> [mois][année]
+     */
     function countFullMonthsBetweenDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
     {
         // Vérifiez que la date de début est antérieure ou égale à la date de fin
@@ -113,17 +120,38 @@ function returnDatesBetweenTwo($date1, $date2, $format = 'd-m-Y', $week_end = tr
     
             // Vérifier si le mois est complet dans l'intervalle
             if ($startDate <= $firstDayOfMonth && $endDate >= $lastDayOfMonth) {
-                $fullMonths[] = $startOfMonth->format('F Y'); // Ajouter le mois au format "Mois Année"
+                $fullMonths[] = [
+                    'month' => $startOfMonth->format('m'),
+                    'year' => $startOfMonth->format('Y')
+                ];
             }
     
             // Passer au mois suivant
             $startOfMonth = $startOfMonth->modify('first day of next month midnight');
         }
-    
         // Retourner le tableau avec les mois et leur nombre
         return [
-            'months' => $fullMonths,
-            'count' => count($fullMonths),
+            'months' => $fullMonths
         ];
+    }
+
+    /**
+     * Retourne les date de début (le 25 du mois précédent) et de fin (le 5 du mois en cours) de la période de paiement
+     * @param int $month
+     * @param int $year
+     * @return bool
+     */
+    function withinRentPaymentPeriod(int $month, int $year): array {
+        // Définir la période de paiement attendue
+        $endDate = new DateTime("{$year}-{$month}-05");
+        $startDate = new DateTime("{$year}-{$month}-25");
+        $startDate->modify('-1 month'); // Passer au 25 du mois précédent
+    
+        $dates = [
+            'start' => $startDate,
+            'end' => $endDate
+        ];
+        // Vérifier si la date de paiement est dans l'intervalle
+        return $dates;
     }
 }

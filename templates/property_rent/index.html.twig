@@ -1,62 +1,60 @@
 {% extends 'base.html.twig' %}
 
 {% set pageName = "Loyer" %}
-{% block title %}{{pageName}}{% endblock %}
-{% block pageName %}{{pageName}}{% endblock %}
+{% block title %}{{ pageName }}{% endblock %}
+{% block pageName %}{{ pageName }}{% endblock %}
 
 {% block body %}
 <div class="container mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
+    <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{ pageName }}</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for property in propertys %}
+        <div class="bg-white shadow-lg rounded-lg p-4">
+            <div class="flex justify-end">
+                <span class="inline-block bg-green-200 text-green-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ property.type.value }}</span>
+            </div>
+            <h2 class="text-xl font-semibold mb-2">{{ property.name }}</h2>
+            <p class="text-gray-600 mb-4">Prix : <span class="font-medium">{{ property.totalRents }} CHF/mois</span></p>
 
-{% for property in propertys %}
-    <div class="bg-white shadow-lg rounded-lg p-6">
-        <h2 class="text-xl font-semibold mb-2">{{ property.description }}</h2>
-        <p class="text-gray-600 mb-4">Type: <span class="font-medium">{{ property.type.name }}</span></p>
-        <p class="text-gray-600 mb-4">Price: <span class="font-medium"> CHF</span></p>
+            <h3 class="text-lg font-bold mt-4 mb-2">Loyers :</h3>
+            <ul class="bg-white divide-y divide-gray-200">
+                {% set has_rents = false %}
+                {% for property_rent in property_rents %}
+                    {% if property_rent.property == property %}
+                        {% set has_rents = true %}
+                        <li class="py-2">
+                            <p class="text-gray-800">Prix Mensuel : <span class="font-medium">{{ property_rent.monthlyPrice }} CHF</span></p>
+                            <p class="text-sm text-gray-500">Début : {{ property_rent.createdAt ? property_rent.fromAt|date('Y-m-d') : 'N/A' }}</p>
+                            <p class="text-sm text-gray-500">Fin : {{ property_rent.endedAt ? property_rent.endedAt|date('Y-m-d') : 'N/A' }}</p>
 
-        <h3 class="text-lg font-bold mt-4 mb-2">Rents:</h3>
-        <ul class="divide-y divide-gray-200">
-            {% set has_rents = false %}
-            {% for property_rent in property_rents %}
-                {% if property_rent.property == property %}
-                    {% set has_rents = true %}
-                    <li class="py-2">
-                        <p class="text-gray-800">Monthly Price: <span class="font-medium">{{ property_rent.monthlyPrice }} CHF</span></p>
-                        <p class="text-sm text-gray-500">Start: {{ property_rent.createdAt ? property_rent.fromAt|date('Y-m-d') : 'N/A' }}</p>
-                        <p class="text-sm text-gray-500">End: {{ property_rent.endedAt ? property_rent.endedAt|date('Y-m-d') : 'N/A' }}</p>
-
-                        <div class="mt-2 flex justify-between">
-                            <a href="{{ path('app_property_rent_show', {'id': property_rent.id}) }}" 
-                               class="text-blue-500 hover:underline text-sm mr-2">View</a>
-                            <a href="{{ path('app_property_rent_edit', {'id': property_rent.id}) }}" 
-                               class="text-green-500 hover:underline text-sm">Edit</a>
-                        </div>
-                    </li>
+                            <div class="mt-2 flex justify-between">
+                                <a href="{{ path('app_property_rent_show', {'id': property_rent.id}) }}" class="bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-600">Voir</a>
+                                <a href="{{ path('app_property_rent_edit', {'id': property_rent.id}) }}" class="bg-green-500 text-white text-sm px-2 py-1 rounded hover:bg-green-600">Éditer</a>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                {% if not has_rents %}
+                    <li class="py-2 text-gray-500">Aucun loyer trouvé pour cette propriété.</li>
                 {% endif %}
-            {% endfor %}
-            {% if not has_rents %}
-                <li class="py-2 text-gray-500">No rents found for this property.</li>
+            </ul>
+            {% if has_rents %}
+            <div class="flex justify-center pt-2">
+                <form method="POST" action="{{ path('app_financial_entry_generate_from_property_rent', {'property_id': property.id}) }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded shadow hover:bg-amber-600">Générer les loyers</button>
+                </form>
+            </div>
             {% endif %}
-        </ul>
-        {% if has_rents %}
-        <div class="flex justify-center pt-2">
-            <form method="POST" action="{{ path('app_financial_entry_generate_from_property_rent', {'property_id' : property.id }) }}">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
-            <button type="submit" class="bg-lime-500 text-white px-4 py-2 rounded shadow hover:bg-lime-600">Générer les loyers</button>
-            </form>
         </div>
-        {% endif %}
+        {% else %}
+        <p class="col-span-full text-center text-gray-500">Aucune propriété trouvée.</p>
+        {% endfor %}
     </div>
-{% else %}
-    <p class="col-span-full text-center text-gray-500">No properties found.</p>
-{% endfor %}
 
-</div>
-
-        <div class="mt-6">
-            <a href="{{ path('app_property_rent_new') }}" class="inline-block bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">AJouter un loyer</a>
-        </div>
+    <div class="mt-6">
+        <a href="{{ path('app_property_rent_new') }}" class="inline-block bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">Ajouter un loyer</a>
+    </div>
 </div>
 {% endblock %}

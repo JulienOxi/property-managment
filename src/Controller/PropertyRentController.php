@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\PropertyRent;
+use App\Service\DateService;
 use App\Form\PropertyRentType;
 use App\Repository\PropertyRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,14 +18,27 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class PropertyRentController extends AbstractController
 {
     #[Route(name: 'app_property_rent_index', methods: ['GET'])]
-    public function index(PropertyRentRepository $propertyRentRepository, PropertyRepository $PropertyRepository, CsrfTokenManagerInterface $csrfTokenManager): Response
+    public function index(PropertyRentRepository $propertyRentRepository, PropertyRepository $PropertyRepository, DateService $dateService, CsrfTokenManagerInterface $csrfTokenManager): Response
     {
         // Générer un token pour la génération des entrée financière
         $csrfToken = $csrfTokenManager->getToken('generate_from_property_rent_form')->getValue();
 
+        $propertys = $PropertyRepository->findAll();
+
+        //calcul du loyer total par apparteemnt en fonction des loyer en cours
+        $totalRenting = 0;
+        foreach ($propertys as $property) {
+            foreach ($property->getPropertyRents() as $key => $rent) {
+                $dates = $dateService->returnDatesBetweenTwo($rent->getFromAt(), $rent->getEndedAt(), 'Y-m-d');
+                if(in_array(date('Y-m-d'), $dates)){
+                    $property->setTotalRents($property->getTotalRents() + $rent->getMonthlyPrice());
+                }
+            }  
+        }
+
         return $this->render('property_rent/index.html.twig', [
             'property_rents' => $propertyRentRepository->findAll(),
-            'propertys' => $PropertyRepository->findAll(),
+            'propertys' => $propertys,
             'csrf_token' => $csrfToken,
         ]);
     }

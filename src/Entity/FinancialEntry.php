@@ -45,6 +45,9 @@ class FinancialEntry
     #[ORM\Column]
     private ?\DateTimeImmutable $paidAt = null;
 
+    #[ORM\ManyToOne(inversedBy: 'financialEntries')]
+    private ?tenant $tenant = null;
+
     public function __construct(){
         $this->createdAt = new \DateTimeImmutable();
     }
@@ -157,6 +160,18 @@ class FinancialEntry
     public function setPaidAt(\DateTimeImmutable $paidAt): static
     {
         $this->paidAt = $paidAt;
+
+        return $this;
+    }
+
+    public function getTenant(): ?tenant
+    {
+        return $this->tenant;
+    }
+
+    public function setTenant(?tenant $tenant): static
+    {
+        $this->tenant = $tenant;
 
         return $this;
     }

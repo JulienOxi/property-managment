@@ -2,11 +2,13 @@
 
 namespace App\Form;
 
+use App\Entity\Bank;
 use App\Entity\Property;
 use App\Enum\MortgageEnum;
 use App\Enum\PropertyEnum;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -41,6 +43,10 @@ class PropertyType extends AbstractType
             ->add('EWID')
             ->add('EGID')
             ->add('address', AddressWoPhoneType::class, [])
+            ->add('bank', EntityType::class, [
+                'class' => Bank::class,
+                'choice_label' => 'name',
+            ])
         ;
     }
 

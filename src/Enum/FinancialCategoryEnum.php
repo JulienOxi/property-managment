@@ -20,4 +20,5 @@ enum FinancialCategoryEnum: string {
 
     // Transferts
     case BANK_TRANSFER = 'Transfère bancaire';
+
 }

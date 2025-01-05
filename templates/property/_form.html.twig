@@ -17,48 +17,7 @@
         {{ form_widget(form.description, {'attr': {'class': 'input-base'}}) }}
     </div>  
 
-    <div>
-        {{ form_label(form.EWID, 'EWID', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.EWID, {'attr': {'class': 'input-base'}}) }}
-    </div>
-
-    <div>
-        {{ form_label(form.EGID, 'EGID', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.EGID, {'attr': {'class': 'input-base'}}) }}
-    </div>
-
-    <div class="relative flex py-5 items-center col-span-3">
-    <div class="flex-grow border-t border-gray-400"></div>
-    <span class="flex-shrink mx-4 text-gray-400">Hypotèque et achat</span>
-    <div class="flex-grow border-t border-gray-400"></div>
-    </div>
-
-    <div>
-        {{ form_label(form.mortgageType, 'Type d\'hypothèque', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.mortgageType, {'attr': {'class': 'input-base'}}) }}
-    </div>    
-
-    <div>
-        {{ form_label(form.mortgageRate, 'Taux hypothécaire', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.mortgageRate, {'attr': {'class': 'input-base'}}) }}
-    </div>
-
-    <div>
-        {{ form_label(form.mortgageEndDate, 'Fin de l\'hypothèque', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.mortgageEndDate, {'attr': {'class': 'input-base'}}) }}
-    </div>
-
-    <div>
-        {{ form_label(form.purchaseDate, 'Date d\'achat', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.purchaseDate, {'attr': {'class': 'input-base'}}) }}
-    </div>
-
-    <div>
-        {{ form_label(form.purchasePrice, 'Prix d\'achat', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.purchasePrice, {'attr': {'class': 'input-base'}}) }}
-    </div>
-
-    <div class="relative flex py-5 items-center col-span-3">
+<div class="relative flex py-5 items-center col-span-3">
     <div class="flex-grow border-t border-gray-400"></div>
     <span class="flex-shrink mx-4 text-gray-400">Adresse</span>
     <div class="flex-grow border-t border-gray-400"></div>
@@ -81,6 +40,49 @@
         {{ form_label(form.address.city, 'ville', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
         {{ form_widget(form.address.city, {'attr': {'class': 'input-base'}}) }}
     </div>    
+
+    <div>
+        {{ form_label(form.EWID, 'EWID', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.EWID, {'attr': {'class': 'input-base'}}) }}
+    </div>
+
+    <div>
+        {{ form_label(form.EGID, 'EGID', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.EGID, {'attr': {'class': 'input-base'}}) }}
+    </div>
+
+    <div class="relative flex py-5 items-center col-span-3">
+    <div class="flex-grow border-t border-gray-400"></div>
+    <span class="flex-shrink mx-4 text-gray-400">Hypotèque et achat</span>
+    <div class="flex-grow border-t border-gray-400"></div>
+    </div>
+
+    <div>
+        {{ form_label(form.purchasePrice, 'Prix d\'achat', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.purchasePrice, {'attr': {'class': 'input-base'}}) }}
+    </div>
+    <div>
+        {{ form_label(form.purchaseDate, 'Date d\'achat', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.purchaseDate, {'attr': {'class': 'input-base'}}) }}
+    </div>
+    <div>
+        {{ form_label(form.bank, 'Banque', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.bank, {'attr': {'class': 'input-base'}}) }}
+    </div>
+    <div>
+        {{ form_label(form.mortgageType, 'Type d\'hypothèque', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.mortgageType, {'attr': {'class': 'input-base'}}) }}
+    </div>    
+
+    <div>
+        {{ form_label(form.mortgageRate, 'Taux hypothécaire', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.mortgageRate, {'attr': {'class': 'input-base'}}) }}
+    </div>
+
+    <div>
+        {{ form_label(form.mortgageEndDate, 'Fin de l\'hypothèque', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.mortgageEndDate, {'attr': {'class': 'input-base'}}) }}
+    </div>
 
 </div>
 

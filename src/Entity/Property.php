@@ -82,6 +82,12 @@ class Property
     #[ORM\OneToMany(targetEntity: FinancialEntry::class, mappedBy: 'property')]
     private Collection $financialEntries;
 
+    #[ORM\ManyToOne]
+    private ?Bank $bank = null;
+
+    private float $totalRents = 0;
+
+
     public function __construct()
     {
         $this->accessControls = new ArrayCollection();
@@ -349,6 +355,30 @@ class Property
                 $financialEntry->setProperty(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getBank(): ?Bank
+    {
+        return $this->bank;
+    }
+
+    public function setBank(?Bank $bank): static
+    {
+        $this->bank = $bank;
+
+        return $this;
+    }
+
+    public function getTotalRents(): float
+    {
+        return $this->totalRents;
+    }
+
+    public function setTotalRents(float $totalRents): static
+    {
+        $this->totalRents = $totalRents;
 
         return $this;
     }

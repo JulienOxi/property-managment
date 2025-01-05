@@ -8,15 +8,15 @@
 {% block body %}
 
         {% set months = { 
-            1 : 'Janvier',
-            2 : 'Février',
-            3 : 'Mars',
-            4 : 'Avril',
-            5 : 'Mai',
-            6 : 'Juin',
-            7 : 'Juillet',
-            8 : 'Août',
-            9 : 'Spetembre',
+            01 : 'Janvier',
+            02 : 'Février',
+            03 : 'Mars',
+            04 : 'Avril',
+            05 : 'Mai',
+            06 : 'Juin',
+            07 : 'Juillet',
+            08 : 'Août',
+            09 : 'Spetembre',
             10 : 'Octobre',
             11 : 'Novembre',
             12 : 'Décembre'
@@ -37,7 +37,7 @@
                         <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">{{ property.type.value }}</span>
                     </div>                      
                     <p class="text-gray-600 text-sm">{{ property.name }}</p>                  
-                    <p class="text-gray-600">{{ property.description }}</p>                  
+                    <p class="text-gray-600">{{ property.description|nl2br }}</p>                  
                 </div>
             {# Locataire #}
                 <div class="bg-gray-50 p-4 rounded-lg shadow hover:shadow-md">
@@ -58,36 +58,77 @@
             <div class="flex justify-between">
                 <h2 class="text-xl font-semibold text-gray-700 mb-2">Loyers</h2>
                 <p>< ></p>
-                <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">Janvier | 2024</span>
+                <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">Année | 2024</span>
             </div>   
             <div class="relative">
                 <div class="flex overflow-x-auto gap-4">
-                    <table border="1" class="table-auto w-full border-separate border border-black">
+                    <table class="table-auto w-full">
                     <thead>
                         <tr>
-                            <th class="text-sm bg-green-200 px-2"></th>
-                            <th class="text-sm bg-green-200 px-2">Locataire</th>
-                            <th class="text-sm bg-green-200 px-2">Loyer</th>
-                            <th class="text-sm bg-green-200 px-2">Charges</th>
-                            <th class="text-sm bg-green-200 px-2">Parking</th>
-                            <th class="text-sm bg-green-200 px-2">Total</th>
-                            <th class="text-sm bg-orange-200 px-2">Charges PPE</th>
+                            <th class="text-sm bg-green-200"></th>
+                            <th class="text-sm bg-green-200">Locataire</th>
+                            <th class="text-sm bg-green-200">Loyer</th>
+                            <th class="text-sm bg-green-200">Charges</th>
+                            <th class="text-sm bg-green-200">Parking</th>
+                            <th class="text-sm bg-green-200">Total</th>
+                            <th class="text-sm bg-orange-200">Charges PPE</th>
                         </tr>
                     </thead>
                     <tbody>
                     </tbody>
-                    {% for month in months %}
-                        <tr>
-                            <td class="text-sm">{{ month }}</td>
-                        </tr>
-                    {% endfor %}
-                        {# {% for rent in property.propertyRents %}
-                            <tr>
-                                <td>{% if rent.type.name == 'RENT' %}{{rent.monthlyPrice}}{% endif %}</td>
-                                <td>{% if rent.type.name == 'CHARGES' %}{{rent.monthlyPrice}}{% endif %}</td>
-                                <td>{% if rent.type.name == 'PARKING' %}{{rent.monthlyPrice}}{% endif %}</td>
+                        {% for key, month in months %}
+                            {% if key < 10 %}
+                                {% set formattedKey = '0' ~ key %}
+                            {% else %}
+                                {% set formattedKey = key %}
+                            {% endif %}
+
+                            {% set total = 0 %}
+                            
+                            <tr class="hover:bg-gray-100">
+                                <td class="text-sm">{{ month }}</td>
+                                {% set rentKey = formattedKey ~ '-RENT' %}
+                                {% if rentKey in financialEntrys|keys %}
+                                    {% set selectedEntry = financialEntrys[rentKey] %}
+                                    <td class="text-xs">{{ selectedEntry.tenant.fullname }}</td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+                                {% set rentKey = formattedKey ~ '-RENT' %}
+                                {% if rentKey in financialEntrys|keys %}
+                                    {% set selectedEntry = financialEntrys[rentKey] %}
+                                    {% set total = total + selectedEntry.amount %}
+                                    <td class="text-sm">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+                                
+                                {% set chargesKey = formattedKey ~ '-CHARGES' %}
+                                {% if chargesKey in financialEntrys|keys %}
+                                    {% set selectedEntry = financialEntrys[chargesKey] %}
+                                    {% set total = total + selectedEntry.amount %}
+                                    <td class="text-sm">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+                                
+                                {% set parkingKey = formattedKey ~ '-PARKING' %}
+                                {% if parkingKey in financialEntrys|keys %}
+                                    {% set selectedEntry = financialEntrys[parkingKey] %}
+                                    {% set total = total + selectedEntry.amount %}
+                                    <td class="text-sm">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+                                {% if total > 0 %}
+                                <td class="text-sm">{{ total|number_format(2, '.', '\'') }}</td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+                                    <td></td>
                             </tr>
-                        {% endfor %} #}
+                        {% endfor %}
+
                     </table>
                 </div>
             </div>

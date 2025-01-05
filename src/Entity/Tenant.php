@@ -44,9 +44,16 @@ class Tenant
     #[ORM\OneToMany(targetEntity: PropertyRent::class, mappedBy: 'tenant', orphanRemoval: true)]
     private Collection $propertyRents;
 
+    /**
+     * @var Collection<int, FinancialEntry>
+     */
+    #[ORM\OneToMany(targetEntity: FinancialEntry::class, mappedBy: 'tenant')]
+    private Collection $financialEntries;
+
     public function __construct()
     {
         $this->propertyRents = new ArrayCollection();
+        $this->financialEntries = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -76,6 +83,11 @@ class Tenant
         $this->lastname = $lastname;
 
         return $this;
+    }
+
+    public function getFullName(): string
+    {
+        return $this->firstname . ' ' . $this->lastname;
     }
 
     public function getEmail(): ?string
@@ -162,6 +174,36 @@ class Tenant
             // set the owning side to null (unless already changed)
             if ($propertyRent->getTenant() === $this) {
                 $propertyRent->setTenant(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FinancialEntry>
+     */
+    public function getFinancialEntries(): Collection
+    {
+        return $this->financialEntries;
+    }
+
+    public function addFinancialEntry(FinancialEntry $financialEntry): static
+    {
+        if (!$this->financialEntries->contains($financialEntry)) {
+            $this->financialEntries->add($financialEntry);
+            $financialEntry->setTenant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFinancialEntry(FinancialEntry $financialEntry): static
+    {
+        if ($this->financialEntries->removeElement($financialEntry)) {
+            // set the owning side to null (unless already changed)
+            if ($financialEntry->getTenant() === $this) {
+                $financialEntry->setTenant(null);
             }
         }
 
