@@ -12,6 +12,7 @@ use App\Enum\FinancialCategoryEnum;
 use App\Repository\PropertyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\FinancialEntryRepository;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -24,13 +25,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class FinancialEntryController extends AbstractController
 {
     #[Route(name: 'app_financial_entry_index', methods: ['GET'])]
-    public function index(FinancialEntryRepository $financialEntryRepository, CsrfTokenManagerInterface $csrfTokenManager): Response
+    public function index(Request $request, FinancialEntryRepository $financialEntryRepository, PaginatorInterface $paginator, CsrfTokenManagerInterface $csrfTokenManager): Response
     {
         // Générer un token pour la génération des entrée financière
         $csrfToken = $csrfTokenManager->getToken('generate_from_property_rent_form')->getValue();
 
+        $financialEntries = $paginator->paginate(
+            $queryBuilder = $financialEntryRepository->createQueryBuilder('f'), /* query NOT result */
+            $request->query->getInt('page', 1), /*page number*/
+            10 /*limit per page*/
+        );
+
         return $this->render('financial_entry/index.html.twig', [
-            'financial_entries' => $financialEntryRepository->findAll(),
+            'financial_entries' => $financialEntries,
             'csrf_token' => $csrfToken,
         ]);
     }

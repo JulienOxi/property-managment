@@ -16,31 +16,31 @@
         <table class="min-w-full bg-white shadow-md rounded-lg">
             <thead class="bg-gray-800 text-white">
                 <tr>
-                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catégorie</th>
-                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant</th>
-                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Créer le</th>
-                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payé</th>
-                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payé le</th>
-                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                    <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider hidden lg:inline-block">{{ knp_pagination_sortable(financial_entries, 'Type', 'f.type') }}<span class="material-symbols-outlined text-xs">unfold_more</span></th>
+                    <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider">{{ knp_pagination_sortable(financial_entries, 'Catégorie', 'f.category') }}<span class="material-symbols-outlined text-xs">unfold_more</span></th>
+                    <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider">{{ knp_pagination_sortable(financial_entries, 'Montant', 'f.amount') }}<span class="material-symbols-outlined text-xs">unfold_more</span></th>
+                    <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider hidden xl:inline-block">Description</th>
+                    <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider hidden xl:inline-block">{{ knp_pagination_sortable(financial_entries, 'Créer le', 'f.createdAt') }}<span class="material-symbols-outlined text-xs">unfold_more</span></th>
+                    <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider">{{ knp_pagination_sortable(financial_entries, 'Payé', 'f.isPaid') }}<span class="material-symbols-outlined text-xs">unfold_more</span></th>
+                    <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider hidden lg:inline-block">{{ knp_pagination_sortable(financial_entries, 'payé le', 'f.PaidAt') }}<span class="material-symbols-outlined text-xs">unfold_more</span></th>
+                    <th class="px-2 py-4 text-left text-xs font-medium uppercase tracking-wider"></th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
                 {% for financial_entry in financial_entries %}
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.type.value }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.category.value }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.amount }} CHF</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.description }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.createdAt ? financial_entry.createdAt|date('Y-m-d H:i:s') : 'N/A' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.isPaid ? '<p class="text-green-500">Oui</p>' : '<p class="text-red-500">Non</p>' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.paidAt ? financial_entry.paidAt|date('Y-m-d H:i:s') : 'N/A' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:inline-block">{{ financial_entry.type.value }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.category.value }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.amount }} CHF</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden xl:inline-block">{{ financial_entry.description }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden xl:inline-block">{{ financial_entry.createdAt ? financial_entry.createdAt|date('Y-m-d H:i:s') : 'N/A' }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.isPaid ? '<p class="text-green-500">Oui</p>' : '<p class="text-red-500">Non</p>' }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:inline-block">{{ financial_entry.paidAt ? financial_entry.paidAt|date('Y-m-d H:i:s') : 'N/A' }}</td>
+                        <td class="px-2 py-4 whitespace-nowrap text-sm font-medium">
                             <a href="{{ path('app_financial_entry_show', {'id': financial_entry.id}) }}" class="inline-block border-[1px] border-blue-500 text-blue-500 font-semibold pt-1 pb-0 px-1 rounded hover:bg-blue-200">
                                <span class="material-symbols-outlined text-sm">visibility</span> 
                             </a>
-                            <a href="{{ path('app_financial_entry_edit', {'id': financial_entry.id}) }}" class="inline-block border-[1px] border-lime-500 text-lime-500 font-semibold pt-1 pb-0 px-1 rounded hover:bg-lime-200">
+                            <a href="{{ path('app_financial_entry_edit', {'id': financial_entry.id}) }}" class="hidden border-[1px] border-lime-500 text-lime-500 font-semibold pt-1 pb-0 px-1 rounded hover:bg-lime-200 md:inline-block">
                                <span class="material-symbols-outlined text-sm">edit</span> 
                             </a>
                         </td>
@@ -52,6 +52,47 @@
                 {% endfor %}
             </tbody>
         </table>
+{# Pagination #}
+<div class="navigation flex justify-center my-4">
+    <ul class="pagination flex list-none">
+        {% if financial_entries.currentPageNumber > 1 %}
+            <li class="page-item">
+                <a class="hidden page-link px-3 py-1 border border-gray-300 rounded-l-lg hover:bg-gray-100 md:inline" href="{{ path('app_financial_entry_index', { page: financial_entries.page - 1 }) }}">
+                    Précédent
+                </a>
+                <a class="page-link px-3 py-1 border border-gray-300 rounded-l-lg hover:bg-gray-100 md:hidden" href="{{ path('app_financial_entry_index', { page: financial_entries.page - 1 }) }}">
+                    <
+                </a>
+            </li>
+        {% endif %}
+
+        {% for page in 1..financial_entries.pageCount %}
+            {% if page == financial_entries.currentPageNumber %}
+                <li class="page-item">
+                    <span class="page-link px-3 py-1 border border-gray-300 bg-gray-200">{{ page }}</span>
+                </li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link px-3 py-1 border border-gray-300 hover:bg-gray-100" href="{{ path('app_financial_entry_index', { page: page }) }}">
+                        {{ page }}
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if financial_entries.currentPageNumber < financial_entries.pageCount %}
+            <li class="page-item">
+                <a class="hidden page-link px-3 py-1 border border-gray-300 rounded-r-lg hover:bg-gray-100 md:inline" href="{{ path('app_financial_entry_index', { page: financial_entries.currentPageNumber + 1 }) }}">
+                    Suivant
+                </a>
+                <a class="page-link px-3 py-1 border border-gray-300 rounded-r-lg hover:bg-gray-100 md:hidden" href="{{ path('app_financial_entry_index', { page: financial_entries.currentPageNumber + 1 }) }}">
+                    >
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+{# endpagination #}
     </div>
 </div>
 {% endblock %}

@@ -1,54 +1,87 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Bank{% endblock %}
+{% set pageName = "Banque : " ~ bank.name %}
+{% block title %}{{ pageName }}{% endblock %}
+{% block pageName %}{{ pageName }}{% endblock %}
 
 {% block body %}
-    <h1>Bank</h1>
+<div class="min-h-screen bg-gray-100">
+    <!-- Header -->
+    <div class="bg-white shadow p-4 md:hidden">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-700">{{ pageName }}</h1>
+        </div>
+    </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ bank.id }}</td>
-            </tr>
-            <tr>
-                <th>Name</th>
-                <td>{{ bank.name }}</td>
-            </tr>
-            <tr>
-                <th>Email</th>
-                <td>{{ bank.email }}</td>
-            </tr>
-            <tr>
-                <th>Website</th>
-                <td>{{ bank.website }}</td>
-            </tr>
-            <tr>
-                <th>Bic</th>
-                <td>{{ bank.bic }}</td>
-            </tr>
-            <tr>
-                <th>Iban</th>
-                <td>{{ bank.iban }}</td>
-            </tr>
-            <tr>
-                <th>ClearingNumber</th>
-                <td>{{ bank.clearingNumber }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ bank.createdAt ? bank.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>UpdatedAt</th>
-                <td>{{ bank.updatedAt ? bank.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <!-- Bank Information -->
+    <div class="container mx-auto p-4">
+        <div class="bg-gray-300 shadow rounded-lg p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="bg-white rounded-lg p-6 shadow-md grid grid-cols-2">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-600 mb-2">Solde</h2>
+                        <p><span class="font-bold text-xl xl:text-3xl">CHF 15'000.00</p>
+                    </div>
+                    <div class="flex justify-end items-center">
+                        <span class="material-symbols-outlined text-6xl xl:text-8xl text-neutral-100">
+                        monitoring
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-600 mb-2">Détails bancaires</h2>
+                    <p><span class="font-medium">BIC :</span> {{ bank.bic }}</p>
+                    <p><span class="font-medium">IBAN :</span> {{ bank.iban }}</p>
+                    <p><span class="font-medium">Numéro de clearing :</span> {{ bank.clearingNumber }}</p>
+                </div>
+            </div>
 
-    <a href="{{ path('app_bank_index') }}">back to list</a>
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-600 mb-2">Dates</h2>
+                    <p><span class="font-medium">Créé le :</span> {{ bank.createdAt ? bank.createdAt|date('Y-m-d H:i:s') : 'Non disponible' }}</p>
+                    <p><span class="font-medium">Mis à jour le :</span> {{ bank.updatedAt ? bank.updatedAt|date('Y-m-d H:i:s') : 'Non disponible' }}</p>
+                </div>
+                <!-- Actions -->
+                <div class="flex place-items-end">
+                    <a href="{{ path('app_bank_index') }}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">Retour à la liste</a>
+                    <a href="{{ path('app_bank_edit', {'id': bank.id}) }}" class="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Modifier</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <a href="{{ path('app_bank_edit', {'id': bank.id}) }}">edit</a>
+    <!-- Statistiques -->
+    <div class="container mx-auto p-4">
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-600 mb-2">Informations générales</h2>
+                    <p><span class="font-medium">Nom :</span> {{ bank.name }}</p>
+                    <p><span class="font-medium">Email :</span> {{ bank.email }}</p>
+                    <p><span class="font-medium">Site web :</span> <a href="{{ bank.website }}" class="text-blue-500 hover:underline">{{ bank.website }}</a></p>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-600 mb-2">Détails bancaires</h2>
+                    <p><span class="font-medium">BIC :</span> {{ bank.bic }}</p>
+                    <p><span class="font-medium">IBAN :</span> {{ bank.iban }}</p>
+                    <p><span class="font-medium">Numéro de clearing :</span> {{ bank.clearingNumber }}</p>
+                </div>
+            </div>
 
-    {{ include('bank/_delete_form.html.twig') }}
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-600 mb-2">Dates</h2>
+                    <p><span class="font-medium">Créé le :</span> {{ bank.createdAt ? bank.createdAt|date('Y-m-d H:i:s') : 'Non disponible' }}</p>
+                    <p><span class="font-medium">Mis à jour le :</span> {{ bank.updatedAt ? bank.updatedAt|date('Y-m-d H:i:s') : 'Non disponible' }}</p>
+                </div>
+                <!-- Actions -->
+                <div class="flex place-items-end">
+                    <a href="{{ path('app_bank_index') }}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">Retour à la liste</a>
+                    <a href="{{ path('app_bank_edit', {'id': bank.id}) }}" class="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Modifier</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

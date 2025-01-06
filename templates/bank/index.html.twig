@@ -1,49 +1,68 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Bank index{% endblock %}
+{% set pageName = "Banque" %}
+{% block title %}{{pageName}}{% endblock %}
+{% block pageName %}{{pageName}}{% endblock %}
 
 {% block body %}
-    <h1>Bank index</h1>
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 flex items-start lg:grid-cols-3 gap-6">
+            {% for bank in banks %}
+                <div class="bg-white shadow-md rounded-lg overflow-hidden border-4 border-white hover:shadow-xl">
+                    <div class="p-4">
+                        <h2 class="text-xl font-semibold">{{ bank.name }}</h2>
+                        <p class="text-gray-600"></p>
+                        <div class="mt-2">
+                            <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ bank.email }}</span>
+                            <span class="inline-block bg-emerald-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ bank.website }}</span>
+                        </div>
+                    </div>
+                    <hr class="m-2">
+                    <div class="bg-white p-4">
+                        <ul>
+                            <li><strong>BIC:</strong> {{ bank.bic }}</li>
+                            <li><strong>IBAN:</strong> {{ bank.iban }} <a href="#" onclick="setClipboard('{{ bank.iban }}')"><span class="material-symbols-outlined text-sm">content_copy</span></a><span class="material-symbols-outlined text-xs text-green-500 hidden" id="iban-copied-success">check</span></li>
+                            <li><strong>Numéro de clearing:</strong> {{ bank.ClearingNumber }}</li>
+                        </ul>
+                    </div>
+                    <hr class="m-2">
+                    <div class="p-4 flex justify-between bg-white">
+                        <a href="{{ path('app_bank_show', {'id': bank.id}) }}" class="inline-block border-[1px] border-blue-500 text-blue-500 font-semibold pt-1 pb-0 px-4 rounded hover:bg-blue-300"><span class="material-symbols-outlined text-sm">visibility</span></a>
+                        <a href="{{ path('app_bank_edit', {'id': bank.id}) }}" class="inline-block border-[1px] border-lime-500 text-lime-500 font-semibold pt-1 pb-0 px-4 rounded hover:bg-lime-300"><span class="material-symbols-outlined text-sm">edit</span></a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-span-full text-center text-gray-600">
+                    <p>No records found</p>
+                </div>
+            {% endfor %}
+        </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Website</th>
-                <th>Bic</th>
-                <th>Iban</th>
-                <th>ClearingNumber</th>
-                <th>CreatedAt</th>
-                <th>UpdatedAt</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for bank in banks %}
-            <tr>
-                <td>{{ bank.id }}</td>
-                <td>{{ bank.name }}</td>
-                <td>{{ bank.email }}</td>
-                <td>{{ bank.website }}</td>
-                <td>{{ bank.bic }}</td>
-                <td>{{ bank.iban }}</td>
-                <td>{{ bank.clearingNumber }}</td>
-                <td>{{ bank.createdAt ? bank.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ bank.updatedAt ? bank.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_bank_show', {'id': bank.id}) }}">show</a>
-                    <a href="{{ path('app_bank_edit', {'id': bank.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="10">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_bank_new') }}">Create new</a>
+        <div class="mt-6">
+            <a href="{{ path('app_bank_new') }}" class="inline-block bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">Créer un nouvelle banque</a>
+        </div>
+    </div>
 {% endblock %}
+
+{% block javascripts %}
+<script>
+function setClipboard(text) {
+  const ibanCopiedSuccess = document.getElementById('iban-copied-success');
+
+  navigator.clipboard.writeText(text).then(
+    function () {
+      ibanCopiedSuccess.classList.remove('hidden');
+      setTimeout(() => {
+        ibanCopiedSuccess.classList.add('hidden');
+      }, 2000);
+    },
+    function (e) {
+      alert("Erreur lors de la copie dans le presse-papier :"+e);
+    },
+  );
+}
+
+</script>
+{% endblock %}
+

@@ -67,15 +67,4 @@ final class BankController extends AbstractController
             'form' => $form,
         ]);
     }
-
-    #[Route('/{id}', name: 'app_bank_delete', methods: ['POST'])]
-    public function delete(Request $request, Bank $bank, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$bank->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($bank);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_bank_index', [], Response::HTTP_SEE_OTHER);
-    }
 }
