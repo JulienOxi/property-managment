@@ -18,36 +18,50 @@
         <div class="bg-gray-300 shadow rounded-lg p-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div class="bg-white rounded-lg p-6 shadow-md grid grid-cols-2">
-                    <div>
+                    <div class="flex flex-col">
                         <h2 class="text-lg font-semibold text-gray-600 mb-2">Solde</h2>
-                        <p><span class="font-bold text-xl xl:text-3xl">CHF 15'000.00</p>
+                        <p>
+                            <span class="font-bold text-xl xl:text-3xl">{{totaLAmount|format_currency('CHF')}}</span>
+                        </p>
+                        <div class="flex-grow flex flex-col justify-between xl:items-end min-h-[50px] h-full">
+                            <span class="flex-1 text-sm text-green-500 p-2 m-2 border border-green-500 flex items-center justify-center">
+                                {{totalAmountIncome|format_currency('CHF')}}
+                            </span>
+                            <span class="flex-1 text-sm text-red-500 p-2 m-2 border border-red-500 flex items-center justify-center">
+                                {{totalAmountExpense|format_currency('CHF')}}
+                            </span>
+                        </div>
                     </div>
                     <div class="flex justify-end items-center">
                         <span class="material-symbols-outlined text-6xl xl:text-8xl text-neutral-100">
-                        monitoring
+                            monitoring
                         </span>
                     </div>
                 </div>
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-600 mb-2">Détails bancaires</h2>
-                    <p><span class="font-medium">BIC :</span> {{ bank.bic }}</p>
-                    <p><span class="font-medium">IBAN :</span> {{ bank.iban }}</p>
-                    <p><span class="font-medium">Numéro de clearing :</span> {{ bank.clearingNumber }}</p>
+                    <h2 class="text-lg font-semibold text-gray-600 mb-2">Dates</h2>
+                    {{ form_start(form) }} 
+                        {{ form_label(form.dateFrom, 'Date du', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                        {{ form_widget(form.dateFrom, {'attr': {'class': 'input-base', 'value': dateFrom|date('Y-m-d')}}) }}
+                        {{ form_label(form.dateTo, 'Date au', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                        {{ form_widget(form.dateTo, {'attr': {'class': 'input-base', 'value': dateTo|date('Y-m-d')}}) }}
+                        <button class="mt-4 py-2 px-4 bg-blue-600 text-white font-bold rounded hover:bg-blue-700">Filtrer</button>
+                    {{ form_end(form) }}
                 </div>
             </div>
 
+            {% if sortTotalAmount != null %}
             <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-600 mb-2">Dates</h2>
-                    <p><span class="font-medium">Créé le :</span> {{ bank.createdAt ? bank.createdAt|date('Y-m-d H:i:s') : 'Non disponible' }}</p>
-                    <p><span class="font-medium">Mis à jour le :</span> {{ bank.updatedAt ? bank.updatedAt|date('Y-m-d H:i:s') : 'Non disponible' }}</p>
+                    {{ render_chart(chart) }}
                 </div>
                 <!-- Actions -->
                 <div class="flex place-items-end">
-                    <a href="{{ path('app_bank_index') }}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">Retour à la liste</a>
-                    <a href="{{ path('app_bank_edit', {'id': bank.id}) }}" class="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Modifier</a>
+
                 </div>
-            </div>
+            </div>            
+            {% endif %}
+            
         </div>
     </div>
 

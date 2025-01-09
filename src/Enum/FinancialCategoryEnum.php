@@ -13,10 +13,14 @@ enum FinancialCategoryEnum: string {
     case CHARGES_DEPOSIT = 'Acompte de charges'; 
     case WATER = 'Eau';
     case HEATER = 'Chauffage';
+    case ELECTRICITY = 'Electricité';
+    case WORKS = 'Travaux divers';
     case MORTAGE = 'Hypotèque';
     case TAXES = 'Impôts';
     case MAINTENANCE = 'maintenance';
     case INSURANCE = 'Assurance';
+    case BANK_FEE = 'Frais bancaire';
+
     case MISCELLANEOUS_EXPENSE = 'Dépenses divers';
 
     // Transferts

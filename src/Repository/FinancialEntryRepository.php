@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Bank;
 use App\Entity\Property;
 use App\Enum\TransactionEnum;
 use App\Entity\FinancialEntry;
@@ -79,8 +80,45 @@ class FinancialEntryRepository extends ServiceEntityRepository
                 ->getQuery()
                 ->getResult()
             ;
-        }
             }
+        }
+
+        /**
+         * Retourne toutes les entrées financières (validée/payée) pour une date de début et une date de fin
+         * @param \App\Entity\Bank $bank
+         * @param mixed $dateFrom
+         * @param mixed $dateEnded
+         * @param mixed $type
+         * @param \App\Entity\Property|null $property
+         * @return mixed
+         */
+        public function findSumAmountBetweenTwoDates(Bank $bank, $dateFrom, $dateEnded, TransactionEnum $type, Property $property = null): ?float
+        {
+            $queryBuilder = $this->createQueryBuilder('f');
+        
+            $queryBuilder
+                ->select('SUM(f.amount) as totalAmount')
+                ->where('f.paidAt BETWEEN :dateFrom AND :dateEnded')
+                ->andWhere('f.type = :type')
+                ->andWhere('f.bank = :bank')
+                ->andWhere('f.isPaid = :ispaid')
+                ->setParameter('dateFrom', $dateFrom)
+                ->setParameter('dateEnded', $dateEnded)
+                ->setParameter('type', $type)
+                ->setParameter('bank', $bank)
+                ->setParameter('ispaid', true);
+        
+            // Si besoin besoin de filtrer par propriété
+            if ($property !== null) {
+                $queryBuilder->andWhere('f.property = :property')
+                    ->setParameter('property', $property);
+            }
+        
+            return $queryBuilder
+                ->getQuery()
+                ->getSingleScalarResult();
+        }
+        
 
         
 }
