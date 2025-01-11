@@ -26,4 +26,12 @@ enum FinancialCategoryEnum: string {
     // Transferts
     case BANK_TRANSFER = 'Transfère bancaire';
 
+    public static function fromName(string $name): ?self {
+        foreach (self::cases() as $case) {
+            if ($case->name === $name) {
+                return $case;
+            }
+        }
+        return null; // Retourne null si aucun cas ne correspond
+    }
 }

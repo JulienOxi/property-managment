@@ -78,4 +78,10 @@ final class TenantController extends AbstractController
 
         return $this->redirectToRoute('app_tenant_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/{id}/lease/renew', name: 'app_tenant_lease_renew', methods: ['GET'])]
+    public function leaseRenew(Request $request, Tenant $tenant, EntityManagerInterface $entityManager): Response
+    {
+        dd($tenant->getPropertyRents());
+    }
 }

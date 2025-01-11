@@ -49,8 +49,8 @@ final class PropertyController extends AbstractController
     {
 
         $year = $request->get('year') ?? date('Y');
-        $financialEntrys = $financialEntryRepository->findEntryByPropertyAndYear($property, $year); //selection des loyers
-        $financialDeposit = $financialEntryRepository->findEntryByPropertyAndYear($property, $year, true); //selection des charges
+        $financialEntrys = $financialEntryRepository->findEntryByPropertyAndYear($property, $year); //selection des loyers (entrées financières)
+        $financialDeposit = $financialEntryRepository->findEntryByPropertyAndYear($property, $year, true); //selection des charges (sorties financières)
 
         //modification de la clef en nom du mois
         $shortFinancialEntrys = [];
@@ -62,12 +62,20 @@ final class PropertyController extends AbstractController
             $shortFinancialDeposit[$value->getPaidAt()->format('m').'-'.$value->getCategory()->name] = $value;
         }
 
+        // selection des hypothèques
+        $shortMortgages = [];
+        $mortgages = $financialEntryRepository->findMortgageByPropertyAndYear($property, $year);
+        foreach ($mortgages as $key => $value) {
+            $shortMortgages[$value->getPaidAt()->format('m').'-'.$value->getCategory()->name] = $value;
+        }
+
         return $this->render('property/show.html.twig', [
             'year' => $year,
             'property' => $property,
             'uploads' => null,
             'financialEntrys' => $shortFinancialEntrys,
             'financialDeposit' => $shortFinancialDeposit,
+            'mortgages' => $shortMortgages,
         ]);
     }
 

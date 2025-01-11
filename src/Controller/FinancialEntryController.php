@@ -11,34 +11,102 @@ use App\Form\FinancialEntryType;
 use App\Enum\FinancialCategoryEnum;
 use App\Repository\PropertyRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\FinancialEntryRepository;
 use Knp\Component\Pager\PaginatorInterface;
+use App\Repository\FinancialEntryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/app/financialentry')]
 final class FinancialEntryController extends AbstractController
 {
-    #[Route(name: 'app_financial_entry_index', methods: ['GET'])]
-    public function index(Request $request, FinancialEntryRepository $financialEntryRepository, PaginatorInterface $paginator, CsrfTokenManagerInterface $csrfTokenManager): Response
+    #[Route(name: 'app_financial_entry_index', methods: ['GET', 'POST'])]
+    public function index(Request $request, FinancialEntryRepository $financialEntryRepository, PropertyRepository $propertyRepository, PaginatorInterface $paginator, CsrfTokenManagerInterface $csrfTokenManager): Response
     {
-        // Générer un token pour la génération des entrée financière
-        $csrfToken = $csrfTokenManager->getToken('generate_from_property_rent_form')->getValue();
+
+        //formulaire de recherche avec récupération des paramètres de l'url pour préremplire le formulaire
+        $caterories = explode(':', $request->query->get('category'));//on récupère les catégories
+        $caterories = array_map(fn($category) => FinancialCategoryEnum::fromName($category), $caterories); //on les transforme en enum
+        $form = $this->createFormBuilder([
+            'property' => $request->query->get('property')?$propertyRepository->find($request->query->get('property')):null,
+            'category' => $caterories,
+            'type' => $request->query->get('type')?TransactionEnum::fromName(($request->query->get('type'))):null,
+        ])
+            ->add('property', EntityType::class, [
+                'class' => Property::class,
+                'choice_label' => 'name',
+                'multiple' => false,
+                'expanded' => true,
+            ])
+            ->add('category', ChoiceType::class, [
+                'choices' => FinancialCategoryEnum::cases(), // Liste des enums
+                'choice_label' => fn(FinancialCategoryEnum $type) => $type->value, // Affichage du label
+                'choice_value' => fn(?FinancialCategoryEnum $type) => $type?->name, // Utilisation du nom de l'enum pour la valeur
+                'placeholder' => 'Sélectionnez une catégorie', // Optionnel
+                'multiple' => true,
+                'expanded' => true,
+            ])
+            ->add('type', ChoiceType::class, [
+                'choices' => TransactionEnum::cases(), // Liste des enums
+                'choice_label' => fn(TransactionEnum $type) => $type->value, // Affichage du label
+                'choice_value' => fn(?TransactionEnum $type) => $type?->name, // Utilisation du nom de l'enum pour la valeur
+                'placeholder' => 'Type de transaction', // Optionnel
+                'multiple' => false,
+                'expanded' => true,
+            ])
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        //si le formulaire est soumis et valide on redirige vers la page avec les paramètres dans l'url
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $properties = $form->get('property')->getData();
+            $categories = $form->get('category')->getData();
+            $types = $form->get('type')->getData();
+
+            $categories = array_map(fn($category) => $category->name, $categories);
+            $categories = implode(':', $categories);
+
+                    // Redirige avec les paramètres dans l'URL
+        return $this->redirectToRoute('app_financial_entry_index', [
+            'property' => $properties ? $properties->getId() : null,
+            'category' => $categories, // Convertir tableau -> chaîne
+            'type' => $types->name,
+        ]);
+
+        }
+
+        //on récupère les paramètres de l'url pour les passer à la requête
+        $request->query->get('property') ? $property = $request->query->get('property') : $property = null;
+        if($request->query->get('category')) {
+            $caterories = explode(':', $request->query->get('category'));//on récupère les catégories
+            $caterories = array_map(fn($category) => FinancialCategoryEnum::fromName($category), $caterories); //on les transforme en enum
+        }
+        $request->query->get('type') ? $type = $request->query->get('type') : $type = null;
+        if($property && $caterories && $type){
+            $query = $financialEntryRepository->findByPropertiesAndCategoriesAndTypes($propertyRepository->find($property), $caterories, TransactionEnum::fromName($type));
+        }else{
+            $query = $financialEntryRepository->createQueryBuilder('f')->orderBy('f.id', 'DESC');
+        }
 
         $financialEntries = $paginator->paginate(
-            $queryBuilder = $financialEntryRepository->createQueryBuilder('f'), /* query NOT result */
-            $request->query->getInt('page', 1), /*page number*/
-            10 /*limit per page*/
+            $query,
+            $request->query->get('page') ?? 1, // Numéro de page
+            10 // Nombre de résultats par page
         );
 
         return $this->render('financial_entry/index.html.twig', [
             'financial_entries' => $financialEntries,
-            'csrf_token' => $csrfToken,
+            'form' => $form->createView(),
+            'queryParams' => $request->query->all(),
         ]);
     }
 
@@ -117,18 +185,17 @@ final class FinancialEntryController extends AbstractController
     #[Route('/generate/from_property_rent/{property_id}', name: 'app_financial_entry_generate_from_property_rent', methods: ['POST'])]
     public function grnerateFromPropertyRent(FinancialEntryRepository $financialEntryRepository, Request $request, CsrfTokenManagerInterface $csrfTokenManager, EntityManagerInterface $em, DateService $dateService, EnumService $enumService, int $property_id = 0): Response
     {
-        //si property_id == 0 on met à jour tous les loyer
         $token = $request->request->get('_csrf_token');
-
-        $property = $em->getRepository(Property::class)->find($property_id);
-        if (!$property && $property_id != 0) {
-            throw $this->createNotFoundException('Property not found');
-        }
 
         // Vérifier si le token est valide
         if (!$csrfTokenManager->isTokenValid(new \Symfony\Component\Security\Csrf\CsrfToken('generate_from_property_rent_form', $token))) {
             throw $this->createAccessDeniedException('Invalid CSRF token');
         }        
+
+        $property = $em->getRepository(Property::class)->find($property_id);
+        if (!$property && $property_id != 0) {
+            throw $this->createNotFoundException('Property not found');
+        }
         
         // Résumé logique
         
@@ -148,6 +215,7 @@ final class FinancialEntryController extends AbstractController
                         $fullMonth[$rent->getType()->name] = $dateService->countFullMonthsBetweenDates($rent->getFromAt(), new \DateTimeImmutable('+1 month'));
                     }
                 }
+
 
                 $createdEntry = 0;
                 $createdDeposit = 0;

@@ -58,8 +58,8 @@ class FinancialEntryRepository extends ServiceEntityRepository
                 return $this->createQueryBuilder('f')
                     ->where('f.property = :property')
                     ->andWhere('f.paidAt LIKE :year')
-                    ->andWhere('f.type LIKE :type')
-                    ->andWhere('f.category LIKE :category')
+                    ->andWhere('f.type = :type')
+                    ->andWhere('f.category = :category')
                     ->setParameters(new ArrayCollection([
                         new Parameter('property', $property),
                         new Parameter('year', '%'.$year.'%'),
@@ -73,14 +73,35 @@ class FinancialEntryRepository extends ServiceEntityRepository
                 return $this->createQueryBuilder('f')
                 ->where('f.property = :property')
                 ->andWhere('f.paidAt LIKE :year')
+                ->andWhere('f.type = :type')
                 ->setParameters(new ArrayCollection([
                     new Parameter('property', $property),
                     new Parameter('year', '%'.$year.'%'),
+                    new Parameter('type', TransactionEnum::INCOME),
                 ]))
                 ->getQuery()
                 ->getResult()
             ;
             }
+        }
+        
+
+        public function findMortgageByPropertyAndYear(Property $property, int $year): ?array
+        {
+            return $this->createQueryBuilder('f')
+            ->where('f.property = :property')
+            ->andWhere('f.paidAt LIKE :year')
+            ->andWhere('f.type = :type')
+            ->andWhere('f.category = :category')
+            ->setParameters(new ArrayCollection([
+                new Parameter('property', $property),
+                new Parameter('year', '%'.$year.'%'),
+                new Parameter('type', TransactionEnum::EXPENSE),
+                new Parameter('category', FinancialCategoryEnum::MORTAGE),
+            ]))
+            ->getQuery()
+            ->getResult()
+        ;
         }
 
         /**
@@ -119,6 +140,31 @@ class FinancialEntryRepository extends ServiceEntityRepository
                 ->getSingleScalarResult();
         }
         
+
+        public function findByPropertiesAndCategoriesAndTypes(?Property $property, array $categories, ?TransactionEnum $type)
+        {
+            $qb = $this->createQueryBuilder('fe');
+        
+            // Filtre sur la propriété
+            if ($property) {
+                $qb->andWhere('fe.property = :property')
+                   ->setParameter('property', $property);
+            }
+        
+            // Filtre sur les catégories
+            if (!empty($categories)) {
+                $qb->andWhere('fe.category IN (:categories)')
+                   ->setParameter('categories', $categories);
+            }
+        
+            // Filtre sur le type
+            if ($type) {
+                $qb->andWhere('fe.type = :type')
+                   ->setParameter('type', $type);
+            }
+        
+            return $qb->getQuery();
+        }
 
         
 }

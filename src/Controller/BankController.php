@@ -52,7 +52,7 @@ final class BankController extends AbstractController
     #[Route('/{id}', name: 'app_bank_show', methods: ['GET', 'POST'])]
     public function show(Bank $bank, Request $request, FinancialEntryRepository $financialEntryRepository, ChartBuilderInterface $chartBuilder): Response
     {
-        
+        $chart = null;
         $form = $this->createFormBuilder()
             ->add('dateFrom', DateType::class, [
                 'widget' => 'single_text',

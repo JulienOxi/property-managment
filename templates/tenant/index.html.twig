@@ -28,6 +28,7 @@
                     <hr class="m-2">
                     <div class="p-4 flex justify-between bg-white">
                         <a href="{{ path('app_tenant_show', {'id': tenant.id}) }}" class="inline-block border-[1px] border-blue-500 text-blue-500 font-semibold pt-1 pb-0 px-4 rounded hover:bg-blue-300"><span class="material-symbols-outlined text-sm">visibility</span></a>
+                        <a href="{{ path('app_tenant_lease_renew', {'id': tenant.id}) }}" class="inline-block border-[1px] border-teal-500 text-teal-500 font-semibold pb-0 px-4 rounded hover:bg-teal-300">Renouveller le bail</a>
                         <a href="{{ path('app_tenant_edit', {'id': tenant.id}) }}" class="inline-block border-[1px] border-lime-500 text-lime-500 font-semibold pt-1 pb-0 px-4 rounded hover:bg-lime-300"><span class="material-symbols-outlined text-sm">edit</span></a>
                     </div>
                 </div>

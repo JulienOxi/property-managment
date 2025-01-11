@@ -146,7 +146,50 @@
                                 {% endif %}
                             </tr>
                         {% endfor %}
-
+                    </table>
+                </div>
+                <div class="flex overflow-x-auto gap-4 mt-4">
+                    <table class="table-auto w-full">
+                    <thead>
+                        <tr>
+                            <th class="text-sm bg-orange-200">Période</th>
+                            <th class="text-sm bg-orange-200">Montant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-sm">1er Janvier au 31 Mars</td>
+                            {% if mortgages['03-MORTAGE'] is defined %}
+                                <td class="text-center text-sm">{{ mortgages['03-MORTAGE'].amount|number_format(2, '.', '\'') }}</td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}                            
+                        </tr>
+                        <tr>
+                            <td class="text-sm">1er Avril au 30 Juin</td>
+                            {% if mortgages['06-MORTAGE'] is defined %}
+                                <td class="text-center text-sm">{{ mortgages['06-MORTAGE'].amount|number_format(2, '.', '\'') }}</td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}                            
+                        </tr>
+                        <tr>
+                            <td class="text-sm">1er Juillet au 30 Septembre</td>
+                            {% if mortgages['09-MORTAGE'] is defined %}
+                                <td class="text-center text-sm">{{ mortgages['09-MORTAGE'].amount|number_format(2, '.', '\'') }}</td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}  
+                        </tr>
+                        <tr>
+                            <td class="text-sm">1er Octobre au 31 Décembre</td>
+                            {% if mortgages['12-MORTAGE'] is defined %}
+                                <td class="text-center text-sm">{{ mortgages['12-MORTAGE'].amount|number_format(2, '.', '\'') }}</td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}  
+                        </tr>
+                    </tbody>
                     </table>
                 </div>
             </div>
