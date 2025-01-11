@@ -94,7 +94,7 @@ final class FinancialEntryController extends AbstractController
         if($property && $caterories && $type){
             $query = $financialEntryRepository->findByPropertiesAndCategoriesAndTypes($propertyRepository->find($property), $caterories, TransactionEnum::fromName($type));
         }else{
-            $query = $financialEntryRepository->createQueryBuilder('f')->orderBy('f.id', 'DESC');
+            $query = $financialEntryRepository->createQueryBuilder('f')->orderBy('f.id', 'DESC')->setMaxResults(100);
         }
 
         $financialEntries = $paginator->paginate(
