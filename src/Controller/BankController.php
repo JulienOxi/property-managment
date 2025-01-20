@@ -37,6 +37,9 @@ final class BankController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $bank->setCreatedBy($this->getUser());
+            
             $entityManager->persist($bank);
             $entityManager->flush();
 

@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\PropertyRent;
+use App\Enum\AccessRoleEnum;
 use App\Service\DateService;
 use App\Form\PropertyRentType;
+use App\Service\AccessControlService;
 use App\Repository\PropertyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\PropertyRentRepository;
@@ -17,13 +19,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/app/propertyrent')]
 final class PropertyRentController extends AbstractController
 {
+
+    private AccessControlService $accessControlService;
+
+    public function __construct(AccessControlService $accessControlService)
+    {
+        $this->accessControlService = $accessControlService;
+    }
+    
     #[Route(name: 'app_property_rent_index', methods: ['GET'])]
     public function index(PropertyRentRepository $propertyRentRepository, PropertyRepository $PropertyRepository, DateService $dateService, CsrfTokenManagerInterface $csrfTokenManager): Response
     {
         // Générer un token pour la génération des entrée financière
         $csrfToken = $csrfTokenManager->getToken('generate_from_property_rent_form')->getValue();
 
-        $propertys = $PropertyRepository->findAll();
+        $propertys = $PropertyRepository->findAccessibleProperties($this->getUser(), AccessRoleEnum::MEMBER);
 
         //calcul du loyer total par apparteemnt en fonction des loyer en cours
         $totalRenting = 0;

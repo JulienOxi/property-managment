@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Bank;
+use App\Entity\User;
 use App\Entity\Property;
+use App\Enum\AccessRoleEnum;
 use App\Enum\TransactionEnum;
 use App\Entity\FinancialEntry;
 use Doctrine\ORM\Query\Parameter;
@@ -141,7 +143,7 @@ class FinancialEntryRepository extends ServiceEntityRepository
         }
         
 
-        public function findByPropertiesAndCategoriesAndTypes(?Property $property, array $categories, ?TransactionEnum $type)
+        public function OLDfindByPropertiesAndCategoriesAndTypes(?Property $property, array $categories, ?TransactionEnum $type)
         {
             $qb = $this->createQueryBuilder('fe');
         
@@ -166,5 +168,50 @@ class FinancialEntryRepository extends ServiceEntityRepository
             return $qb->getQuery();
         }
 
+        public function findByPropertiesAndCategoriesAndTypes(
+            User $user,
+            AccessRoleEnum $requiredRole,
+            ?Property $property = null,
+            array $categories = [],
+            ?TransactionEnum $type = null
+        ) {
+            $qb = $this->createQueryBuilder('fe')
+                ->join('fe.property', 'p') // Associe la propriété à l'entité financière
+                ->join('p.accessControls', 'ac') // Associe les droits d'accès
+                ->where('ac.grantedUser = :user')
+                ->andWhere('ac.role IN (:roles)')
+                ->setParameter('user', $user)
+                ->setParameter('roles', $this->getRolesHierarchy($requiredRole));
+            
+            // Ajout du filtre par propriété
+            if ($property) {
+                $qb->andWhere('fe.property = :property')
+                   ->setParameter('property', $property);
+            }
+            
+            // Ajout du filtre par catégories
+            if (!empty($categories)) {
+                $qb->andWhere('fe.category IN (:categories)')
+                   ->setParameter('categories', $categories);
+            }
+            
+            // Ajout du filtre par type
+            if ($type) {
+                $qb->andWhere('fe.type = :type')
+                   ->setParameter('type', $type);
+            }
+            
+            return $qb->getQuery()->getResult();
+        }
+        
+        private function getRolesHierarchy(AccessRoleEnum $requiredRole): array
+        {
+            // Define the hierarchy of roles
+            return match ($requiredRole) {
+                AccessRoleEnum::GUEST => [AccessRoleEnum::GUEST->value],
+                AccessRoleEnum::MEMBER => [AccessRoleEnum::MEMBER->value, AccessRoleEnum::GUEST->value],
+                AccessRoleEnum::OWNER => [AccessRoleEnum::OWNER->value, AccessRoleEnum::MEMBER->value, AccessRoleEnum::GUEST->value],
+            };
+        }
         
 }

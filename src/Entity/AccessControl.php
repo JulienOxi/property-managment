@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Enum\AccessRole;
+use App\Enum\AccessRoleEnum;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -21,9 +21,9 @@ class AccessControl
     private ?User $grantedUser = null;
 
     #[ORM\Column(length: 50)]
-    private AccessRole $role;
+    private AccessRoleEnum $role;
 
-    #[ORM\ManyToOne(inversedBy: 'AccessControl')]
+    #[ORM\ManyToOne(inversedBy: 'AccessControls')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Property $property = null;
 
@@ -49,12 +49,12 @@ class AccessControl
         return $this;
     }
 
-    public function getRole(): ?string
+    public function getRole(): ?AccessRoleEnum
     {
         return $this->role;
     }
 
-    public function setRole(AccessRole $role): static
+    public function setRole(AccessRoleEnum $role): static
     {
         $this->role = $role;
 

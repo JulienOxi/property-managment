@@ -49,14 +49,8 @@ class Property
     /**
      * @var Collection<int, AccessControl>
      */
-    #[ORM\ManyToMany(targetEntity: AccessControl::class, inversedBy: 'properties')]
+    #[ORM\OneToMany(targetEntity: AccessControl::class, mappedBy: 'property', cascade: ['persist', 'remove'])]
     private Collection $accessControls;
-
-    /**
-     * @var Collection<int, AccessControl>
-     */
-    #[ORM\OneToMany(targetEntity: AccessControl::class, mappedBy: 'property', orphanRemoval: true)]
-    private Collection $AccessControl;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $EWID = null;

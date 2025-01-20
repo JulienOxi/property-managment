@@ -43,7 +43,12 @@
                 <div class="bg-gray-50 p-4 rounded-lg shadow hover:shadow-md">
                     <div class="flex justify-between">
                         <h2 class="text-xl font-semibold text-gray-700 mb-2">Locataire</h2>
-                        <span class="inline-block bg-green-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">Loué</span>
+                        {% if property.tenants is empty %}
+                            <span class="inline-block bg-orange-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">Disponible</span>
+                        {% else %}
+                            <span class="inline-block bg-green-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">Loué</span>
+                        {% endif %}
+                                                
                     </div>               
                     {% for tenant in property.tenants %}
                         <p class="text-gray-600">{{ tenant.firstname }} {{ tenant.lastname }}</p>   
@@ -265,7 +270,6 @@
         <a href="{{ path('app_property_index') }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">Back to list</a>
         <div>
             <a href="{{ path('app_property_edit', {'id': property.id}) }}" class="px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 mr-2">Edit</a>
-            {{ include('property/_delete_form.html.twig') }}
         </div>
     </div>
 </div>

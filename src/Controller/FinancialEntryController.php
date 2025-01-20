@@ -3,12 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Property;
+use App\Enum\AccessRoleEnum;
 use App\Service\DateService;
 use App\Service\EnumService;
 use App\Enum\TransactionEnum;
 use App\Entity\FinancialEntry;
 use App\Form\FinancialEntryType;
 use App\Enum\FinancialCategoryEnum;
+use App\Form\TransactionFilterType;
 use App\Repository\PropertyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -34,34 +36,18 @@ final class FinancialEntryController extends AbstractController
         //formulaire de recherche avec récupération des paramètres de l'url pour préremplire le formulaire
         $caterories = explode(':', $request->query->get('category'));//on récupère les catégories
         $caterories = array_map(fn($category) => FinancialCategoryEnum::fromName($category), $caterories); //on les transforme en enum
-        $form = $this->createFormBuilder([
-            'property' => $request->query->get('property')?$propertyRepository->find($request->query->get('property')):null,
-            'category' => $caterories,
-            'type' => $request->query->get('type')?TransactionEnum::fromName(($request->query->get('type'))):null,
-        ])
-            ->add('property', EntityType::class, [
-                'class' => Property::class,
-                'choice_label' => 'name',
-                'multiple' => false,
-                'expanded' => true,
-            ])
-            ->add('category', ChoiceType::class, [
-                'choices' => FinancialCategoryEnum::cases(), // Liste des enums
-                'choice_label' => fn(FinancialCategoryEnum $type) => $type->value, // Affichage du label
-                'choice_value' => fn(?FinancialCategoryEnum $type) => $type?->name, // Utilisation du nom de l'enum pour la valeur
-                'placeholder' => 'Sélectionnez une catégorie', // Optionnel
-                'multiple' => true,
-                'expanded' => true,
-            ])
-            ->add('type', ChoiceType::class, [
-                'choices' => TransactionEnum::cases(), // Liste des enums
-                'choice_label' => fn(TransactionEnum $type) => $type->value, // Affichage du label
-                'choice_value' => fn(?TransactionEnum $type) => $type?->name, // Utilisation du nom de l'enum pour la valeur
-                'placeholder' => 'Type de transaction', // Optionnel
-                'multiple' => false,
-                'expanded' => true,
-            ])
-            ->getForm();
+        
+        // Récupérer les propriétés accessibles par l'utilisateur
+        $accessibleProperties = $propertyRepository->findAccessibleProperties($this->getUser(), AccessRoleEnum::MEMBER);
+
+        // Créer le formulaire
+        $form = $this->createForm(TransactionFilterType::class, [
+            'property' => $request->query->get('property') ? $propertyRepository->find($request->query->get('property')) : null,
+            'category' => $request->query->get('category') ? $caterories : null,
+            'type' => $request->query->get('type') ? TransactionEnum::fromName($request->query->get('type')) : null,
+        ], [
+            'accessible_properties' => $accessibleProperties, // Passer les propriétés accessibles
+        ]);
 
         $form->handleRequest($request);
 
@@ -92,9 +78,9 @@ final class FinancialEntryController extends AbstractController
         }
         $request->query->get('type') ? $type = $request->query->get('type') : $type = null;
         if($property && $caterories && $type){
-            $query = $financialEntryRepository->findByPropertiesAndCategoriesAndTypes($propertyRepository->find($property), $caterories, TransactionEnum::fromName($type));
+            $query = $financialEntryRepository->findByPropertiesAndCategoriesAndTypes($this->getUser(), AccessRoleEnum::OWNER, $propertyRepository->find($property), $caterories, TransactionEnum::fromName($type));
         }else{
-            $query = $financialEntryRepository->createQueryBuilder('f')->orderBy('f.id', 'DESC')->setMaxResults(100);
+            $query = $financialEntryRepository->findByPropertiesAndCategoriesAndTypes($this->getUser(), AccessRoleEnum::OWNER, null, $caterories);
         }
 
         $financialEntries = $paginator->paginate(

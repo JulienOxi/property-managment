@@ -2,9 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\Property;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Enum\AccessRoleEnum;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Property>
@@ -16,28 +18,26 @@ class PropertyRepository extends ServiceEntityRepository
         parent::__construct($registry, Property::class);
     }
 
-//    /**
-//     * @return Property[] Returns an array of Property objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
 
-//    public function findOneBySomeField($value): ?Property
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findAccessibleProperties(User $user, AccessRoleEnum $requiredRole): array
+{
+    return $this->createQueryBuilder('p')
+        ->join('p.accessControls', 'ac')
+        ->where('ac.grantedUser = :user')
+        ->andWhere('ac.role IN (:roles)')
+        ->setParameter('user', $user)
+        ->setParameter('roles', $this->getRolesHierarchy($requiredRole))
+        ->getQuery()
+        ->getResult();
+}
+
+private function getRolesHierarchy(AccessRoleEnum $requiredRole): array
+{
+    // Define the hierarchy of roles
+    return match ($requiredRole) {
+        AccessRoleEnum::GUEST => [AccessRoleEnum::GUEST->value],
+        AccessRoleEnum::MEMBER => [AccessRoleEnum::MEMBER->value, AccessRoleEnum::GUEST->value],
+        AccessRoleEnum::OWNER => [AccessRoleEnum::OWNER->value, AccessRoleEnum::MEMBER->value, AccessRoleEnum::GUEST->value],
+    };
+}
 }

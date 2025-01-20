@@ -4,23 +4,37 @@ namespace App\Controller;
 
 use App\Entity\Property;
 use App\Form\PropertyType;
-use App\Repository\FinancialEntryRepository;
+use App\Enum\AccessRoleEnum;
+use App\Entity\AccessControl;
+use App\Service\AccessControlService;
 use App\Repository\PropertyRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\FinancialEntryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/app/property')]
 final class PropertyController extends AbstractController
 {
+
+    private AccessControlService $accessControlService;
+
+    public function __construct(AccessControlService $accessControlService)
+    {
+        $this->accessControlService = $accessControlService;
+    }
+
+    
     #[Route(name: 'app_property_index', methods: ['GET'])]
     public function index(PropertyRepository $propertyRepository): Response
     {
 
+        $properties = $propertyRepository->findAccessibleProperties($this->getUser(), AccessRoleEnum::MEMBER);
+
         return $this->render('property/index.html.twig', [
-            'properties' => $propertyRepository->findAll(),
+            'properties' => $properties,
         ]);
     }
 
@@ -32,6 +46,13 @@ final class PropertyController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $accessControl = new AccessControl();
+            $accessControl->setGrantedUser($this->getUser())
+                ->setRole(AccessRoleEnum::OWNER)
+                ->setProperty($property);
+
+            $entityManager->persist($accessControl);
             $entityManager->persist($property);
             $entityManager->flush();
 
@@ -47,6 +68,11 @@ final class PropertyController extends AbstractController
     #[Route('/{id}', name: 'app_property_show', methods: ['GET'])]
     public function show(Request $request, Property $property, FinancialEntryRepository $financialEntryRepository): Response
     {
+
+        $propertyCheck = $this->accessControlService->canAccessProperty($this->getUser(), $property, AccessRoleEnum::MEMBER);
+        if (!$propertyCheck) {
+            throw $this->createAccessDeniedException('Vous n’avez pas accès à cette propriété.');
+        }
 
         $year = $request->get('year') ?? date('Y');
         $financialEntrys = $financialEntryRepository->findEntryByPropertyAndYear($property, $year); //selection des loyers (entrées financières)
@@ -82,6 +108,11 @@ final class PropertyController extends AbstractController
     #[Route('/{id}/edit', name: 'app_property_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Property $property, EntityManagerInterface $entityManager): Response
     {
+        $propertyCheck = $this->accessControlService->canAccessProperty($this->getUser(), $property, AccessRoleEnum::MEMBER);
+        if (!$propertyCheck) {
+            throw $this->createAccessDeniedException('Vous n’avez pas accès à cette propriété.');
+        }
+
         $form = $this->createForm(PropertyType::class, $property);
         $form->handleRequest($request);
 
@@ -95,16 +126,5 @@ final class PropertyController extends AbstractController
             'property' => $property,
             'form' => $form,
         ]);
-    }
-
-    #[Route('/{id}', name: 'app_property_delete', methods: ['POST'])]
-    public function delete(Request $request, Property $property, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$property->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($property);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_property_index', [], Response::HTTP_SEE_OTHER);
     }
 }

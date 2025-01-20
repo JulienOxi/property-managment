@@ -1,11 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Bank{% endblock %}
+{% set pageName = "Créer nouveau compte bancaire" %}
+{% block title %}{{pageName}}{% endblock %}
+{% block pageName %}{{pageName}}{% endblock %}
 
 {% block body %}
-    <h1>Create new Bank</h1>
+    <div class="container mx-auto p-4">
+            <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
 
-    {{ include('bank/_form.html.twig') }}
+        {{ include('bank/_form.html.twig') }}
 
-    <a href="{{ path('app_bank_index') }}">back to list</a>
+        <a href="{{ path('app_bank_index') }}">back to list</a>
+    </div>
 {% endblock %}

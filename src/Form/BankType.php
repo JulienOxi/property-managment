@@ -20,16 +20,6 @@ class BankType extends AbstractType
             ->add('bic')
             ->add('iban')
             ->add('clearingNumber')
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('updatedAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('createdBy', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'id',
-            ])
         ;
     }
 
