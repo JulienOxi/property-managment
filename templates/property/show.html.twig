@@ -239,29 +239,49 @@
         </div>
         <!-- Gallery Section -->
         <div class="bg-gray-50 p-4 rounded-lg shadow col-span-2 hover:shadow-md xl:col-span-3">
-            <h3 class="text-xl font-medium mb-4">Image Gallery</h3>
-            <div class="relative">
-                <div class="flex overflow-x-scroll gap-4">
-                    {% for image in uploads %}
-                        <img src="{{ asset(image.path) }}" alt="{{ image.alt }}" class="h-40 w-full rounded-lg object-cover shadow">
+            <div class="flex justify-between">
+                <h3 class="text-xl font-medium mb-4">Gallerie d'image</h3>
+                <a href="{{ path('app_upload_file_new', {'entityClass': 'Property', 'entityId': property.id, 'type': 'image'}) }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">Télécharger</a>
+            </div>
+                <div class="space-y-2 mt-4">
+                    {% for image in uploadsImages %}
+                        <div class="flex justify-between border-b pb-2">
+                            <p class="text-gray-600 text-sm">{{ image.description }}</p>
+                            <a href="{{ asset('uploads/' ~ property.id ~ '/' ~ image.fileName) }}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
+                                <span class="material-symbols-outlined text-base mr-1">picture_as_pdf</span>
+                                Voir le fichier
+                            </a>
+                            <div class="flex items-end">
+                            {{ include('upload_file/_delete_form.html.twig', {'upload_file': image}) }}
+                            </div>
+                        </div>
                     {% else %}
-                        <p class="text-gray-500">No images available.</p>
+                        <p class="text-gray-500">No files available.</p>
                     {% endfor %}
                 </div>
-            </div>
         </div>
         {# documents #}
         <div class="bg-gray-50 p-4 rounded-lg shadow col-span-2 hover:shadow-md xl:col-span-3">
-            <h3 class="text-xl font-medium mb-4">Documents</h3>
-            <div class="relative">
-                <div class="flex overflow-x-scroll gap-4">
-                    {% for image in uploads %}
-                        <img src="{{ asset(image.path) }}" alt="{{ image.alt }}" class="h-40 w-full rounded-lg object-cover shadow">
+            <div class="flex justify-between">
+                <h3 class="text-xl font-medium mb-4">Documents</h3>
+                <a href="{{ path('app_upload_file_new', {'entityClass': 'Property', 'entityId': property.id, 'type': 'document'}) }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">Télécharger</a>
+            </div>
+                <div class="space-y-2 mt-4">
+                    {% for file in uploadsFiles %}
+                        <div class="flex justify-between border-b pb-2">
+                            <p class="text-gray-600 text-sm">{{ file.description }}</p>
+                            <a href="{{ asset('uploads/' ~ property.id ~ '/' ~ file.fileName) }}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
+                                <span class="material-symbols-outlined text-base mr-1">picture_as_pdf</span>
+                                Voir le fichier
+                            </a>
+                            <div class="flex items-end">
+                            {{ include('upload_file/_delete_form.html.twig', {'upload_file': file}) }}
+                            </div>
+                        </div>
                     {% else %}
-                        <p class="text-gray-500">No documents available.</p>
+                        <p class="text-gray-500">No files available.</p>
                     {% endfor %}
                 </div>
-            </div>
         </div>
     </div>
     

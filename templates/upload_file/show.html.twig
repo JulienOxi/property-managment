@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}UploadFile{% endblock %}
+
+{% block body %}
+    <h1>UploadFile</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ upload_file.id }}</td>
+            </tr>
+            <tr>
+                <th>FileName</th>
+                <td>{{ upload_file.fileName }}</td>
+            </tr>
+            <tr>
+                <th>FileSize</th>
+                <td>{{ upload_file.fileSize }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ upload_file.updatedAt ? upload_file.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>EntityClass</th>
+                <td>{{ upload_file.entityClass }}</td>
+            </tr>
+            <tr>
+                <th>EntityId</th>
+                <td>{{ upload_file.entityId }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_upload_file_index') }}">back to list</a>
+
+    <a href="{{ path('app_upload_file_edit', {'id': upload_file.id}) }}">edit</a>
+
+    {{ include('upload_file/_delete_form.html.twig') }}
+{% endblock %}

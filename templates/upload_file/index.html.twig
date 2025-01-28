@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}UploadFile index{% endblock %}
+
+{% block body %}
+    <h1>UploadFile index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>FileName</th>
+                <th>FileSize</th>
+                <th>UpdatedAt</th>
+                <th>EntityClass</th>
+                <th>EntityId</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for upload_file in upload_files %}
+            <tr>
+                <td>{{ upload_file.id }}</td>
+                <td>{{ upload_file.fileName }}</td>
+                <td>{{ upload_file.fileSize }}</td>
+                <td>{{ upload_file.updatedAt ? upload_file.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ upload_file.entityClass }}</td>
+                <td>{{ upload_file.entityId }}</td>
+                <td>
+                    <a href="{{ path('app_upload_file_show', {'id': upload_file.id}) }}">show</a>
+                    <a href="{{ path('app_upload_file_edit', {'id': upload_file.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_upload_file_new') }}">Create new</a>
+{% endblock %}

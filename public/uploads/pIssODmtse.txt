@@ -1,0 +1,3 @@
+Pouvoir supprimer une entreprise
+Problème aff. pagination
+Tri colonne

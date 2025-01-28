@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Code d'authentification</title>
+    <style>
+        /* Styles généraux */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        table {
+            border-spacing: 0;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        .header {
+            background-color: #0078d7;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .content p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 10px 0;
+        }
+        .auth-code {
+            display: inline-block;
+            font-size: 24px;
+            font-weight: bold;
+            color: #0078d7;
+            background-color: #f0f8ff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            background-color: #f4f4f9;
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: #aaa;
+        }
+        .footer a {
+            color: #0078d7;
+            text-decoration: none;
+        }
+
+        /* Styles responsives */
+        @media (max-width: 600px) {
+            .content {
+                padding: 15px;
+            }
+            .auth-code {
+                font-size: 20px;
+                padding: 8px 15px;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table style="margin-top: 20px; margin-bottom: 20px;">
+        <tr>
+            <td class="header">
+                <h1>Votre code d'authentification</h1>
+            </td>
+        </tr>
+        <tr>
+            <td class="content">
+                <p>Bonjour,</p>
+                <p>Votre code à 6 chiffres est le :</p>
+                <div class="auth-code" id="authCode" onclick="copyToClipboard()" style="cursor: pointer;" alt="Copier le code">{{ auth_code }}</div>
+                 <div class="copy-icon" id="copyIcon"></div>
+                <p>Utilisez ce code pour compléter le processus de vérification sur le site web, ne le partagez pas.</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="footer">
+                <p>Merci de faire confiance à notre service.<br>
+                <a href="https://example.com">Notre site</a> | <a href="mailto:support@example.com">Support</a></p>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+        function copyToClipboard() {
+            const authCode = document.getElementById('authCode').textContent;
+            const ico = document.getElementById('copyIcon');
+            navigator.clipboard.writeText(authCode).then(() => {
+                copyIcon.textContent = '✅ copié dans le presse papier';
+                setTimeout(() => {
+                    copyIcon.textContent = '';
+                }, 2000);
+            }).catch(err => {
+                copyIcon.textContent = '❌ Une erreur est survenue lors de la copie dans le presse papier';
+                setTimeout(() => {
+                    copyIcon.textContent = '';
+                }, 2000);
+                console.error(err);
+            });
+        }
+    </script>
+</body>
+</html>

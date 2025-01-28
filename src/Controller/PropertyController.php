@@ -6,6 +6,7 @@ use App\Entity\Property;
 use App\Form\PropertyType;
 use App\Enum\AccessRoleEnum;
 use App\Entity\AccessControl;
+use App\Repository\UploadFileRepository;
 use App\Service\AccessControlService;
 use App\Repository\PropertyRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,6 +14,7 @@ use App\Repository\FinancialEntryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/app/property')]
@@ -66,7 +68,7 @@ final class PropertyController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_property_show', methods: ['GET'])]
-    public function show(Request $request, Property $property, FinancialEntryRepository $financialEntryRepository): Response
+    public function show(Request $request, Property $property, FinancialEntryRepository $financialEntryRepository, UploadFileRepository $uploadFileRepository): Response
     {
 
         $propertyCheck = $this->accessControlService->canAccessProperty($this->getUser(), $property, AccessRoleEnum::MEMBER);
@@ -95,6 +97,10 @@ final class PropertyController extends AbstractController
             $shortMortgages[$value->getPaidAt()->format('m').'-'.$value->getCategory()->name] = $value;
         }
 
+        //selection des fichiers
+        $uploadsFiles = $uploadFileRepository->findBy(['entityId' => $property->getId(), 'type' => 'document', 'entityClass' => 'Property']);
+        $uploadsImages = $uploadFileRepository->findBy(['entityId' => $property->getId(), 'type' => 'image', 'entityClass' => 'Property']);
+
         return $this->render('property/show.html.twig', [
             'year' => $year,
             'property' => $property,
@@ -102,6 +108,8 @@ final class PropertyController extends AbstractController
             'financialEntrys' => $shortFinancialEntrys,
             'financialDeposit' => $shortFinancialDeposit,
             'mortgages' => $shortMortgages,
+            'uploadsFiles' => $uploadsFiles,
+            'uploadsImages' => $uploadsImages
         ]);
     }
 

@@ -18,11 +18,8 @@ use App\Repository\FinancialEntryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -108,6 +105,8 @@ final class FinancialEntryController extends AbstractController
             $financialEntry->setCreatedBy($this->getUser());
             $entityManager->persist($financialEntry);
             $entityManager->flush();
+
+            $this->addFlash('success', 'La transaction a bien été ajouté');
 
             return $this->redirectToRoute('app_financial_entry_index', [], Response::HTTP_SEE_OTHER);
         }
