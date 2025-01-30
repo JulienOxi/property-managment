@@ -3,6 +3,7 @@
 <div class="md:grid md:grid-cols-3 md:gap-4">
 
     <div class="md:col-span-3">
+        {{ form_errors(form.description) }}
         {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
         {{ form_widget(form.description, {'attr': {'class': 'input-base'}}) }}
     </div>  
@@ -33,13 +34,13 @@
 
     <div>
         {{ form_label(form.property, 'Proprieté', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.property, {'attr': {'class': 'input-base'}}) }}
+        {{ form_widget(form.property, {'attr': {'class': 'input-base', 'onchange': 'addTenant(this.value)'}}) }}
     </div>
 
-    <div>
-        {{ form_label(form.tenant, 'Locataire', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.tenant, {'attr': {'class': 'input-base'}}) }}
-    </div> 
+    <div id="tenant" class="col-span-2 text-sm font-medium text-gray-700 place-items-center spinner">
+    </div>
+
+
 
 </div>
 

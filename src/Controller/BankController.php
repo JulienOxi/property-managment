@@ -22,8 +22,9 @@ final class BankController extends AbstractController
     #[Route(name: 'app_bank_index', methods: ['GET'])]
     public function index(BankRepository $bankRepository): Response
     {
+        $banks = $bankRepository->findby(['createdBy' => $this->getUser()]);
         return $this->render('bank/index.html.twig', [
-            'banks' => $bankRepository->findAll(),
+            'banks' => $banks,
         ]);
     }
 
@@ -41,6 +42,8 @@ final class BankController extends AbstractController
             $entityManager->persist($bank);
             $entityManager->flush();
 
+            $this->addFlash('success','La banque a bien été crée');
+
             return $this->redirectToRoute('app_bank_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -53,6 +56,11 @@ final class BankController extends AbstractController
     #[Route('/{id}', name: 'app_bank_show', methods: ['GET', 'POST'])]
     public function show(Bank $bank, Request $request, FinancialEntryRepository $financialEntryRepository, ChartBuilderInterface $chartBuilder): Response
     {
+        if($bank->getCreatedBy() != $this->getUser()){
+            $this->addFlash('error','Vous n\'avez pas accès à cette banque');
+            return $this->redirectToRoute('app_bank_index');
+        }
+        
         $chart = null;
         $form = $this->createFormBuilder()
             ->add('dateFrom', DateType::class, [
@@ -112,8 +120,8 @@ final class BankController extends AbstractController
             $dateTo = new \DateTime('last day of this month');
         }
         
-        $totalAmountIncome = $financialEntryRepository->findSumAmountBetweenTwoDates($bank, new \DateTime('2000-01-01'), new \DateTime('last day of this month'), TransactionEnum::INCOME);
-        $totalAmountExpense = $financialEntryRepository->findSumAmountBetweenTwoDates($bank, new \DateTime('2000-01-01'), new \DateTime('last day of this month'), TransactionEnum::EXPENSE);
+        $totalAmountIncome = $financialEntryRepository->findSumAmountBetweenTwoDates($bank, new \DateTime('2000-01-01'), new \DateTime('+1 year'), TransactionEnum::INCOME);
+        $totalAmountExpense = $financialEntryRepository->findSumAmountBetweenTwoDates($bank, new \DateTime('2000-01-01'), new \DateTime('+1 year'), TransactionEnum::EXPENSE);
         $totalAmount = $totalAmountIncome - $totalAmountExpense;
 
         return $this->render('bank/show.html.twig', [
@@ -140,6 +148,7 @@ final class BankController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
+            $this->addFlash('success','Modification effectuée');
             return $this->redirectToRoute('app_bank_index', [], Response::HTTP_SEE_OTHER);
         }
 

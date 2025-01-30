@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitation acceptée</title>
+</head>
+<body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+    <div style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+        <h2 style="color: #2c3e50;">✅ Invitation validée</h2>
+
+        <p>Bonjour {{ owner_name }},</p>
+
+        <p>Bonne nouvelle ! Votre invitation pour l’accès à la propriété <strong>{{ property_name }}</strong> a été acceptée par <strong>{{ invited_user }}</strong>.</p>
+
+        <p>Cet utilisateur a désormais accès aux informations et documents associés à cette propriété.</p>
+
+        <p>Vous pouvez gérer les accès et permissions directement depuis votre espace Nelyo.</p>
+
+        <p style="text-align: center; margin-top: 20px;">
+            <a href="{{ property_link }}" style="display: inline-block; background-color: #3498db; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+                Voir la propriété
+            </a>
+        </p>
+
+        <p>Si vous n’êtes pas à l’origine de cette invitation, veuillez nous contacter immédiatement.</p>
+
+        <p>Cordialement,<br>
+        L’équipe Nelyo</p>
+    </div>
+</body>
+</html>

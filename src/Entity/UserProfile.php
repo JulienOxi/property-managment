@@ -52,6 +52,11 @@ class UserProfile
         return $this;
     }
 
+    public function getFullName(): string
+    {
+        return $this->firstname . ' ' . $this->lastname;
+    }
+
     public function getAddress(): ?Address
     {
         return $this->address;

@@ -35,7 +35,7 @@ final class FinancialEntryController extends AbstractController
         $caterories = array_map(fn($category) => FinancialCategoryEnum::fromName($category), $caterories); //on les transforme en enum
         
         // Récupérer les propriétés accessibles par l'utilisateur
-        $accessibleProperties = $propertyRepository->findAccessibleProperties($this->getUser(), AccessRoleEnum::MEMBER);
+        $accessibleProperties = $propertyRepository->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]);
 
         // Créer le formulaire
         $form = $this->createForm(TransactionFilterType::class, [
@@ -134,6 +134,8 @@ final class FinancialEntryController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+            
+            $this->addFlash('success','Modification effectuée');
 
             $referer = $session->get('referer', null); // Rediriger vers le referer si disponible, sinon vers une route par défaut 
             if ($referer) 

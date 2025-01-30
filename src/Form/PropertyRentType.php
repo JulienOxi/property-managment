@@ -36,10 +36,6 @@ class PropertyRentType extends AbstractType
                 'class' => Property::class,
                 'choice_label' => 'name',
             ])
-            ->add('tenant', EntityType::class, [
-                'class' => Tenant::class,
-                'choice_label' => 'fullName',
-            ])
         ;
     }
 

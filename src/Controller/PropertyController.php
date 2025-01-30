@@ -6,15 +6,20 @@ use App\Entity\Property;
 use App\Form\PropertyType;
 use App\Enum\AccessRoleEnum;
 use App\Entity\AccessControl;
-use App\Repository\UploadFileRepository;
+use App\Form\PropertyShareType;
+use App\Repository\AccessControlRepository;
 use App\Service\AccessControlService;
 use App\Repository\PropertyRepository;
+use App\Repository\UploadFileRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\FinancialEntryRepository;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/app/property')]
@@ -33,7 +38,7 @@ final class PropertyController extends AbstractController
     public function index(PropertyRepository $propertyRepository): Response
     {
 
-        $properties = $propertyRepository->findAccessibleProperties($this->getUser(), AccessRoleEnum::MEMBER);
+        $properties = $propertyRepository->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]);
 
         return $this->render('property/index.html.twig', [
             'properties' => $properties,
@@ -57,6 +62,8 @@ final class PropertyController extends AbstractController
             $entityManager->persist($accessControl);
             $entityManager->persist($property);
             $entityManager->flush();
+
+            $this->addFlash('success','Félicitation, votre propriété a bien été crée !');
 
             return $this->redirectToRoute('app_property_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -127,10 +134,107 @@ final class PropertyController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
+            $this->addFlash('success','Modification effectuée');
+
             return $this->redirectToRoute('app_property_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('property/edit.html.twig', [
+            'property' => $property,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/share/{id}', name: 'app_property_share', methods: ['GET', 'POST'])]
+    public function share(Request $request, Property $property, AccessControlRepository $accessControlRepository, EntityManagerInterface $entityManager, UriSigner $uriSigner, MailerInterface $mailer): Response
+    {
+    
+    /////Partie validation du lien
+        //on regarde si on trouve une url de validation valide
+        if ($request->isMethod('GET') && $request->query->has('_hash') && $request->query->get('_expiration') && $request->query->get('email')) {
+            //check si email correspond à l'email de l'utilisateur
+            if($request->query->get('email') != md5(strtoupper($this->getUser()->getEmail()))) {
+                $this->addFlash('error','Erreur. L\'email d\'invitation ne correspond pas à votre email.');
+                return $this->redirectToRoute('app_home', ['id' => $property->getId()]);
+            }
+            //check de la validation du lien
+            $uriSignatureIsValid = $uriSigner->check($request->getUri());
+            if ($uriSignatureIsValid) {
+                //on control que l'utilisateur n'aille pas déjà un accès à cette propriété
+                $accessControlGranted = $accessControlRepository->findOneBy(['property' => $property, 'grantedUser' => $this->getUser()]);
+                if($accessControlGranted) {
+                    $this->addFlash('warning','OUPS,Vous avez déjà accès à cette propriété comme '.$accessControlGranted->getRole()->value.'.');
+                    return $this->redirectToRoute('app_property_show', ['id' => $property->getId()]);
+                }
+                //si l'utilisateur n'a pas encore accès à la propriété on lui accorde un accès en tant que membre
+                $accessControl = new AccessControl();
+                $accessControl->setGrantedUser($this->getUser())
+                    ->setRole(AccessRoleEnum::MEMBER)
+                    ->setProperty($property);
+                $entityManager->persist($accessControl);
+                $entityManager->flush();
+
+            //email au propriétaire
+                //on récupère le propriétaire du bien
+                $propertyOwner = $accessControlRepository->findOneBy(['property' => $property, 'role' => AccessRoleEnum::OWNER]);
+
+                $templateEmail = (new TemplatedEmail())
+                ->from($this->getUser()->getEmail())
+                ->to($propertyOwner->getGrantedUser()->getEmail())
+                ->subject('Votre invitation a été acceptée')
+                ->htmlTemplate('emails/ownerConfirmSharing.html.twig')
+                    // pass variables
+                ->context([
+                    'owner_name' => $propertyOwner->getGrantedUser()->getProfile()->getFullName(),
+                    'property_link' => $this->generateUrl('app_property_share', ['id' => $property->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
+                    'property_name' => $property->getType()->value.' - '.$property->getAddress()->getZipCode().' '.$property->getAddress()->getCity(),
+                    'invited_user' => $this->getUser()->getProfile()->getFullName(),
+                ]);
+                $mailer->send($templateEmail);
+
+                $this->addFlash('success','Félicitation, le partage de cette propriété a bien été effectuée, vous pouvez maintenant consulter ce bien !');
+
+                return $this->redirectToRoute('app_property_index', [], Response::HTTP_SEE_OTHER);
+            }
+        }else{
+    /////Partie si pas de lien valide
+            //si l'utlisateur n'est pas le propriétaire du bien
+            $propertyCheck = $this->accessControlService->canAccessProperty($this->getUser(), $property, AccessRoleEnum::OWNER);
+            if (!$propertyCheck) {
+                $this->addFlash('error','OUPS,Vous n’avez pas accès au partage de cette propriété.');
+                return $this->redirect($request->headers->get('referer'));
+            }
+        }
+
+        $form = $this->createForm(PropertyShareType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $name = $form->get('name')->getData();
+            $email = $form->get('email')->getData();
+            $hashUrl = $uriSigner->sign($this->generateUrl('app_property_share', ['id' => $property->getId(), 'email' => md5(strtoupper($email))], UrlGeneratorInterface::ABSOLUTE_URL), new \DateTimeImmutable('+1 day'));
+            strtr($hashUrl, ['/' => '_', '+' => '-']);
+
+            //envoi de l'email au destinataire
+            $templateEmail = (new TemplatedEmail())
+            ->from($this->getUser()->getEmail())
+            ->to($email)
+            ->subject('Invitation à rejoindre une propriété')
+            ->htmlTemplate('emails/shareLink.html.twig')
+                // pass variables
+            ->context([
+                'name' => $name,
+                'secure_link' => $hashUrl
+            ]);
+            $mailer->send($templateEmail);
+
+            $this->addFlash('success','Un lien de partage vient d\'être envoyé à '.$email);
+
+            return $this->redirectToRoute('app_property_show', ['id' => $property->getId()]);
+        }
+
+        return $this->render('property/share.html.twig', [
             'property' => $property,
             'form' => $form,
         ]);

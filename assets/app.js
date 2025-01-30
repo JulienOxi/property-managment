@@ -35,7 +35,6 @@ window.validateInput = function(inputId, regex, capitalize = true){
   
     // Event listner
     elem.addEventListener("input", () => {
-        console.log('test input');
       //test avec le regex
       const isValid = regex.test(elem.value);
       if(capitalize){
@@ -53,5 +52,38 @@ window.validateInput = function(inputId, regex, capitalize = true){
         }
     });
   };
+
+
+  window.addTenant = function(property){
+    let div = document.getElementById("tenant");
+    let spinner = document.getElementById("full-spinner");
+    div.innerHTML="";
+    spinner.classList.remove('hidden');
+    fetch('/app/propertyrent/gettenant/'+property, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify({ token: '1234' })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                spinner.classList.add("hidden");
+                div.innerHTML = '<p>Locataire actuel :</p>'+data.message;
+                // setTimeout(function(){ location.reload(); }, 2500);
+            } else {
+                spinner.classList.add("hidden");
+                div.innerHTML = "❌ "+data.message;
+                // setTimeout(function(){ location.reload(); }, 2500);
+            }
+        })
+        .catch(error => {
+                spinner.classList.add("hidden");
+                div.innerHTML = "❌ Une erreur est survenue";
+                // setTimeout(function(){ location.reload(); }, 2500);
+        });  
+}
 
 

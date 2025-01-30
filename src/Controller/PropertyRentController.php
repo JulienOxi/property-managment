@@ -8,8 +8,10 @@ use App\Service\DateService;
 use App\Form\PropertyRentType;
 use App\Service\AccessControlService;
 use App\Repository\PropertyRepository;
+use App\Service\PropertyService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\PropertyRentRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -33,7 +35,7 @@ final class PropertyRentController extends AbstractController
         // Générer un token pour la génération des entrée financière
         $csrfToken = $csrfTokenManager->getToken('generate_from_property_rent_form')->getValue();
 
-        $propertys = $PropertyRepository->findAccessibleProperties($this->getUser(), AccessRoleEnum::MEMBER);
+        $propertys = $PropertyRepository->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]);
 
         //calcul du loyer total par apparteemnt en fonction des loyer en cours
         $totalRenting = 0;
@@ -56,7 +58,7 @@ final class PropertyRentController extends AbstractController
     }
 
     #[Route('/new', name: 'app_property_rent_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, PropertyService $propertyService): Response
     {
         $propertyRent = new PropertyRent();
         $form = $this->createForm(PropertyRentType::class, $propertyRent);
@@ -64,9 +66,12 @@ final class PropertyRentController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            $propertyRent->setTenant($propertyService->getActualTenant($propertyRent->getProperty()));
             $propertyRent->setCreatedBy($this->getUser());
             $entityManager->persist($propertyRent);
             $entityManager->flush();
+
+            $this->addFlash('success','Le loyer à bien été crée');
 
             return $this->redirectToRoute('app_property_rent_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -85,6 +90,8 @@ final class PropertyRentController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+            
+            $this->addFlash('success','Modification effectuée');
 
             return $this->redirectToRoute('app_property_rent_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -104,5 +111,24 @@ final class PropertyRentController extends AbstractController
         }
 
         return $this->redirectToRoute('app_property_rent_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+
+    #[Route('/gettenant/{propertyId}', name: 'app_property_rent_get_tenant', methods: ['POST', 'GET'])]
+    public function getTenantFromProperty($propertyId, PropertyService $propertyService, PropertyRepository $propertyRepository): JsonResponse
+    {
+        $tenant = $propertyService->getActualTenant($propertyRepository->findOneBy(['id' => $propertyId]));
+        if($tenant == null){
+            return new JsonResponse([
+                'error' => 'tenant is null',
+                'message' => 'Aucun locataire trouvé pour ce bien immobilier.'
+            ]
+            );
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'message' => $tenant->getFullName()
+        ]);
     }
 }

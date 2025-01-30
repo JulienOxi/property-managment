@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% set title = "Partager une propriété" %}
+{% block title %}{{title}}{% endblock %}
+{% block pageName %}{{title}}{% endblock %}
+
+{% block body %}
+    <div class="flex items-center justify-center min-h-screen bg-gray-100">
+        <div class="w-full max-w-2xl p-6 bg-white rounded-lg shadow-lg">
+            <h1 class="text-2xl font-semibold text-center text-gray-800 mb-5">{{title}}</h1>
+            <h6 class="text-md font-semibold text-center text-gray-800 mb-5">{{property.name}}</h6>
+
+            <div class="bg-gray-50 p-4 rounded-md mb-6">
+                <p class="text-gray-600">Veuillez remplir les informations ci-dessous :</p>
+            </div>
+
+            {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+                <div class="md:grid md:grid-cols-3 md:gap-4">
+                    <div class="md:col-span-3">
+                        {{ form_label(form.email, 'Partager avec', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                        {{ form_widget(form.email, {'attr': {'class': 'input-base', 'placeholder': 'Email'}}) }}
+                    </div>  
+
+                    <div class="md:col-span-3">
+                        {{ form_label(form.name, 'Nom', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                        {{ form_widget(form.name, {'attr': {'class': 'input-base', 'placeholder': 'Nom'}}) }}
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button class="mt-4 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        {{ button_label|default('Partager') }}
+                    </button>
+                </div>
+                                
+            {{ form_end(form) }}
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const nameRegex = /^([A-Z]|[0-9]+)[-a-zA-ZÀ-ú\s]{2,100}$/;
+    const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    validateInput('property_share_email', emailRegex)
+    validateInput('property_share_name', nameRegex)
+
+
+});
+</script>
+{% endblock %}

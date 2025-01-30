@@ -26,7 +26,18 @@
 <div class="container mx-auto p-6">
     <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
 
-    <div class="bg-white shadow-md rounded-lg p-6 grid grid-cols-2 xl:grid-cols-6 gap-6">
+    <div class="mt-6 flex justify-between">
+        <div>
+            <a href="{{ path('app_property_edit', {'id': property.id}) }}" 
+            class="flex items-center px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 mr-2 space-x-2">
+                <span class="material-symbols-outlined text-base">edit</span>
+                <span>Modifier</span>
+            </a>
+        </div>
+            <a href="{{ path('app_property_share', {'id': property.id}) }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">Partager cette propriété</a>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-6 mt-2 grid grid-cols-2 xl:grid-cols-6 gap-6">
         <!-- Card Section -->
         <div class="col-span-2">
             <div class="grid gap-4">
@@ -75,10 +86,10 @@
                     <thead>
                         <tr>
                             <th class="text-sm bg-green-200"></th>
-                            <th class="text-sm bg-green-200">Locataire</th>
-                            <th class="text-sm bg-green-200">Loyer</th>
-                            <th class="text-sm bg-green-200">Charges</th>
-                            <th class="text-sm bg-green-200">Parking</th>
+                            <th class="text-sm bg-green-200 hidden lg:table-cell">Locataire</th>
+                            <th class="text-sm bg-green-200 hidden md:table-cell">Loyer</th>
+                            <th class="text-sm bg-green-200 hidden md:table-cell">Charges</th>
+                            <th class="text-sm bg-green-200 hidden md:table-cell">Parking</th>
                             <th class="text-sm bg-green-200">Total</th>
                             <th class="text-sm bg-orange-200">Charges PPE</th>
                         </tr>
@@ -99,41 +110,41 @@
                                 {% set rentKey = formattedKey ~ '-RENT' %}
                                 {% if rentKey in financialEntrys|keys %}
                                     {% set selectedEntry = financialEntrys[rentKey] %}
-                                    <td class="text-xs">{{ selectedEntry.tenant.fullname }}</td>
+                                    <td class="text-xs hidden lg:table-cell">{{ selectedEntry.tenant.fullname }}</td>
                                 {% else %}
-                                    <td></td>
+                                    <td class="text-xs hidden lg:table-cell"></td>
                                 {% endif %}
                                 {% set rentKey = formattedKey ~ '-RENT' %}
                                 {% if rentKey in financialEntrys|keys %}
                                     {% set selectedEntry = financialEntrys[rentKey] %}
                                     {% set total = total + selectedEntry.amount %}
-                                    <td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }}">
+                                    <td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }} hidden md:table-cell">
                                         <a href="{{path('app_financial_entry_edit', {'id': selectedEntry.id})}}">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</a>
                                     </td>
                                 {% else %}
-                                    <td></td>
+                                    <td class="hidden md:table-cell"></td>
                                 {% endif %}
                                 
                                 {% set chargesKey = formattedKey ~ '-CHARGES' %}
                                 {% if chargesKey in financialEntrys|keys %}
                                     {% set selectedEntry = financialEntrys[chargesKey] %}
                                     {% set total = total + selectedEntry.amount %}
-                                    <td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }}">
+                                    <td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }} hidden md:table-cell">
                                         <a href="{{path('app_financial_entry_edit', {'id': selectedEntry.id})}}">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</a>
                                     </td>
                                 {% else %}
-                                    <td></td>
+                                    <td class="hidden md:table-cell"></td>
                                 {% endif %}
                                 
                                 {% set parkingKey = formattedKey ~ '-PARKING' %}
                                 {% if parkingKey in financialEntrys|keys %}
                                     {% set selectedEntry = financialEntrys[parkingKey] %}
                                     {% set total = total + selectedEntry.amount %}
-                                    <td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }}">
+                                    <td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }} hidden md:table-cell">
                                         <a href="{{path('app_financial_entry_edit', {'id': selectedEntry.id})}}">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</a>
                                     </td>
                                 {% else %}
-                                    <td></td>
+                                    <td class="hidden md:table-cell"></td>
                                 {% endif %}
                                 {% if total > 0 %}
                                 <td class="text-sm text-center">{{ total|number_format(2, '.', '\'') }}</td>
@@ -243,18 +254,16 @@
                 <h3 class="text-xl font-medium mb-4">Gallerie d'image</h3>
                 <a href="{{ path('app_upload_file_new', {'entityClass': 'Property', 'entityId': property.id, 'type': 'image'}) }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">Télécharger</a>
             </div>
-                <div class="space-y-2 mt-4">
+                <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
                     {% for image in uploadsImages %}
-                        <div class="flex justify-between border-b pb-2">
-                            <p class="text-gray-600 text-sm">{{ image.description }}</p>
-                            <a href="{{ asset('uploads/' ~ property.id ~ '/' ~ image.fileName) }}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
-                                <span class="material-symbols-outlined text-base mr-1">picture_as_pdf</span>
-                                Voir le fichier
-                            </a>
-                            <div class="flex items-end">
-                            {{ include('upload_file/_delete_form.html.twig', {'upload_file': image}) }}
+                            <div>
+                                <a href="{{ asset('uploads/' ~ property.id ~ '/' ~ image.fileName) }}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
+                                    <img src="{{ asset('uploads/' ~ property.id ~ '/' ~ image.fileName) }}" alt="{{ image.fileName }}" class="h-30 w-30 object-scale-down">
+                                </a>
+                                <div class="text-end -mt-6">
+                                    {{ include('upload_file/_delete_form.html.twig', {'upload_file': image, 'bgColor': 'bg-gray-50'}) }}
+                                </div>
                             </div>
-                        </div>
                     {% else %}
                         <p class="text-gray-500">No files available.</p>
                     {% endfor %}
@@ -282,14 +291,6 @@
                         <p class="text-gray-500">No files available.</p>
                     {% endfor %}
                 </div>
-        </div>
-    </div>
-    
-
-    <div class="mt-6 flex justify-between">
-        <a href="{{ path('app_property_index') }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">Back to list</a>
-        <div>
-            <a href="{{ path('app_property_edit', {'id': property.id}) }}" class="px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 mr-2">Edit</a>
         </div>
     </div>
 </div>

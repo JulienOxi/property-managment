@@ -113,6 +113,15 @@
             "./src/Kernel.php"
         ]
     },
+    "symfony/joli-notif-notifier": {
+        "version": "7.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "7.2",
+            "ref": "e38fbf364dbf38a431b561cf70fec054790b569f"
+        }
+    },
     "symfony/mailer": {
         "version": "7.2",
         "recipe": {
@@ -133,6 +142,18 @@
             "version": "1.0",
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
+    },
+    "symfony/notifier": {
+        "version": "7.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "5.0",
+            "ref": "178877daf79d2dbd62129dd03612cb1a2cb407cc"
+        },
+        "files": [
+            "./config/packages/notifier.yaml"
+        ]
     },
     "symfony/routing": {
         "version": "7.2",

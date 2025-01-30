@@ -81,6 +81,18 @@ class Property
 
     private float $totalRents = 0;
 
+    #[ORM\ManyToOne]
+    private ?User $createdBy = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $UpdatedAt = null;
+
+    #[ORM\ManyToOne]
+    private ?User $UpdatedBy = null;
+
 
     public function __construct()
     {
@@ -373,6 +385,54 @@ class Property
     public function setTotalRents(float $totalRents): static
     {
         $this->totalRents = $totalRents;
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->UpdatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $UpdatedAt): static
+    {
+        $this->UpdatedAt = $UpdatedAt;
+
+        return $this;
+    }
+
+    public function getUpdatedBy(): ?User
+    {
+        return $this->UpdatedBy;
+    }
+
+    public function setUpdatedBy(?User $UpdatedBy): static
+    {
+        $this->UpdatedBy = $UpdatedBy;
 
         return $this;
     }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7899572640b40ac0d9bdfa1071744217",
+    "content-hash": "410e88cd502a94fe48ee5098af2c1cf3",
     "packages": [
         {
             "name": "beberlei/doctrineextensions",
@@ -1657,6 +1657,123 @@
                 "source": "https://github.com/schmittjoh/metadata/tree/2.8.0"
             },
             "time": "2023-02-15T13:44:18+00:00"
+        },
+        {
+            "name": "jolicode/jolinotif",
+            "version": "v3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jolicode/JoliNotif.git",
+                "reference": "ce27ee0f510ff394b4f7fc3061cda88ee158fa03"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jolicode/JoliNotif/zipball/ce27ee0f510ff394b4f7fc3061cda88ee158fa03",
+                "reference": "ce27ee0f510ff394b4f7fc3061cda88ee158fa03",
+                "shasum": ""
+            },
+            "require": {
+                "jolicode/php-os-helper": "^0.1.0",
+                "php": ">=8.1",
+                "psr/log": "^1.0 || ^2.0 || ^3.0",
+                "symfony/deprecation-contracts": "^3",
+                "symfony/process": "^5.4 || ^6.0 || ^7.0"
+            },
+            "require-dev": {
+                "symfony/finder": "^5.4 || ^6.0 || ^7.0",
+                "symfony/phpunit-bridge": "^5.4 || ^6.0 || ^7.0"
+            },
+            "suggest": {
+                "ext-ffi": "Needed to send notifications via libnotify on Linux"
+            },
+            "bin": [
+                "jolinotif"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Joli\\JoliNotif\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Loïck Piera",
+                    "email": "pyrech@gmail.com"
+                }
+            ],
+            "description": "Send desktop notifications on Windows, Linux, MacOS.",
+            "keywords": [
+                "MAC",
+                "growl",
+                "linux",
+                "notification",
+                "windows"
+            ],
+            "support": {
+                "issues": "https://github.com/jolicode/JoliNotif/issues",
+                "source": "https://github.com/jolicode/JoliNotif/tree/v3.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/jolicode/jolinotif",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2024-10-02T16:00:59+00:00"
+        },
+        {
+            "name": "jolicode/php-os-helper",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jolicode/php-os-helper.git",
+                "reference": "1622ad8bbcab98e62b5c041397e8519f10d90e29"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jolicode/php-os-helper/zipball/1622ad8bbcab98e62b5c041397e8519f10d90e29",
+                "reference": "1622ad8bbcab98e62b5c041397e8519f10d90e29",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "symfony/phpunit-bridge": "^6.3.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "JoliCode\\PhpOsHelper\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Loïck Piera",
+                    "email": "pyrech@gmail.com"
+                }
+            ],
+            "description": "Helpers to detect the OS of the machine where PHP is running.",
+            "keywords": [
+                "linux",
+                "os",
+                "osx",
+                "php",
+                "windows"
+            ],
+            "support": {
+                "issues": "https://github.com/jolicode/php-os-helper/issues",
+                "source": "https://github.com/jolicode/php-os-helper/tree/v0.1.0"
+            },
+            "time": "2023-12-03T12:46:03+00:00"
         },
         {
             "name": "knplabs/knp-components",
@@ -4527,6 +4644,76 @@
             "time": "2024-11-25T14:26:33+00:00"
         },
         {
+            "name": "symfony/joli-notif-notifier",
+            "version": "v7.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/joli-notif-notifier.git",
+                "reference": "101bf84881d8003b4cefa1a9475ebf7d8a1c894b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/joli-notif-notifier/zipball/101bf84881d8003b4cefa1a9475ebf7d8a1c894b",
+                "reference": "101bf84881d8003b4cefa1a9475ebf7d8a1c894b",
+                "shasum": ""
+            },
+            "require": {
+                "jolicode/jolinotif": "^2.7.2|^3.0",
+                "php": ">=8.2",
+                "symfony/http-client": "^7.2",
+                "symfony/notifier": "^7.2"
+            },
+            "type": "symfony-notifier-bridge",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Notifier\\Bridge\\JoliNotif\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ahmed Ghanem",
+                    "email": "ahmedghanem7361@gmail.com",
+                    "homepage": "https://github.com/ahmedghanem00"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony JoliNotif Notifier Bridge",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "desktop-notifications",
+                "joli-notif",
+                "notifier"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/joli-notif-notifier/tree/v7.2.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2024-10-02T19:25:54+00:00"
+        },
+        {
             "name": "symfony/mailer",
             "version": "v7.2.0",
             "source": {
@@ -4689,6 +4876,84 @@
                 }
             ],
             "time": "2024-12-07T08:50:44+00:00"
+        },
+        {
+            "name": "symfony/notifier",
+            "version": "v7.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/notifier.git",
+                "reference": "b5104341c0b0d78fe2cfc8a7a0a185d544ee5c1c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/notifier/zipball/b5104341c0b0d78fe2cfc8a7a0a185d544ee5c1c",
+                "reference": "b5104341c0b0d78fe2cfc8a7a0a185d544ee5c1c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2",
+                "psr/log": "^1|^2|^3"
+            },
+            "conflict": {
+                "symfony/event-dispatcher": "<6.4",
+                "symfony/event-dispatcher-contracts": "<2.5",
+                "symfony/http-client-contracts": "<2.5",
+                "symfony/http-kernel": "<6.4"
+            },
+            "require-dev": {
+                "symfony/event-dispatcher-contracts": "^2.5|^3",
+                "symfony/http-client-contracts": "^2.5|^3",
+                "symfony/http-foundation": "^6.4|^7.0",
+                "symfony/messenger": "^6.4|^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Notifier\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Sends notifications via one or more channels (email, SMS, ...)",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "notification",
+                "notifier"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/notifier/tree/v7.2.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2024-11-15T13:52:25+00:00"
         },
         {
             "name": "symfony/options-resolver",

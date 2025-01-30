@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitation à rejoindre une propriété</title>
+</head>
+<body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+    <div style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+        <h2 style="color: #2c3e50;">🏠 Invitation à rejoindre une propriété</h2>
+
+        <p>Bonjour {{ name }},</p>
+
+        <p>Vous avez été invité à accéder à une propriété sur <strong>Nelyo</strong>. Avant d’accepter cette invitation, vous devez d'abord créer un compte ou vous connecter.</p>
+
+        <p>Une fois votre inscription validée, vous pourrez accéder à toutes les informations et documents associés à cette propriété.</p>
+
+        <p style="text-align: center; margin-top: 20px;">
+            <a href="{{ secure_link }}" style="display: inline-block; background-color: #3498db; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+                Valider mon accès
+            </a>
+        </p>
+
+        <p>Si vous n’êtes pas à l’origine de cette demande, ignorez simplement cet email.</p>
+
+        <p>Cordialement,<br>
+        L’équipe Nelyo</p>
+    </div>
+</body>
+</html>

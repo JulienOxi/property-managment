@@ -19,17 +19,23 @@ class PropertyRepository extends ServiceEntityRepository
     }
 
 
-    public function findAccessibleProperties(User $user, AccessRoleEnum $requiredRole): array
-{
-    return $this->createQueryBuilder('p')
-        ->join('p.accessControls', 'ac')
-        ->where('ac.grantedUser = :user')
-        ->andWhere('ac.role IN (:roles)')
-        ->setParameter('user', $user)
-        ->setParameter('roles', $this->getRolesHierarchy($requiredRole))
-        ->getQuery()
-        ->getResult();
-}
+    public function findAccessibleProperties(User $user, AccessRoleEnum|array $requiredRoles): array
+    {
+        // Normaliser les rôles en un tableau
+        $roles = is_array($requiredRoles) 
+            ? array_merge(...array_map([$this, 'getRolesHierarchy'], $requiredRoles)) 
+            : $this->getRolesHierarchy($requiredRoles);
+    
+        return $this->createQueryBuilder('p')
+            ->join('p.accessControls', 'ac')
+            ->where('ac.grantedUser = :user')
+            ->andWhere('ac.role IN (:roles)')
+            ->setParameter('user', $user)
+            ->setParameter('roles', $roles)
+            ->getQuery()
+            ->getResult();
+    }
+    
 
 private function getRolesHierarchy(AccessRoleEnum $requiredRole): array
 {

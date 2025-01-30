@@ -27,7 +27,7 @@ final class TenantController extends AbstractController
     #[Route(name: 'app_tenant_index', methods: ['GET'])]
     public function index(PropertyRepository $propertyRepository): Response
     {
-        $properties = $propertyRepository->findAccessibleProperties($this->getUser(), AccessRoleEnum::MEMBER);
+        $properties = $propertyRepository->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]);
 
         $tenants = [];
         foreach ($properties as $property) {
@@ -49,6 +49,8 @@ final class TenantController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($tenant);
             $entityManager->flush();
+
+            $this->addFlash('success','Le locataire a bien été crée');
 
             return $this->redirectToRoute('app_tenant_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -85,6 +87,8 @@ final class TenantController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+
+            $this->addFlash('success','Modification effectuée');
 
             return $this->redirectToRoute('app_tenant_index', [], Response::HTTP_SEE_OTHER);
         }

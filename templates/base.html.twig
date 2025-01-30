@@ -35,12 +35,12 @@
       </div>
       <nav>
         <ul>
-          <li class="p-4 flex items-center hover:bg-gray-700 transition">
+          {# <li class="p-4 flex items-center hover:bg-gray-700 transition">
             <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18m-9 5h9" />
             </svg>
             <a href="{{ path('app_home') }}">Home</a>
-          </li>
+          </li> #}
           <li class="p-4 flex items-center hover:bg-gray-700 transition">
             <span class="material-symbols-outlined mr-2">apartment</span>
             <a href="{{ path('app_property_index') }}">Bien immobilier</a>
@@ -99,7 +99,7 @@
           <div class="relative">
             <button class="flex items-center gap-2 hover:text-blue-500 transition">
               <span class="material-symbols-outlined">person</span>
-              <span>John Doe</span>
+              <span>{{ app.user.profile.fullName }}</span>
             </button>
           </div>
 
@@ -107,6 +107,11 @@
       </header>
       <!-- Main Section -->
       <main class="p-4">
+
+        {# spinner pleine page pour indiquer un chargement #}
+        <div id="full-spinner" class="hidden absolute inset-0 flex items-center justify-center bg-gray-200/50">
+            <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-blue-500"></div>
+        </div>
       
     {% for message in app.flashes('success') %}
       <div class="w-full flex justify-center bg-lime-500 px-5 mt-2 rounded-lg" id="alert">
@@ -116,6 +121,11 @@
     {% for message in app.flashes('warning') %}
       <div class="w-full flex justify-center bg-amber-500 px-5 mt-2 rounded-lg" id="alert">
         <div class="py-2 font-bold text-gray-900">{{ message }}</div>
+      </div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+      <div class="w-full flex justify-center bg-red-500 px-5 mt-2 rounded-lg" id="alert">
+        <div class="py-2 font-bold text-gray-50">{{ message }}</div>
       </div>
     {% endfor %}
 
