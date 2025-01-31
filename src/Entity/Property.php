@@ -101,6 +101,8 @@ class Property
         $this->propertyRents = new ArrayCollection();
         $this->tenants = new ArrayCollection();
         $this->financialEntries = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int

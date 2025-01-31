@@ -54,6 +54,8 @@ final class PropertyController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            $property->setCreatedBy($this->getUser());
+            
             $accessControl = new AccessControl();
             $accessControl->setGrantedUser($this->getUser())
                 ->setRole(AccessRoleEnum::OWNER)
@@ -132,6 +134,10 @@ final class PropertyController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $property->setUpdatedBy($this->getUser())
+                ->setUpdatedAt(new \DateTimeImmutable());
+
             $entityManager->flush();
 
             $this->addFlash('success','Modification effectuée');
@@ -145,6 +151,12 @@ final class PropertyController extends AbstractController
         ]);
     }
 
+    /**
+     * Fonction permettant de partager une propriété
+     * elle peut recevoir un lien de partage et le traiter si celui-ci est valide
+     * elle affiche un formulaire pour le partage d'un lien sinon
+     * prend en param le ID de la propriété
+     */
     #[Route('/share/{id}', name: 'app_property_share', methods: ['GET', 'POST'])]
     public function share(Request $request, Property $property, AccessControlRepository $accessControlRepository, EntityManagerInterface $entityManager, UriSigner $uriSigner, MailerInterface $mailer): Response
     {
@@ -155,14 +167,17 @@ final class PropertyController extends AbstractController
             //check si email correspond à l'email de l'utilisateur
             if($request->query->get('email') != md5(strtoupper($this->getUser()->getEmail()))) {
                 $this->addFlash('error','Erreur. L\'email d\'invitation ne correspond pas à votre email.');
-                return $this->redirectToRoute('app_home', ['id' => $property->getId()]);
+                return $this->redirectToRoute('app_home');
+            }
+
+            if (!$propertyOwner = $accessControlRepository->findOneBy(['property' => $property, 'role' => AccessRoleEnum::OWNER])) {
+                $this->addFlash('error', 'Erreur, le propriétaire n\'a pas été trouvé.');
+                return $this->redirectToRoute('app_home');
             }
             //check de la validation du lien
-            $uriSignatureIsValid = $uriSigner->check($request->getUri());
-            if ($uriSignatureIsValid) {
+                if ($uriSigner->check($request->getUri())) {
                 //on control que l'utilisateur n'aille pas déjà un accès à cette propriété
-                $accessControlGranted = $accessControlRepository->findOneBy(['property' => $property, 'grantedUser' => $this->getUser()]);
-                if($accessControlGranted) {
+                if($accessControlGranted = $accessControlRepository->findOneBy(['property' => $property, 'grantedUser' => $this->getUser()])) {
                     $this->addFlash('warning','OUPS,Vous avez déjà accès à cette propriété comme '.$accessControlGranted->getRole()->value.'.');
                     return $this->redirectToRoute('app_property_show', ['id' => $property->getId()]);
                 }
@@ -175,9 +190,6 @@ final class PropertyController extends AbstractController
                 $entityManager->flush();
 
             //email au propriétaire
-                //on récupère le propriétaire du bien
-                $propertyOwner = $accessControlRepository->findOneBy(['property' => $property, 'role' => AccessRoleEnum::OWNER]);
-
                 $templateEmail = (new TemplatedEmail())
                 ->from($this->getUser()->getEmail())
                 ->to($propertyOwner->getGrantedUser()->getEmail())
@@ -189,6 +201,7 @@ final class PropertyController extends AbstractController
                     'property_link' => $this->generateUrl('app_property_share', ['id' => $property->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
                     'property_name' => $property->getType()->value.' - '.$property->getAddress()->getZipCode().' '.$property->getAddress()->getCity(),
                     'invited_user' => $this->getUser()->getProfile()->getFullName(),
+                    'app_name' => $_ENV['APP_NAME']
                 ]);
                 $mailer->send($templateEmail);
 
@@ -225,7 +238,8 @@ final class PropertyController extends AbstractController
                 // pass variables
             ->context([
                 'name' => $name,
-                'secure_link' => $hashUrl
+                'secure_link' => $hashUrl,
+                'app_name' => $_ENV['APP_NAME']
             ]);
             $mailer->send($templateEmail);
 
