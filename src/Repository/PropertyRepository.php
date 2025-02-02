@@ -37,13 +37,13 @@ class PropertyRepository extends ServiceEntityRepository
     }
     
 
-private function getRolesHierarchy(AccessRoleEnum $requiredRole): array
-{
-    // Define the hierarchy of roles
-    return match ($requiredRole) {
-        AccessRoleEnum::GUEST => [AccessRoleEnum::GUEST->value],
-        AccessRoleEnum::MEMBER => [AccessRoleEnum::MEMBER->value, AccessRoleEnum::GUEST->value],
-        AccessRoleEnum::OWNER => [AccessRoleEnum::OWNER->value, AccessRoleEnum::MEMBER->value, AccessRoleEnum::GUEST->value],
-    };
-}
+    private function getRolesHierarchy(AccessRoleEnum $requiredRole): array
+    {
+        // Define the hierarchy of roles
+        return match ($requiredRole) {
+            AccessRoleEnum::GUEST => [AccessRoleEnum::GUEST->value],
+            AccessRoleEnum::MEMBER => [AccessRoleEnum::MEMBER->value, AccessRoleEnum::GUEST->value],
+            AccessRoleEnum::OWNER => [AccessRoleEnum::OWNER->value, AccessRoleEnum::MEMBER->value, AccessRoleEnum::GUEST->value],
+        };
+    }
 }

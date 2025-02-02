@@ -6,8 +6,10 @@ use App\Entity\Tenant;
 use App\Form\TenantType;
 use App\Enum\AccessRoleEnum;
 use App\Repository\TenantRepository;
+use App\Repository\UploadFileRepository;
 use App\Service\AccessControlService;
 use App\Repository\PropertyRepository;
+use App\Service\PropertyService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +27,7 @@ final class TenantController extends AbstractController
     }
     
     #[Route(name: 'app_tenant_index', methods: ['GET'])]
-    public function index(PropertyRepository $propertyRepository): Response
+    public function index(PropertyRepository $propertyRepository, UploadFileRepository $uploadFileRepository): Response
     {
         $properties = $propertyRepository->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]);
 
@@ -34,19 +36,37 @@ final class TenantController extends AbstractController
             $tenants = [...$tenants, ...$property->getTenants()];
         }
 
+        //on cherche l'image liée à la propriété pour afficher dans le card header
+        $images = [];
+        foreach ($tenants as $tenant) {
+            $property = $tenant->getProperty();
+            $uploadsImages = $uploadFileRepository->findBy(['entityId' => $property->getId(), 'type' => 'image', 'entityClass' => 'Property']);
+                if (!empty($uploadsImages)) { //on récupère la première immage
+                    $images[$tenant->getId()] = array_values($uploadsImages)[0];
+                }
+            }
+
         return $this->render('tenant/index.html.twig', [
             'tenants' => $tenants,
+            'images' => $images
         ]);
     }
 
     #[Route('/new', name: 'app_tenant_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, PropertyService $propertyService): Response
     {
         $tenant = new Tenant();
         $form = $this->createForm(TenantType::class, $tenant);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            //check que la date d'entrée ne correspond pas à une date déjà louée
+            if($propertyService->haveTenantBetweenTwoDates($tenant->getProperty(), $tenant->getRentalStartDate(), $tenant->getRentalEndDate()))
+            {
+                $this->addFlash('warning', 'Date de location ce chevauche avec les locations en cours. Veuillez choisir une autre date de location.');
+                return $this->redirectToRoute('app_tenant_new', [$tenant], Response::HTTP_SEE_OTHER);
+            }
+
             $entityManager->persist($tenant);
             $entityManager->flush();
 
@@ -75,7 +95,7 @@ final class TenantController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_tenant_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Tenant $tenant, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Tenant $tenant, EntityManagerInterface $entityManager, PropertyService $propertyService): Response
     {
         $propertyCheck = $this->accessControlService->canAccessProperty($this->getUser(), $tenant->getProperty(), AccessRoleEnum::MEMBER);
         if (!$propertyCheck) {
@@ -86,6 +106,7 @@ final class TenantController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            
             $entityManager->flush();
 
             $this->addFlash('success','Modification effectuée');
