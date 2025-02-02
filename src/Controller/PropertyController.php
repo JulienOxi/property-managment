@@ -35,13 +35,23 @@ final class PropertyController extends AbstractController
 
     
     #[Route(name: 'app_property_index', methods: ['GET'])]
-    public function index(PropertyRepository $propertyRepository): Response
+    public function index(PropertyRepository $propertyRepository, UploadFileRepository $uploadFileRepository): Response
     {
 
         $properties = $propertyRepository->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]);
 
+        //on cherche les images liées aux propriétés pour afficher dans le card header
+        $images = [];
+        foreach ($properties as $property) {
+        $uploadsImages = $uploadFileRepository->findBy(['entityId' => $property->getId(), 'type' => 'image', 'entityClass' => 'Property']);
+            if (!empty($uploadsImages)) { //on récupère la première immage
+                $images[$property->getId()] = array_values($uploadsImages)[0];
+            }
+        }
+
         return $this->render('property/index.html.twig', [
             'properties' => $properties,
+            'images' => $images
         ]);
     }
 

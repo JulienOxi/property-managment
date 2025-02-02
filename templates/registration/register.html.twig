@@ -7,51 +7,96 @@
 <main>
     <div class="md:grid md:grid-cols-3 h-screen">
 
-    <!--login-->
-    <div class="">
-        <div class="ml-2 mt-2 text-xl font-thin">Property Manager App</div>
-        <div class="content-center mx-12 h-[90vh]">
+        <!--login-->
+        <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+            <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
+                <div>
+                    <div class="text-2xl font-thin mb-4">{{ app_name }} App</div>
+                        {# les erreurs #}
+                        {% for flash_error in app.flashes('verify_email_error') %}
+                            <div class="bg-red-600 w-full text-center text-white rounded" role="alert">{{ flash_error }}</div>
+                        {% endfor %}   
 
-    {# les erreurs #}
-    {% for flash_error in app.flashes('verify_email_error') %}
-        <div class="bg-red-600 w-full text-center text-white rounded" role="alert">{{ flash_error }}</div>
-    {% endfor %}    
-    <div class="bg-red-600 w-full text-center text-white rounded" role="alert">{{ form_errors(registrationForm) }}</div>
+                        {% set flashs = {1 : 'green', 2 :'yellow', 3 : 'red'} %}
+                        {% for flash in flashs %}
+                            {% for message in app.flashes(flash) %}
+                                <div class="bg-{{ flash }}-600 w-full text-center text-white rounded py-2 mb-4">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
 
-        <div class="my-3 py-2 text-2xl text-center text-gray-600 font-bold">Enregistrement nouvel utilisateur</div>
-                <div class="text-end">
-                    <a href="{{path('app_login')}}" class="text-blue-600 font-thin">Déjà membre, login</a>
-                </div>        
-    {{ form_errors(registrationForm) }}
+                        <div class="bg-red-600 w-full text-center text-white rounded mb-2" role="alert">{{ form_errors(registrationForm) }}</div>
+                        <div class="flex flex-col items-center mb-6">
+                            <div class="w-40 h-40 mx-auto">
+                                <img src="{{ asset('media/logo.png') }}" alt="Logo" class="w-full h-full object-cover rounded-full" />
+                            </div>
+                            <h2 class="mt-4 text-xl font-bold text-center text-gray-900 bg-gray-100 px-4 py-2 rounded-lg">
+                                Enregistrement nouvel utilisateur
+                            </h2>
+                        </div>
 
-    {{ form_start(registrationForm) }}
-        {{ form_label(registrationForm.email) }}
-        {{ form_widget(registrationForm.email) }}
-        <div class="text-red-500 text-sm">{{ form_errors(registrationForm.email) }}</div>
-        {{ form_label(registrationForm.profile.firstname) }}
-        {{ form_widget(registrationForm.profile.firstname) }}
-        <div class="text-red-500 text-sm">{{ form_errors(registrationForm.profile.firstname) }}</div>      
-        {{ form_label(registrationForm.profile.lastname) }}
-        {{ form_widget(registrationForm.profile.lastname) }}
-        <div class="text-red-500 text-sm">{{ form_errors(registrationForm.profile.lastname) }}</div>              
-        {{form_label(registrationForm.plainPassword.first)}}
-        {{ form_widget(registrationForm.plainPassword.first) }}
-        <div class="text-red-500 text-sm">{{ form_errors(registrationForm.plainPassword.first) }}</div>
-        {{form_label(registrationForm.plainPassword.second)}}
-        {{ form_widget(registrationForm.plainPassword.second) }}   
-        <div class="text-red-500 text-sm">{{ form_errors(registrationForm.plainPassword.second) }}</div>
-        {# {{ form_row(registrationForm.agreeTerms) }} #}
+                        <div class="text-center mb-6">
+                            <a href="{{path('app_login')}}" class="text-blue-600 font-thin">Déjà membre, login</a>
+                        </div>
 
-        <button type="submit" class="mt-8 py-2 appearance-none w-full border rounded-md border-gray-300 bg-cyan-400 hover:bg-cyan-500">Let's go</button>
-    {{ form_end(registrationForm) }}            
+                        <hr class="my-6">
+                        {{ form_start(registrationForm) }}
+                            {{ form_label(registrationForm.email) }}
+                            {{ form_widget(registrationForm.email) }}
+                            <div class="text-red-500 text-sm">{{ form_errors(registrationForm.email) }}</div>
+                            {{ form_label(registrationForm.profile.firstname) }}
+                            {{ form_widget(registrationForm.profile.firstname) }}
+                            <div class="text-red-500 text-sm">{{ form_errors(registrationForm.profile.firstname) }}</div>      
+                            {{ form_label(registrationForm.profile.lastname) }}
+                            {{ form_widget(registrationForm.profile.lastname) }}
+                            <div class="text-red-500 text-sm">{{ form_errors(registrationForm.profile.lastname) }}</div>              
+                            {{form_label(registrationForm.plainPassword.first)}}
+                            {{ form_widget(registrationForm.plainPassword.first) }}
+                            <div class="text-red-500 text-sm">{{ form_errors(registrationForm.plainPassword.first) }}</div>
+                            {{form_label(registrationForm.plainPassword.second)}}
+                            {{ form_widget(registrationForm.plainPassword.second) }}   
+                            <div class="text-red-500 text-sm">{{ form_errors(registrationForm.plainPassword.second) }}</div>
+                            {# {{ form_row(registrationForm.agreeTerms) }} #}
+
+                            <button type="submit" class="mt-8 py-2 appearance-none w-full border rounded-md border-gray-300 bg-cyan-400 hover:bg-cyan-500">Let's go</button>
+                            {{ form_end(registrationForm) }}           
+                    </div>
+                </div>
+            </div>
+            <!--image-->
+            <div class="hidden md:block bg-cover bg-center col-span-2" style="background-image: url({{ asset('media/registration.jpg') }})"></div>
         </div>
-    </div>
-
-        <!--image-->
-        <div class="hidden md:block bg-cover bg-center col-span-2" style="background-image: url({{ asset('media/registration.jpg') }})"></div>
-    </div>
+    </div>  
 </main>
     
 {% endblock %}
 
+{% block javascripts %}
+  <script>
 
+document.addEventListener("DOMContentLoaded", () => {
+    // Regex list
+    const nameRegex = /^[0-9-a-zA-ZÀ-ú\s]{3,255}$/;
+    const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/; // Minimum 8 characters, at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character
+
+    validateInput('registration_form_email', emailRegex, false)
+    validateInput('registration_form_profile_firstname', nameRegex)
+    validateInput('registration_form_profile_lastname', nameRegex)
+    validateInput('registration_form_plainPassword_first', passwordRegex, false)
+
+
+    //control que le deuxième mot de passe soit identique au premier
+    const passwordSecond = document.getElementById("registration_form_plainPassword_second");
+    const passwordFirst = document.getElementById("registration_form_plainPassword_first");
+    passwordSecond.addEventListener("input", () => {
+    if(passwordSecond.value == passwordFirst.value){
+        passwordSecond.classList.add("focus:border-green-700");
+    }else{
+        passwordSecond.classList.remove("focus:border-green-700");
+    }
+    });
+});
+</script>
+{% endblock %}

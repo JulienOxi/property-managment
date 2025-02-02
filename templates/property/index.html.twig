@@ -7,47 +7,72 @@
 {% block body %}
     <div class="container mx-auto p-4">
         <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {% for property in properties %}
-                <div class="bg-white shadow-md rounded-lg overflow-hidden border-4 border-white hover:shadow-xl">
-                    <div class="mt-2 flex justify-end">
-                        <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ property.type.value }}</span>
-                    </div>
-                    <div class="p-4">
-                        <h2 class="text-xl font-semibold">{{ property.name }}</h2>
-                    </div>
-                    <hr class="m-2">
-                    <div class="bg-white p-4">
-                        <ul>
-                            <li><strong>Prix d'achat:</strong> {{ property.purchasePrice|format_currency('CHF') }}</li>
-                            <li><strong>Date d'achat:</strong> {{ property.purchaseDate ? property.purchaseDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</li>
-                            <li><strong>Taux hypothécaire:</strong> {{ property.mortgageRate }}%</li>
-                            <li><strong>Type d'hypothèque:</strong> {{ property.mortgageType.value }}</li>
-                            <li><strong>Fin de l'hypothèque:</strong> {{ property.mortgageEndDate ? property.mortgageEndDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</li>
-                            <li><hr class="m-2"></li>
-                            {% set rentTotal = 0 %}
-                            {% for property_rent in property.propertyRents %}
-                                {% if property_rent.type.name != 'CHARGES_DEPOSIT' %}
-                                    {% set rentTotal = rentTotal + property_rent.monthlyPrice %}
-                                {% endif %}
-                            {% endfor %}
-                            <li><strong>Loyer mensuel:</strong> {{ rentTotal }} CHF</li>
-                            {% for tenant in property.tenants %}
-                                <li><strong>Locataire:</strong> {{ tenant.firstname }} {{ tenant.lastname }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <hr class="m-2">
-                    <div class="p-4 flex justify-between bg-white">
-                        <a href="{{ path('app_property_show', {'id': property.id}) }}" class="inline-block border-[1px] border-blue-500 text-blue-500 font-semibold pt-1 pb-0 px-4 rounded hover:bg-blue-300"><span class="material-symbols-outlined text-sm">visibility</span></a>
-                        <a href="{{ path('app_property_edit', {'id': property.id}) }}" class="inline-block border-[1px] border-lime-500 text-lime-500 font-semibold pt-1 pb-0 px-4 rounded hover:bg-lime-300"><span class="material-symbols-outlined text-sm">edit</span></a>
-                    </div>
-                </div>
+    <div class="flex flex-col">
+        <div class="flex flex-col bg-white shadow-md rounded-lg overflow-hidden border-4 border-white hover:shadow-xl">
+            {% if images[property.id] is defined %}
+                {% set path = asset('uploads/' ~ property.id ~ '/' ~ images[property.id].fileName) %}
             {% else %}
-                <div class="col-span-full text-center text-gray-600">
-                    <p>No records found</p>
+                {% set path = asset('media/app_default.JPE') %}
+            {% endif %}
+                <div class="relative">
+                    <img src="{{ path }}" class="w-full h-48 object-cover opacity-50">
+                    <div class="absolute inset-0 flex items-start justify-end">
+                        <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded mt-2 z-10">
+                            {{ property.type.value }}
+                        </span>
+                    </div>
+                    <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <h2 class="text-white text-xl font-semibold text-center px-4 py-2 bg-gray-900 w-full">{{ property.name }}</h2>
+                    </div>
                 </div>
-            {% endfor %}
+            
+
+            <div class="bg-white p-4">
+                <ul>
+                    <li><strong>Prix d'achat:</strong> {{ property.purchasePrice|format_currency('CHF') }}</li>
+                    <li><strong>Date d'achat:</strong> {{ property.purchaseDate ? property.purchaseDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</li>
+                    <li><strong>Taux hypothécaire:</strong> {{ property.mortgageRate }}%</li>
+                    <li><strong>Type d'hypothèque:</strong> {{ property.mortgageType.value }}</li>
+                    <li><strong>Fin de l'hypothèque:</strong> {{ property.mortgageEndDate ? property.mortgageEndDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</li>
+                    <li><hr class="m-2"></li>
+                    
+                    {% set rentTotal = 0 %}
+                    {% for property_rent in property.propertyRents %}
+                        {% if property_rent.type.name != 'CHARGES_DEPOSIT' %}
+                            {% set rentTotal = rentTotal + property_rent.monthlyPrice %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <li><strong>Loyer mensuel:</strong> {{ rentTotal }} CHF</li>
+                    
+                    {% for tenant in property.tenants %}
+                        <li><strong>Locataire:</strong> {{ tenant.firstname }} {{ tenant.lastname }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <hr class="m-2">
+
+            <div class="p-4 flex justify-center bg-white gap-4">
+                <a href="{{ path('app_property_show', {'id': property.id}) }}" class="inline-flex items-center border-[1px] border-blue-500 text-blue-500 font-semibold py-1 px-4 rounded hover:bg-blue-300 transition-colors">
+                    <span class="material-symbols-outlined text-sm mr-2">visibility</span>
+                    Voir
+                </a>
+                <a href="{{ path('app_property_edit', {'id': property.id}) }}" class="inline-flex items-center border-[1px] border-lime-500 text-lime-500 font-semibold py-1 px-4 rounded hover:bg-lime-300 transition-colors">
+                    <span class="material-symbols-outlined text-sm mr-2">edit</span>
+                    Modifier
+                </a>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="col-span-full text-center text-gray-600">
+        <p>No records found</p>
+    </div>
+{% endfor %}
+
         </div>
 
         <div class="mt-6">

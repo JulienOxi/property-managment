@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const nameRegex = /^([A-Z]|[0-9]+)[-a-zA-ZÀ-ú\s]{2,100}$/;
     const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-    validateInput('property_share_email', emailRegex)
+    validateInput('property_share_email', emailRegex, false)
     validateInput('property_share_name', nameRegex)
 
 

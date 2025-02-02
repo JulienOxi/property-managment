@@ -16,48 +16,63 @@
         </a>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for property in propertys %}
-        <div class="bg-white shadow-lg rounded-lg p-4">
-            <div class="flex justify-end">
-                <span class="inline-block bg-green-200 text-green-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ property.type.value }}</span>
-            </div>
-            <h2 class="text-xl font-semibold mb-2">{{ property.name }}</h2>
-            <p class="text-gray-600 mb-4">Prix : <span class="font-medium">{{ property.totalRents }} CHF/mois</span></p>
-
-            <h3 class="text-lg font-bold mt-4 mb-2">Loyers :</h3>
-            <ul class="bg-white divide-y divide-gray-200">
-                {% set has_rents = false %}
-                {% for property_rent in property_rents %}
-                    {% if property_rent.property == property %}
-                        {% set has_rents = true %}
-                        <li class="py-2">
-                            <div class="flex justify-between ">
-                                <span class="font-medium">{{ property_rent.monthlyPrice }} CHF /mois</span>
-                                {% if property_rent.type.name == 'CHARGES_DEPOSIT' %}{% set bgColor = 'bg-red-200' %}{% else %}{% set bgColor = 'bg-lime-200' %}{% endif %}
-                                 <span class="{{ bgColor }} inline-block text-xs text-green-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ property_rent.type.value }}</span>
-                            </div>
-                            <p class="text-sm text-gray-500">Début : {{ property_rent.createdAt ? property_rent.fromAt|date('Y-m-d') : 'N/A' }}</p>
-                            <p class="text-sm text-gray-500">Fin : {{ property_rent.endedAt ? property_rent.endedAt|date('Y-m-d') : 'N/A' }}</p>
-
-                            <div class="mt-2 flex justify-start">
-                                <a href="{{ path('app_property_rent_edit', {'id': property_rent.id}) }}" class="bg-green-500 text-white text-sm px-2 py-1 rounded hover:bg-green-600">Éditer</a>
-                            </div>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-                {% if not has_rents %}
-                    <li class="py-2 text-gray-500">Aucun loyer trouvé pour cette propriété.</li>
-                {% endif %}
-            </ul>
-            {% if has_rents %}
-            <div class="flex justify-center pt-2">
-                <form method="POST" action="{{ path('app_financial_entry_generate_from_property_rent', {'property_id': property.id}) }}">
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
-                    <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded shadow hover:bg-amber-600">Générer les loyers</button>
-                </form>
-            </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {% for property in properties %}
+        <div>
+            {% if images[property.id] is defined %}
+                {% set path = asset('uploads/' ~ property.id ~ '/' ~ images[property.id].fileName) %}
+            {% else %}
+                {% set path = asset('media/app_default.JPE') %}
             {% endif %}
+                <div class="relative">
+                    <img src="{{ path }}" class="w-full h-48 object-cover opacity-50">
+                    <div class="absolute inset-0 flex items-start justify-end">
+                        <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded mt-2 z-10">
+                            {{ property.type.value }}
+                        </span>
+                    </div>
+                    <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <h2 class="text-white text-xl font-semibold text-center px-4 py-2 bg-gray-900 w-full">{{ property.name }}</h2>
+                    </div>
+                    <div class="absolute inset-0 flex items-end justify-start">
+                        <p class="inline-block bg-white text-gray-800 text-sm font-semibold mr-2 px-2.5 mt-2 z-10">Prix : <span class="font-medium">{{ property.totalRents }} CHF/mois</span></p>
+                    </div>
+                </div>
+            <div class="p-4 bg-white shadow-lg rounded-lg hover:shadow-xl">
+                <h3 class="text-lg font-bold mt-4 mb-2">Loyers :</h3>
+                <ul class="bg-white divide-y divide-gray-200">
+                    {% set has_rents = false %}
+                    {% for property_rent in property_rents %}
+                        {% if property_rent.property == property %}
+                            {% set has_rents = true %}
+                            <li class="py-2">
+                                <div class="flex justify-between ">
+                                    <span class="font-medium">{{ property_rent.monthlyPrice }} CHF /mois</span>
+                                    {% if property_rent.type.name == 'CHARGES_DEPOSIT' %}{% set bgColor = 'bg-red-200' %}{% else %}{% set bgColor = 'bg-lime-200' %}{% endif %}
+                                    <span class="{{ bgColor }} inline-block text-xs text-green-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ property_rent.type.value }}</span>
+                                </div>
+                                <p class="text-sm text-gray-500">Début : {{ property_rent.createdAt ? property_rent.fromAt|date('Y-m-d') : 'N/A' }}</p>
+                                <p class="text-sm text-gray-500">Fin : {{ property_rent.endedAt ? property_rent.endedAt|date('Y-m-d') : 'N/A' }}</p>
+
+                                <div class="mt-2 flex justify-start">
+                                    <a href="{{ path('app_property_rent_edit', {'id': property_rent.id}) }}" class="bg-green-500 text-white text-sm px-2 py-1 rounded hover:bg-green-600">Éditer</a>
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if not has_rents %}
+                        <li class="py-2 text-gray-500">Aucun loyer trouvé pour cette propriété.</li>
+                    {% endif %}
+                </ul>
+                {% if has_rents %}
+                <div class="flex justify-center pt-2">
+                    <form method="POST" action="{{ path('app_financial_entry_generate_from_property_rent', {'property_id': property.id}) }}">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                        <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded shadow hover:bg-amber-600">Générer les loyers</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
         </div>
         {% else %}
         <p class="col-span-full text-center text-gray-500">Aucune propriété trouvée.</p>

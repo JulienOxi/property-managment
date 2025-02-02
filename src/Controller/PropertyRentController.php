@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\PropertyRent;
 use App\Enum\AccessRoleEnum;
+use App\Repository\UploadFileRepository;
 use App\Service\DateService;
 use App\Form\PropertyRentType;
 use App\Service\AccessControlService;
@@ -30,16 +31,25 @@ final class PropertyRentController extends AbstractController
     }
     
     #[Route(name: 'app_property_rent_index', methods: ['GET'])]
-    public function index(PropertyRentRepository $propertyRentRepository, PropertyRepository $PropertyRepository, DateService $dateService, CsrfTokenManagerInterface $csrfTokenManager): Response
+    public function index(PropertyRentRepository $propertyRentRepository, PropertyRepository $PropertyRepository, UploadFileRepository $uploadFileRepository, DateService $dateService, CsrfTokenManagerInterface $csrfTokenManager): Response
     {
         // Générer un token pour la génération des entrée financière
         $csrfToken = $csrfTokenManager->getToken('generate_from_property_rent_form')->getValue();
 
-        $propertys = $PropertyRepository->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]);
+        $properties = $PropertyRepository->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]);
+
+        //on cherche les images liées aux propriétés pour afficher dans le card header
+        $images = [];
+        foreach ($properties as $property) {
+        $uploadsImages = $uploadFileRepository->findBy(['entityId' => $property->getId(), 'type' => 'image', 'entityClass' => 'Property']);
+            if (!empty($uploadsImages)) { //on récupère la première immage
+                $images[$property->getId()] = array_values($uploadsImages)[0];
+            }
+        }
 
         //calcul du loyer total par apparteemnt en fonction des loyer en cours
         $totalRenting = 0;
-        foreach ($propertys as $property) {
+        foreach ($properties as $property) {
             foreach ($property->getPropertyRents() as $key => $rent) {
                 $dates = $dateService->returnDatesBetweenTwo($rent->getFromAt(), $rent->getEndedAt(), 'Y-m-d');
                 if(in_array(date('Y-m-d'), $dates)){
@@ -52,8 +62,9 @@ final class PropertyRentController extends AbstractController
 
         return $this->render('property_rent/index.html.twig', [
             'property_rents' => $propertyRentRepository->findAll(),
-            'propertys' => $propertys,
+            'properties' => $properties,
             'csrf_token' => $csrfToken,
+            'images' => $images
         ]);
     }
 
