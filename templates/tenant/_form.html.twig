@@ -38,9 +38,11 @@
 
     <div class="md:col-span-2">
         {{ form_label(form.property, 'Appartement', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.property, {'attr': {'class': 'input-base'}}) }}
+        {{ form_widget(form.property, {'attr': {'class': 'input-base', 'onchange': 'addTenant(this.value)'}})  }}
     </div>
 </div>
+    <div id="tenant" class="col-span-2 text-sm font-medium text-gray-700 place-items-center spinner">
+    </div>
 
 <div>
     <button class="mt-4 py-2 px-4 bg-blue-600 text-white font-bold rounded hover:bg-blue-700">

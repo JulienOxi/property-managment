@@ -7,12 +7,24 @@
     <div class="flex items-center justify-center min-h-screen bg-gray-100">
         <div class="w-full max-w-2xl p-6 bg-white rounded-lg shadow-lg">
             <h1 class="text-2xl font-semibold text-center text-gray-800 mb-5">Créer une nouvelle propriété</h1>
+    <div class="">
+        {{ form_errors(form) }}
+    </div>
 
+        {% if banks is not empty %}
             <div class="bg-gray-50 p-4 rounded-md mb-6">
                 <p class="text-gray-600">Veuillez remplir les informations ci-dessous :</p>
             </div>
 
-            {{ include('property/_form.html.twig') }}
+                {{ include('property/_form.html.twig') }}
+        {% else %}  
+                <div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
+                    Vous devez ajoutez une banque avant de pouvoir ajouter une propriété.
+                </div>
+                <div class="my-2 flex justify-center px-5">
+                    <a href="{{ path('app_bank_new') }}" class="inline-block bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">Ajouter une nouvelle banque</a>
+                </div>
+        {% endif %}
 
         </div>
     </div>
@@ -31,11 +43,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const purchasePriceRegex = /^(10(?:[.,]0{1,2})?|[0-9](?:[0-9']{0,2}(?:[0-9]{3})?)*(?:[.,][0-9]{1,2})?)$/;
     const cityRegex = /^[A-Z][-a-zA-ZÀ-ú\s]{2,100}$/;
     const streetRegex = /^[A-Z][-a-zA-ZÀ-ú\s]{2,255}$/;
-    const streetNumberRegex = /^[A-Z][-a-zA-ZÀ-ú\s]{1,10}$/;
+    const streetNumberRegex = /^\d{1,4}[A-Za-z]?$/;
     const zipCodeRegex = /^\d{4}$/;
 
-    validateInput('property_name', nameRegex, false)
-    validateInput('property_description', descriptionRegex, false)
+    validateInput('property_name', nameRegex)
+    validateInput('property_description', descriptionRegex)
     validateInput('property_EWID', ewidRegex, false)
     validateInput('property_EGID', egidRegex, false)
 

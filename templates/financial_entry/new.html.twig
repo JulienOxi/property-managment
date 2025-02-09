@@ -1,11 +1,37 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New FinancialEntry{% endblock %}
+{% set pageName = "Créer une nouvelle transaction financière" %}
+
+{% block title %}{{pageName}}{% endblock %}
+{% block pageName %}{{pageName}}{% endblock %}
 
 {% block body %}
-    <h1>Create new FinancialEntry</h1>
+<div class="container mx-auto px-4 py-6">
+    <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
+
+{% if properties is not empty %}
 
     {{ include('financial_entry/_form.html.twig') }}
 
-    <a href="{{ path('app_financial_entry_index') }}">back to list</a>
+{% else %}
+    <div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
+        Vous devez ajoutez une propriété avant de pouvoir ajouter une transaction financière.
+    </div>
+{% endif %}
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const amountRegex = /^\d+(?:[\.,]\d{0,2})?$/;
+    const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(\d{4})$/;
+    const descriptionRegex = /^.{1,255}$/;
+
+    validateInput('financial_entry_amount', amountRegex, false)
+    validateInput('financial_entry_paidAt', dateRegex, false)
+    validateInput('financial_entry_description', descriptionRegex, false)
+});
+</script>
 {% endblock %}

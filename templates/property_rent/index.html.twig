@@ -75,7 +75,11 @@
             </div>
         </div>
         {% else %}
-        <p class="col-span-full text-center text-gray-500">Aucune propriété trouvée.</p>
+            <div class="col-span-full text-center text-gray-600">
+                <div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
+                    Aucun loyer actuellement
+                </div>
+            </div>
         {% endfor %}
     </div>
 </div>

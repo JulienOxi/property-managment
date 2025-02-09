@@ -21,7 +21,7 @@ class Property
     #[ORM\Column(length: 100)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: "text")]
     private ?string $description = null;
 
     #[ORM\Column(enumType: PropertyEnum::class)]
@@ -45,6 +45,15 @@ class Property
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $mortgageEndDate = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $mortgageRate2 = null;
+
+    #[ORM\Column(enumType: MortgageEnum::class, nullable: true)]
+    private ?MortgageEnum $mortgageType2 = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $mortgageEndDate2 = null;
 
     /**
      * @var Collection<int, AccessControl>
@@ -70,6 +79,8 @@ class Property
     #[ORM\OneToMany(targetEntity: Tenant::class, mappedBy: 'property', orphanRemoval: true)]
     private Collection $tenants;
 
+    private ?Tenant $actualTenant = null;
+
     /**
      * @var Collection<int, FinancialEntry>
      */
@@ -88,10 +99,10 @@ class Property
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $UpdatedAt = null;
+    private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne]
-    private ?User $UpdatedBy = null;
+    private ?User $updatedBy = null;
 
 
     public function __construct()
@@ -102,7 +113,7 @@ class Property
         $this->tenants = new ArrayCollection();
         $this->financialEntries = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
-        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -221,6 +232,46 @@ class Property
         return $this;
     }
 
+
+    public function getMortgageRate2(): ?string
+    {
+        return $this->mortgageRate2;
+    }
+
+    public function setMortgageRate2(?string $mortgageRate2): static
+    {
+        $this->mortgageRate2 = $mortgageRate2;
+
+        return $this;
+    }
+
+    /**
+     * @return MortgageEnum[]|null
+     */
+    public function getMortgageType2(): ?MortgageEnum
+    {
+        return $this->mortgageType2;
+    }
+
+    public function setMortgageType2(?MortgageEnum $mortgageType2): static
+    {
+        $this->mortgageType2 = $mortgageType2;
+
+        return $this;
+    }
+
+    public function getMortgageEndDate2(): ?\DateTimeInterface
+    {
+        return $this->mortgageEndDate2;
+    }
+
+    public function setMortgageEndDate2(?\DateTimeInterface $mortgageEndDate2): static
+    {
+        $this->mortgageEndDate2 = $mortgageEndDate2;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, AccessControl>
      */
@@ -325,6 +376,18 @@ class Property
         return $this;
     }
 
+    public function getActualTenant(): ?Tenant
+    {
+        return $this->actualTenant;
+    }
+
+    public function setActualTenant(?Tenant $actualTenant): static
+    {
+        $this->actualTenant = $actualTenant;
+
+        return $this;
+    }
+
     public function removeTenant(Tenant $tenant): static
     {
         if ($this->tenants->removeElement($tenant)) {
@@ -417,24 +480,24 @@ class Property
 
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        return $this->UpdatedAt;
+        return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $UpdatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
-        $this->UpdatedAt = $UpdatedAt;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
 
     public function getUpdatedBy(): ?User
     {
-        return $this->UpdatedBy;
+        return $this->updatedBy;
     }
 
-    public function setUpdatedBy(?User $UpdatedBy): static
+    public function setUpdatedBy(?User $updatedBy): static
     {
-        $this->UpdatedBy = $UpdatedBy;
+        $this->updatedBy = $updatedBy;
 
         return $this;
     }

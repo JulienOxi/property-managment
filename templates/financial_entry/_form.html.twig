@@ -2,10 +2,14 @@
 
 <div class="md:grid md:grid-cols-3 md:gap-4">
 
-    <div class="md:col-span-2">
+    <div>
         {{ form_label(form.type, 'Type', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
         {{ form_widget(form.type, {'attr': {'class': 'input-base'}}) }}
     </div>  
+    <div class="md:col-span-2">
+        {{ form_label(form.property, 'Bien immobilier', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.property, {'attr': {'class': 'input-base'}}) }}
+    </div>
 
     <div class="md:col-span-3">
         {{ form_label(form.category, 'Category', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
@@ -13,31 +17,21 @@
     </div>
 
     <div class="md:col-span-3">
-        {{ form_label(form.amount, 'Montant', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.amount, {'attr': {'class': 'input-base'}}) }}
-    </div>  
-
-    <div>
         {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
         {{ form_widget(form.description, {'attr': {'class': 'input-base'}}) }}
     </div>
+
     <div>
-        {{ form_label(form.isPaid, 'Payé', {'label_attr': {'class': ''}}) }}
-        {{ form_widget(form.isPaid, {'attr': {'class': 'hover:bg-red-900'}}) }}
-    </div>    
+        {{ form_label(form.amount, 'Montant', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.amount, {'attr': {'class': 'input-base'}}) }}
+    </div>  
     <div>
         {{ form_label(form.paidAt, 'Payé le', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.paidAt, {'attr': {'class': 'input-base'}}) }}
+        {{ form_widget(form.paidAt, {'attr': {'class': 'input-base focus:border-green-700'}}) }}
     </div>
-
     <div>
-        {{ form_label(form.property, 'Bien immobilier', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.property, {'attr': {'class': 'input-base'}}) }}
-    </div>
-
-    <div>
-        {{ form_label(form.bank, 'Banque', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.bank, {'attr': {'class': 'input-base'}}) }}
+        {{ form_label(form.isPaid, 'Montant payé', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.isPaid, {'attr': {'class': "input-base focus:border-green-700"}}) }}
     </div>
 
 </div>

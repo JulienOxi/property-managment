@@ -2,20 +2,21 @@
 
 namespace App\Controller;
 
+use App\Entity\Property;
 use App\Entity\PropertyRent;
 use App\Enum\AccessRoleEnum;
-use App\Repository\UploadFileRepository;
 use App\Service\DateService;
 use App\Form\PropertyRentType;
+use App\Service\PropertyService;
 use App\Service\AccessControlService;
 use App\Repository\PropertyRepository;
-use App\Service\PropertyService;
+use App\Repository\UploadFileRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\PropertyRentRepository;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -90,6 +91,7 @@ final class PropertyRentController extends AbstractController
         return $this->render('property_rent/new.html.twig', [
             'property_rent' => $propertyRent,
             'form' => $form,
+            'properties' => $entityManager->getRepository(Property::class)->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]),
         ]);
     }
 

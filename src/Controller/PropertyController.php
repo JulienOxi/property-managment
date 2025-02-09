@@ -2,16 +2,18 @@
 
 namespace App\Controller;
 
+use App\Entity\Bank;
 use App\Entity\Property;
 use App\Form\PropertyType;
 use App\Enum\AccessRoleEnum;
 use App\Entity\AccessControl;
 use App\Form\PropertyShareType;
-use App\Repository\AccessControlRepository;
+use App\Service\PropertyService;
 use App\Service\AccessControlService;
 use App\Repository\PropertyRepository;
 use App\Repository\UploadFileRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\AccessControlRepository;
 use App\Repository\FinancialEntryRepository;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,7 +37,7 @@ final class PropertyController extends AbstractController
 
     
     #[Route(name: 'app_property_index', methods: ['GET'])]
-    public function index(PropertyRepository $propertyRepository, UploadFileRepository $uploadFileRepository): Response
+    public function index(PropertyRepository $propertyRepository, UploadFileRepository $uploadFileRepository, PropertyService $propertyService): Response
     {
 
         $properties = $propertyRepository->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]);
@@ -47,6 +49,7 @@ final class PropertyController extends AbstractController
             if (!empty($uploadsImages)) { //on récupère la première immage
                 $images[$property->getId()] = array_values($uploadsImages)[0];
             }
+            $property->setActualTenant($propertyService->getActualTenant($property));
         }
 
         return $this->render('property/index.html.twig', [
@@ -65,6 +68,7 @@ final class PropertyController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $property->setCreatedBy($this->getUser());
+            $property->setUpdatedBy($this->getUser());
             
             $accessControl = new AccessControl();
             $accessControl->setGrantedUser($this->getUser())
@@ -83,17 +87,21 @@ final class PropertyController extends AbstractController
         return $this->render('property/new.html.twig', [
             'property' => $property,
             'form' => $form,
+            'banks' => $entityManager->getRepository(Bank::class)->findBy(['createdBy' => $this->getUser()]),
         ]);
     }
 
     #[Route('/{id}', name: 'app_property_show', methods: ['GET'])]
-    public function show(Request $request, Property $property, FinancialEntryRepository $financialEntryRepository, UploadFileRepository $uploadFileRepository): Response
+    public function show(Request $request, Property $property, PropertyService $propertyService, FinancialEntryRepository $financialEntryRepository, UploadFileRepository $uploadFileRepository): Response
     {
 
         $propertyCheck = $this->accessControlService->canAccessProperty($this->getUser(), $property, AccessRoleEnum::MEMBER);
         if (!$propertyCheck) {
             throw $this->createAccessDeniedException('Vous n’avez pas accès à cette propriété.');
         }
+
+        //on ajout le locataire actuel
+        $property->setActualTenant($propertyService->getActualTenant($property));
 
         $year = $request->get('year') ?? date('Y');
         $financialEntrys = $financialEntryRepository->findEntryByPropertyAndYear($property, $year); //selection des loyers (entrées financières)
@@ -113,7 +121,12 @@ final class PropertyController extends AbstractController
         $shortMortgages = [];
         $mortgages = $financialEntryRepository->findMortgageByPropertyAndYear($property, $year);
         foreach ($mortgages as $key => $value) {
-            $shortMortgages[$value->getPaidAt()->format('m').'-'.$value->getCategory()->name] = $value;
+            //si il existe dejà une hypothèque pour ce mois, c'est qu'il y a deux hypotèque pour ce bien on ajoute donc une deuxieme hypothèque
+            if (isset($shortMortgages[$value->getPaidAt()->format('m').'-'.$value->getCategory()->name])) {
+                $shortMortgages[$value->getPaidAt()->format('m').'-'.$value->getCategory()->name.'2'] = $value;
+            }else{
+                $shortMortgages[$value->getPaidAt()->format('m').'-'.$value->getCategory()->name] = $value;
+            }
         }
 
         //selection des fichiers

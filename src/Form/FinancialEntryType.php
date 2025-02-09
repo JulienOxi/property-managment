@@ -5,18 +5,29 @@ namespace App\Form;
 use App\Entity\Bank;
 use App\Entity\User;
 use App\Entity\Property;
+use App\Enum\AccessRoleEnum;
 use App\Enum\TransactionEnum;
 use App\Entity\FinancialEntry;
 use App\Enum\FinancialCategoryEnum;
+use App\Repository\PropertyRepository;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 class FinancialEntryType extends AbstractType
 {
+    private Security $security;
+
+    public function __construct(Security $security)
+    {
+        $this->security = $security;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -34,18 +45,21 @@ class FinancialEntryType extends AbstractType
             ])
             ->add('amount')
             ->add('description')
-            ->add('isPaid', CheckboxType::class, [
-                'required' => false,
+            ->add('isPaid', ChoiceType::class, [
+                'choices' => [
+                    'Oui' => true,
+                    'Non' => false
+                ],
             ])
-            ->add('paidAt', null, [
+            ->add('paidAt', DateType::class, [
                 'widget' => 'single_text',
+                'attr' => ['value' => Date('Y-m-d')],
             ])
             ->add('property', EntityType::class, [
                 'class' => Property::class,
-                'choice_label' => 'name',
-            ])
-            ->add('bank', EntityType::class, [
-                'class' => Bank::class,
+                'query_builder' => function (PropertyRepository $propertyRepository) {
+                    return $propertyRepository->findAccessibleProperties($this->security->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER], false);
+                },
                 'choice_label' => 'name',
             ])
         ;

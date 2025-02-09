@@ -19,6 +19,11 @@
                 <div class="relative">
                     <img src="{{ path }}" class="w-full h-48 object-cover opacity-50">
                     <div class="absolute inset-0 flex items-start justify-end">
+                        {% if property.actualTenant is null %}
+                            <span class="inline-block bg-orange-200 text-orange-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded mt-2 z-10">
+                                Disponible
+                            </span>
+                        {% endif %}
                         <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded mt-2 z-10">
                             {{ property.type.value }}
                         </span>
@@ -33,9 +38,20 @@
                 <ul>
                     <li><strong>Prix d'achat:</strong> {{ property.purchasePrice|format_currency('CHF') }}</li>
                     <li><strong>Date d'achat:</strong> {{ property.purchaseDate ? property.purchaseDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</li>
+
+                    <li><hr class="m-2"></li>
+                    
                     <li><strong>Taux hypothécaire:</strong> {{ property.mortgageRate }}%</li>
                     <li><strong>Type d'hypothèque:</strong> {{ property.mortgageType.value }}</li>
                     <li><strong>Fin de l'hypothèque:</strong> {{ property.mortgageEndDate ? property.mortgageEndDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</li>
+
+                    {% if property.mortgageType2 is not null %}
+                    <li class="mt-2 text-gray-500 text-sm text-center">Deuxième hypothèque</li>
+                    <li><strong>Taux hypothécaire:</strong> {{ property.mortgageRate2 }}%</li>
+                    <li><strong>Type d'hypothèque:</strong> {{ property.mortgageType2.value }}</li>
+                    <li><strong>Fin de l'hypothèque:</strong> {{ property.mortgageEndDate2 ? property.mortgageEndDate2|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</li>
+                    {% endif %}
+                    
                     <li><hr class="m-2"></li>
                     
                     {% set rentTotal = 0 %}
@@ -47,9 +63,9 @@
                     
                     <li><strong>Loyer mensuel:</strong> {{ rentTotal }} CHF</li>
                     
-                    {% for tenant in property.tenants %}
-                        <li><strong>Locataire:</strong> {{ tenant.firstname }} {{ tenant.lastname }}</li>
-                    {% endfor %}
+                    {% if property.actualTenant is not null %}
+                        <li><strong>Locataire:</strong> {{ property.actualTenant.firstname }} {{ property.actualTenant.lastname }}</li>
+                    {% endif %}
                 </ul>
             </div>
 
@@ -69,7 +85,9 @@
     </div>
 {% else %}
     <div class="col-span-full text-center text-gray-600">
-        <p>No records found</p>
+        <div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
+            Aucune proprieté actuellement.
+        </div>
     </div>
 {% endfor %}
 

@@ -3,13 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Tenant;
+use App\Entity\Property;
 use App\Form\TenantType;
 use App\Enum\AccessRoleEnum;
+use App\Service\PropertyService;
 use App\Repository\TenantRepository;
-use App\Repository\UploadFileRepository;
 use App\Service\AccessControlService;
 use App\Repository\PropertyRepository;
-use App\Service\PropertyService;
+use App\Repository\UploadFileRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,6 +32,7 @@ final class TenantController extends AbstractController
     {
         $properties = $propertyRepository->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]);
 
+        //on récupère les locataires liés aux propriétés
         $tenants = [];
         foreach ($properties as $property) {
             $tenants = [...$tenants, ...$property->getTenants()];
@@ -78,6 +80,7 @@ final class TenantController extends AbstractController
         return $this->render('tenant/new.html.twig', [
             'tenant' => $tenant,
             'form' => $form,
+            'properties' => $entityManager->getRepository(Property::class)->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]),
         ]);
     }
 
@@ -136,6 +139,9 @@ final class TenantController extends AbstractController
         return $this->redirectToRoute('app_tenant_index', [], Response::HTTP_SEE_OTHER);
     }
 
+    /**
+     * Route permettant de renouveler la location d'un locataire
+     */
     #[Route('/{id}/lease/renew', name: 'app_tenant_lease_renew', methods: ['GET'])]
     public function leaseRenew(Request $request, Tenant $tenant, EntityManagerInterface $entityManager): Response
     {
@@ -146,15 +152,15 @@ final class TenantController extends AbstractController
 
         $rentTo = $tenant->getRentalEndDate();
         if($rentTo < new \DateTimeImmutable()) {
+            //on ajoute 1 an à la date de fin du bail
             $newDate = (new \DateTimeImmutable(date('Y/m/d', $tenant->getRentalEndDate()->getTimestamp())))->modify('+1 year');
             $tenant->setRentalEndDate($newDate);
-            $entityManager->persist($tenant);
+            $this->addFlash('success', 'La durée du bail a été renouvelée');
 
             //on boucle pour récupérer tous les types de loyer / charges et modifier la date de fin
             foreach ($tenant->getPropertyRents() as $key => $value) {
                 if($value->getEndedAt() < $tenant->getRentalEndDate()) {
                     $value->setEndedAt($tenant->getRentalEndDate());
-                    $entityManager->persist($value);
                 }
             }
         }else{

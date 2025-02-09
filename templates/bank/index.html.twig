@@ -14,8 +14,12 @@
                         <h2 class="text-xl font-semibold">{{ bank.name }}</h2>
                         <hr class="m-2">
                         <div class="m-3">
-                            <p><span class="bg-blue-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ bank.email }}</span></p>
-                            <p class="mt-2"><span class="bg-emerald-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ bank.website }}</span></p>
+                            {% if bank.email is not null %}                            
+                                <p><span class="bg-blue-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ bank.email }}</span></p>
+                            {% endif %}
+                            {% if bank.website is not null %}   
+                                <p class="mt-2"><span class="bg-emerald-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ bank.website }}</span></p>
+                            {% endif %}
                         </div>
                         <hr class="m-2">
                     </div>
@@ -23,7 +27,9 @@
                         <ul>
                             <li><strong>BIC:</strong> {{ bank.bic }}</li>
                             <li><strong>IBAN:</strong> {{ bank.iban }} <a href="#" onclick="setClipboard('{{ bank.iban }}')"><span class="material-symbols-outlined text-sm">content_copy</span></a><span class="material-symbols-outlined text-xs text-green-500 hidden" id="iban-copied-success">check</span></li>
-                            <li><strong>Numéro de clearing:</strong> {{ bank.ClearingNumber }}</li>
+                            {% if bank.ClearingNumber is not null %}
+                                <li><strong>Numéro de clearing:</strong> {{ bank.ClearingNumber }}</li>
+                            {% endif %}
                         </ul>
                     </div>
                     <hr class="m-2">
@@ -34,13 +40,17 @@
                 </div>
             {% else %}
                 <div class="col-span-full text-center text-gray-600">
-                    <p>No records found</p>
+                    <div class="col-span-full text-center text-gray-600">
+                        <div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
+                            Aucune banque actuellement.
+                        </div>
+                    </div>
                 </div>
             {% endfor %}
         </div>
 
         <div class="mt-6">
-            <a href="{{ path('app_bank_new') }}" class="inline-block bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">Créer un nouvelle banque</a>
+            <a href="{{ path('app_bank_new') }}" class="inline-block bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">Créer une nouvelle banque</a>
         </div>
     </div>
 {% endblock %}

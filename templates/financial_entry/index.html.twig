@@ -5,11 +5,12 @@
 {% block title %}{{pageName}}{% endblock %}
 {% block pageName %}{{pageName}}{% endblock %}
 
+
 {% block body %}
 <div class="container mx-auto px-4 py-6">
     <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
     <div class="my-2 flex justify-center">
-        <a href="{{ path('app_financial_entry_new') }}" class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">Nouvelle entrée financière</a>
+        <a href="{{ path('app_financial_entry_new') }}" class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">Nouvelle transaction financière</a>
     </div>
 
     <div class="relative flex py-5 items-center col-span-3">
@@ -18,60 +19,67 @@
         <div class="flex-grow border-t border-gray-400"></div>
     </div>
 
-{# formulaire de recherche #}
-<div class="my-2 flex justify-center">
-    {{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
-        <div class="space-y-4">
-            <!-- Propriété -->
-            <div>
-                <h3 class="text-sm font-medium text-gray-900 mb-2">Propriétés</h3>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {% for child in form.property %}
-                        <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
-                            {{ form_widget(child) }}
-                            <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
-                        </label>
-                    {% endfor %}
+{% if properties is not empty %}
+    
+    {# formulaire de recherche #}
+    <div class="my-2 flex justify-center">
+        {{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
+            <div class="space-y-4">
+                <!-- Propriété -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900 mb-2">Propriétés</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {% for child in form.property %}
+                            <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
+                                {{ form_widget(child) }}
+                                <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Type -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900 mb-2">Types de Transaction</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {% for child in form.type %}
+                            <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
+                                {{ form_widget(child) }}
+                                <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Catégorie -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900 mb-2">Catégories</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2" id="category-div">
+                        {% for child in form.category %}
+                            <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
+                                {{ form_widget(child) }}
+                                <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="flex justify-center">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">Filtrer</button>
                 </div>
             </div>
+        {{ form_end(form) }}
+    </div>
 
-            <!-- Catégorie -->
-            <div>
-                <h3 class="text-sm font-medium text-gray-900 mb-2">Catégories</h3>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {% for child in form.category %}
-                        <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
-                            {{ form_widget(child) }}
-                            <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
-                        </label>
-                    {% endfor %}
-                </div>
-            </div>
+{% else %}
 
-            <!-- Type -->
-            <div>
-                <h3 class="text-sm font-medium text-gray-900 mb-2">Types de Transaction</h3>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {% for child in form.type %}
-                        <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
-                            {{ form_widget(child) }}
-                            <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
-                        </label>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <div class="flex justify-center">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">Filtrer</button>
-            </div>
-        </div>
-    {{ form_end(form) }}
+<div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
+    Vous devez ajoutez une Propriété avant de pouvoir effectuer une recherche et ajouter une transaction financière.
 </div>
+{% endif %}
 
 
 {# fin du formulaire de recherche #}
-
-
     
     <div class="overflow-x-auto">
         <table class="min-w-full bg-white shadow-md rounded-lg">
@@ -98,9 +106,6 @@
                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.isPaid ? '<p class="text-green-500">Oui</p>' : '<p class="text-red-500">Non</p>' }}</td>
                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">{{ financial_entry.paidAt ? financial_entry.paidAt|date('Y-m-d H:i:s') : 'N/A' }}</td>
                         <td class="px-2 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="{{ path('app_financial_entry_show', {'id': financial_entry.id}) }}" class="inline-block border-[1px] border-blue-500 text-blue-500 font-semibold pt-1 pb-0 px-1 rounded hover:bg-blue-200">
-                               <span class="material-symbols-outlined text-sm">visibility</span> 
-                            </a>
                             <a href="{{ path('app_financial_entry_edit', {'id': financial_entry.id}) }}" class="hidden border-[1px] border-lime-500 text-lime-500 font-semibold pt-1 pb-0 px-1 rounded hover:bg-lime-200 md:inline-block">
                                <span class="material-symbols-outlined text-sm">edit</span> 
                             </a>
@@ -162,4 +167,21 @@
 
     </div>
 </div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+//permet de generer l'url pour le tri des catégories et afficher uniquement les catégories en foncitron des "entrées" ou "sorties"
+document.addEventListener("DOMContentLoaded", function () {
+    const typeFields = document.querySelectorAll('input[name="transaction_filter[type]"]');
+    const baseUrl = '{{ path("app_financial_entry_index") }}'; // Twig génère l'URL en tant que string JS
+
+    typeFields.forEach(field => {
+        field.addEventListener("change", function () {
+            window.location.href = baseUrl + '?type=' + encodeURIComponent(this.value);
+        });
+    });
+});
+</script>
 {% endblock %}

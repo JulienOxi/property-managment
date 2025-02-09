@@ -99,7 +99,7 @@ class FinancialEntryRepository extends ServiceEntityRepository
                 new Parameter('property', $property),
                 new Parameter('year', '%'.$year.'%'),
                 new Parameter('type', TransactionEnum::EXPENSE),
-                new Parameter('category', FinancialCategoryEnum::MORTAGE),
+                new Parameter('category', FinancialCategoryEnum::MORTGAGE),
             ]))
             ->getQuery()
             ->getResult()

@@ -20,7 +20,11 @@
                     <img src="{{ path }}" class="w-full h-48 object-cover opacity-50">
                     <div class="absolute inset-0 bg-black/50 flex flex-col items-start justify-center px-4">
                         <!-- Nom et prénom -->
-                        <h2 class="text-white text-xl font-semibold bg-gray-900 px-4 py-2 w-fit">
+                        {% set color = 'gray' %}
+                        {# si les dates de bail sont passées, on met la couleur rouge (les locataires n'ont plus de bails actif) #}
+                        {% if tenant.rentalEndDate|date("U") <= "now"|date("U") %}{% set color = 'red' %}{% endif %}
+                        
+                        <h2 class="text-white text-xl font-semibold bg-{{color}}-900 px-4 py-2 w-fit">
                             {{ tenant.firstname }} {{ tenant.lastname }}
                         </h2>
 
@@ -39,17 +43,20 @@
                         </ul>
                     </div>
                     <hr class="m-2">
-                    <div class="p-4 flex justify-between bg-white">
-                        <a href="{{ path('app_tenant_show', {'id': tenant.id}) }}" class="inline-block border-[1px] border-blue-500 text-blue-500 font-semibold pt-1 pb-0 px-4 rounded hover:bg-blue-300"><span class="material-symbols-outlined text-sm">visibility</span></a>
+
+                    <div class="p-4 flex justify-center bg-white gap-4">
+                        <a href="{{ path('app_tenant_show', {'id': tenant.id}) }}" class="inline-flex items-center border-[1px] border-blue-500 text-blue-500 font-semibold py-1 px-4 rounded hover:bg-blue-300 transition-colors"><span class="material-symbols-outlined text-sm">visibility</span>&nbsp;Voir</a>
                         {% if tenant.rentalEndDate|date("U") <= "now"|date("U") %}                        
-                            <a href="{{ path('app_tenant_lease_renew', {'id': tenant.id}) }}" class="inline-block border-[1px] border-teal-500 text-teal-500 font-semibold pb-0 px-4 rounded hover:bg-teal-300">Renouveller le bail</a>
+                            <a href="{{ path('app_tenant_lease_renew', {'id': tenant.id}) }}" class="inline-flex items-center border-[1px] border-orange-500 text-orange-500 font-semibold py-1 px-4 rounded hover:bg-orange-300 transition-colors">Renouveller le bail</a>
                         {% endif %}
-                        <a href="{{ path('app_tenant_edit', {'id': tenant.id}) }}" class="inline-block border-[1px] border-lime-500 text-lime-500 font-semibold pt-1 pb-0 px-4 rounded hover:bg-lime-300"><span class="material-symbols-outlined text-sm">edit</span></a>
+                        <a href="{{ path('app_tenant_edit', {'id': tenant.id}) }}" class="inline-flex items-center border-[1px] border-lime-500 text-lime-500 font-semibold py-1 px-4 rounded hover:bg-lime-300 transition-colors"><span class="material-symbols-outlined text-sm">edit</span>&nbsp;Modifier</a>
                     </div>
                 </div>
             {% else %}
                 <div class="col-span-full text-center text-gray-600">
-                    <p>No records found</p>
+                        <div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
+                            Aucun locataire actuelleemnt.
+                        </div>
                 </div>
             {% endfor %}
         </div>

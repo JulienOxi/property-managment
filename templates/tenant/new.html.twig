@@ -8,11 +8,18 @@
         <div class="w-full max-w-2xl p-6 bg-white rounded-lg shadow-lg">
             <h1 class="text-2xl font-semibold text-center text-gray-800 mb-5">Nouveau locataire</h1>
 
+{% if properties is not empty %}
             <div class="bg-gray-50 p-4 rounded-md mb-6">
                 <p class="text-gray-600">Veuillez remplir les informations ci-dessous :</p>
             </div>
 
-            {{ include('tenant/_form.html.twig') }}
+    {{ include('tenant/_form.html.twig') }}
+{% else %}
+    <div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
+        Vous devez ajoutez une propriété avant de pouvoir ajouter un locataire.
+    </div>
+{% endif %}
+            
 
         </div>
     </div>
@@ -32,8 +39,39 @@ document.addEventListener("DOMContentLoaded", () => {
     validateInput('tenant_firstname', nameRegex)
     validateInput('tenant_email', emailRegex, false)
     validateInput('tenant_phoneNumber', swissPhoneRegex, false)
+});
 
+document.addEventListener("DOMContentLoaded", function () {
+    let startDateInput = document.getElementById("tenant_rentalStartDate");
+    let endDateInput = document.getElementById("tenant_rentalEndDate");
 
+    function getFirstDayOfNextMonth() {
+        let today = new Date();
+        return new Date(today.getFullYear(), today.getMonth() + 1, 2);
+    }
+
+    function updateEndDate() {
+        if (startDateInput.value) {
+            let startDate = new Date(startDateInput.value);
+            startDate.setFullYear(startDate.getFullYear() + 1);
+            startDate.setDate(startDate.getDate() - 1); // Soustrait un jour
+            endDateInput.value = startDate.toISOString().split('T')[0];
+        }
+    }
+
+    // Définir automatiquement la date de début au premier jour du mois suivant
+    let firstDayNextMonth = getFirstDayOfNextMonth();
+    startDateInput.value = firstDayNextMonth.toISOString().split('T')[0];
+
+    // Mettre à jour la date de fin automatiquement
+    updateEndDate();
+
+    startDateInput.addEventListener("change", updateEndDate);
+});
+
+addEventListener("load", (event) => {
+
+    addTenant(document.getElementById('tenant_property').value);
 });
 </script>
 {% endblock %}

@@ -9,11 +9,18 @@
         <div class="w-full max-w-2xl p-6 bg-white rounded-lg shadow-lg">
             <h1 class="text-2xl font-semibold text-center text-gray-800 mb-5">{{pageTitle}}</h1>
 
-            <div class="bg-gray-50 p-4 rounded-md mb-6">
-                <p class="text-gray-600">Veuillez remplir les informations ci-dessous :</p>
-            </div>
 
-            {{ include('property_rent/_form.html.twig') }}
+                {% if properties is not empty %}
+                    <div class="bg-gray-50 p-4 rounded-md mb-6">
+                        <p class="text-gray-600">Veuillez remplir les informations ci-dessous :</p>
+                    </div>
+
+                    {{ include('property_rent/_form.html.twig') }}
+                {% else %}  
+                        <div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
+                            Vous devez ajoutez une propriété avant de pouvoir ajouter un locataire.
+                        </div>
+                {% endif %}
 
         </div>
     </div>

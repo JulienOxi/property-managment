@@ -29,7 +29,6 @@ final class FinancialEntryController extends AbstractController
     #[Route(name: 'app_financial_entry_index', methods: ['GET', 'POST'])]
     public function index(Request $request, FinancialEntryRepository $financialEntryRepository, PropertyRepository $propertyRepository, PaginatorInterface $paginator, CsrfTokenManagerInterface $csrfTokenManager): Response
     {
-
         //formulaire de recherche avec récupération des paramètres de l'url pour préremplire le formulaire
         $caterories = explode(':', $request->query->get('category'));//on récupère les catégories
         $caterories = array_map(fn($category) => FinancialCategoryEnum::fromName($category), $caterories); //on les transforme en enum
@@ -88,6 +87,7 @@ final class FinancialEntryController extends AbstractController
 
         return $this->render('financial_entry/index.html.twig', [
             'financial_entries' => $financialEntries,
+            'properties' => $accessibleProperties,
             'form' => $form->createView(),
             'queryParams' => $request->query->all(),
         ]);
@@ -102,7 +102,8 @@ final class FinancialEntryController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $financialEntry->setCreatedBy($this->getUser());
+            $financialEntry->setCreatedBy($this->getUser())
+                ->setBank($financialEntry->getProperty()->getBank());
             $entityManager->persist($financialEntry);
             $entityManager->flush();
 
@@ -114,14 +115,7 @@ final class FinancialEntryController extends AbstractController
         return $this->render('financial_entry/new.html.twig', [
             'financial_entry' => $financialEntry,
             'form' => $form,
-        ]);
-    }
-
-    #[Route('/{id}', name: 'app_financial_entry_show', methods: ['GET'])]
-    public function show(FinancialEntry $financialEntry): Response
-    {
-        return $this->render('financial_entry/show.html.twig', [
-            'financial_entry' => $financialEntry,
+            'properties' => $entityManager->getRepository(Property::class)->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]),
         ]);
     }
 
@@ -164,7 +158,7 @@ final class FinancialEntryController extends AbstractController
             $entityManager->remove($financialEntry);
             $entityManager->flush();
         }
-
+        $this->addFlash('success', 'La transaction a été supprimée');
         return $this->redirectToRoute('app_financial_entry_index', [], Response::HTTP_SEE_OTHER);
     }
 

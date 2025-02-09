@@ -16,8 +16,6 @@ import './styles/app.css';
 window.validateInput = function(inputId, regex, capitalize = true){
 
     const elem = document.getElementById(inputId);
-  
-    console.log('test input 1');
     //test avec le regex
     const isValid = regex.test(elem.value);
     //on load check

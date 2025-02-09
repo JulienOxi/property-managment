@@ -95,13 +95,14 @@ final class BankController extends AbstractController
                 'labels' => [number_format($sortAmountIncome, 2, '.', '\''), number_format($sortAmountExpense, 2, '.', '\''), number_format($sortTotalAmount, 2, '.', '\'')],//[$sortAmountIncome, $sortAmountExpense, $sortTotalAmount],
                 'datasets' => [
                     [
-                        'label' => 'Dépenses - Revenus - Gains',
+                        'label' => 'Revenus - Dépenses - Gains',
+                        'labelColor' => 'rgb(209, 213, 219)',
                         'backgroundColor' => ['rgb(8, 241, 8)', 'rgb(255, 99, 172)', 'rgb(111, 0, 255)'],
                         'borderColor' => ['rgb(1, 141, 1)', 'rgb(139, 50, 69)', 'rgb(69, 0, 160)'],
                         'data' => [$sortAmountIncome, $sortAmountExpense, $sortTotalAmount]
                     ]
                 ]
-            ]);
+                    ]);
 
             $chart->setOptions([
                 'scales' => [

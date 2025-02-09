@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\User;
 use App\Entity\Property;
 use App\Enum\AccessRoleEnum;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -19,21 +20,26 @@ class PropertyRepository extends ServiceEntityRepository
     }
 
 
-    public function findAccessibleProperties(User $user, AccessRoleEnum|array $requiredRoles): array
+    public function findAccessibleProperties(User $user, AccessRoleEnum|array $requiredRoles, $result = true): array | QueryBuilder
     {
         // Normaliser les rôles en un tableau
         $roles = is_array($requiredRoles) 
             ? array_merge(...array_map([$this, 'getRolesHierarchy'], $requiredRoles)) 
             : $this->getRolesHierarchy($requiredRoles);
     
-        return $this->createQueryBuilder('p')
+                
+        $query = $this->createQueryBuilder('p')
             ->join('p.accessControls', 'ac')
             ->where('ac.grantedUser = :user')
             ->andWhere('ac.role IN (:roles)')
             ->setParameter('user', $user)
-            ->setParameter('roles', $roles)
-            ->getQuery()
-            ->getResult();
+            ->setParameter('roles', $roles);
+
+            if ($result) {
+                return $query->getQuery()->getResult();
+            }
+            
+            return $query;
     }
     
 
