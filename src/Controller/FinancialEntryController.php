@@ -10,6 +10,7 @@ use App\Enum\TransactionEnum;
 use App\Entity\FinancialEntry;
 use App\Form\FinancialEntryType;
 use App\Enum\FinancialCategoryEnum;
+use App\Form\FinancialEntryNewType;
 use App\Form\TransactionFilterType;
 use App\Repository\PropertyRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -97,7 +98,11 @@ final class FinancialEntryController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $financialEntry = new FinancialEntry();
-        $form = $this->createForm(FinancialEntryType::class, $financialEntry);
+
+        // On Set le type si il est renseigné dans la route
+        $request->query->get('type') ? $financialEntry->setType(TransactionEnum::fromName($request->query->get('type'))) : null;
+
+        $form = $this->createForm(FinancialEntryNewType::class, $financialEntry);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

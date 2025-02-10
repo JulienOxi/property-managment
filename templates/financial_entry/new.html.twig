@@ -29,9 +29,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(\d{4})$/;
     const descriptionRegex = /^.{1,255}$/;
 
-    validateInput('financial_entry_amount', amountRegex, false)
-    validateInput('financial_entry_paidAt', dateRegex, false)
-    validateInput('financial_entry_description', descriptionRegex, false)
+    validateInput('financial_entry_new_amount', amountRegex, false)
+    validateInput('financial_entry_new_paidAt', dateRegex, false)
+    validateInput('financial_entry_new_description', descriptionRegex, false)
+});
+</script>
+
+<script>
+//permet de generer l'url pour le tri des catégories et afficher uniquement les catégories en foncitron des "entrées" ou "sorties"
+document.addEventListener("DOMContentLoaded", function () {
+    const typeFields = document.querySelectorAll('select[name="financial_entry_new[type]"]');
+    const baseUrl = '{{ path("app_financial_entry_new") }}'; // Twig génère l'URL en tant que string JS
+
+    typeFields.forEach(field => {
+        field.addEventListener("change", function () {
+            window.location.href = baseUrl + '?type=' + encodeURIComponent(this.value);
+        });
+    });
 });
 </script>
 {% endblock %}
