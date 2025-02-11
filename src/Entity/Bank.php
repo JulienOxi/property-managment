@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BankRepository::class)]
 class Bank
@@ -17,21 +18,54 @@ class Bank
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(
+        message: 'Le nom ne peut pas être vide',
+    )]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: 'Le nom doit faire au minimum {{ limit }} caractères',
+        maxMessage: 'Le nom peut faire au maximum {{ limit }} caractères',
+    )]
+    #[Assert\NotBlank(
+        message: 'Le nom ne peut pas être vide',
+    )]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Email(
+        message: 'l\'email {{ value }} n\'est pas un email valide.',
+    )]
     private ?string $email = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Url(
+        message: 'Le site web {{ value }} n\'est pas une URL valide.',
+    )]
     private ?string $website = null;
 
     #[ORM\Column(length: 11)]
+    #[Assert\NotBlank(
+        message: 'Le BIC ne peut pas être vide',
+    )]
+    #[Assert\Regex(
+        pattern: '/^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$/',
+        message: 'Le BIC {{ value }} n\'est pas un BIC valide.',
+    )]
     private ?string $bic = null;
 
     #[ORM\Column(length: 34)]
+    #[Assert\NotBlank(
+        message: 'Le IBAN ne peut pas être vide',
+    )]
+    #[Assert\Regex(
+        pattern: '/^[A-Z]{2}[0-9]{2}(?:[ ]?[0-9]{4}){4}(?:[ ]?[0-9]{1,2})?$/',
+        message: 'Le IBAN {{ value }} n\'est pas un IBAN valide.',
+    )]
     private ?string $iban = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    #[Assert\Positive]
     private ?int $clearingNumber = null;
 
     #[ORM\Column]

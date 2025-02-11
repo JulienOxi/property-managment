@@ -7,6 +7,7 @@ use App\Enum\TransactionEnum;
 use App\Repository\FinancialEntryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FinancialEntryRepository::class)]
 class FinancialEntry
@@ -23,9 +24,22 @@ class FinancialEntry
     private ?FinancialCategoryEnum $category = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Assert\NotBlank]
+    #[Assert\Type(
+        type: "numeric",
+        message: 'Veuillez entrer une valeur numérique'
+    )]
+    #[Assert\GreaterThanOrEqual(0)]
+    #[Assert\Regex(pattern: "/^\d+(?:[\.,]\d{0,2})?$/", message: "Le montant peut avoir au maximum 2 décimales.")]
     private ?string $amount = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+        minMessage: 'La description doit faire au minimum {{ limit }} caractères',
+        maxMessage: 'La description peut faire au maximum {{ limit }} caractères',
+    )]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'financialEntries')]

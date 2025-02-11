@@ -1,21 +1,12 @@
+{% import 'form_macros.html.twig' as macros %}
 {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
 
 <div class="md:grid md:grid-cols-3 md:gap-4">
 
-    <div class="md:col-span-2">
-        {{ form_label(form.type, 'Type', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.type, {'attr': {'class': 'input-base'}}) }}
-    </div>  
 
-    <div class="md:col-span-3">
-        {{ form_label(form.name, 'Nom', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.name, {'attr': {'class': 'input-base'}}) }}
-    </div>
-
-    <div class="md:col-span-3">
-        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.description, {'attr': {'class': 'input-base'}}) }}
-    </div>  
+    {{ macros.field(form.type, 'Type', 'md:col-span-2') }}
+    {{ macros.field(form.name, 'Nom', 'md:col-span-3') }}
+    {{ macros.field(form.description, 'Description', 'md:col-span-3') }}
 
     <div class="relative flex py-5 items-center col-span-3">
         <div class="flex-grow border-t border-gray-400"></div>
@@ -23,33 +14,14 @@
         <div class="flex-grow border-t border-gray-400"></div>
     </div>
 
+    {{ macros.field(form.address.street, 'Rue', 'col-span-2') }}
+    {{ macros.field(form.address.streetNumber, 'Numéro de rue', '') }}
+    {{ macros.field(form.address.zipCode, 'Code postal', '') }}
+    {{ macros.field(form.address.city, 'Ville', 'col-span-2') }}
 
-    <div class="col-span-2">
-        {{ form_label(form.address.street, 'Rue', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.address.street, {'attr': {'class': 'input-base'}}) }}
-    </div>
-    <div>
-        {{ form_label(form.address.streetNumber, 'Numéro de rue', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.address.streetNumber, {'attr': {'class': 'input-base'}}) }}
-    </div>   
-    <div>
-        {{ form_label(form.address.zipCode, 'Code postal', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.address.zipCode, {'attr': {'class': 'input-base'}}) }}
-    </div>   
-    <div class="col-span-2">
-        {{ form_label(form.address.city, 'ville', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.address.city, {'attr': {'class': 'input-base'}}) }}
-    </div>    
+    {{ macros.field(form.EWID, 'EWID', '') }}
+    {{ macros.field(form.EGID, 'EGID', '') }}
 
-    <div>
-        {{ form_label(form.EWID, 'EWID', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.EWID, {'attr': {'class': 'input-base'}}) }}
-    </div>
-
-    <div>
-        {{ form_label(form.EGID, 'EGID', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.EGID, {'attr': {'class': 'input-base'}}) }}
-    </div>
 
     <div class="relative flex py-5 items-center col-span-3">
     <div class="flex-grow border-t border-gray-400"></div>
@@ -57,57 +29,30 @@
     <div class="flex-grow border-t border-gray-400"></div>
     </div>
 
-    <div>
-        {{ form_label(form.purchasePrice, 'Prix d\'achat', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.purchasePrice, {'attr': {'class': 'input-base'}}) }}
-    </div>
-    <div>
-        {{ form_label(form.purchaseDate, 'Date d\'achat', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.purchaseDate, {'attr': {'class': 'input-base'}}) }}
-    </div>
-    <div>
-        {{ form_label(form.bank, 'Banque', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.bank, {'attr': {'class': 'input-base'}}) }}
-    </div>
+    {{ macros.field(form.purchasePrice, 'Prix d\'achat', '') }}
+    {{ macros.field(form.purchaseDate, 'Date d\'achat', '') }}
+    {{ macros.field(form.bank, 'Banque', '') }}
+
+
     <div class="relative flex py-5 items-center col-span-3">
     <div class="flex-grow border-t border-gray-400"></div>
     <span class="flex-shrink mx-4 text-gray-400">Première hypothèque</span>
     <div class="flex-grow border-t border-gray-400"></div>
     </div>
-    <div>
-        {{ form_label(form.mortgageType, 'Type d\'hypothèque', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.mortgageType, {'attr': {'class': 'input-base'}}) }}
-    </div>    
 
-    <div>
-        {{ form_label(form.mortgageRate, 'Taux hypothécaire', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.mortgageRate, {'attr': {'class': 'input-base'}}) }}
-    </div>
+    {{ macros.field(form.mortgageType, 'Type d\'hypothèque', '') }}
+    {{ macros.field(form.mortgageRate, 'Taux hypothécaire', '') }}
+    {{ macros.field(form.mortgageEndDate, 'Fin de l\'hypothèque', '') }}
 
-    <div>
-        {{ form_label(form.mortgageEndDate, 'Fin de l\'hypothèque', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.mortgageEndDate, {'attr': {'class': 'input-base'}}) }}
-    </div>
     <div class="relative flex py-5 items-center col-span-3">
     <div class="flex-grow border-t border-gray-400"></div>
     <span class="flex-shrink mx-4 text-gray-400">Seconde hypothèque</span>
     <div class="flex-grow border-t border-gray-400"></div>
     </div>
 
-    <div>
-        {{ form_label(form.mortgageType2, 'Type d\'hypothèque', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.mortgageType2, {'attr': {'class': 'input-base'}}) }}
-    </div>    
-
-    <div>
-        {{ form_label(form.mortgageRate2, 'Taux hypothécaire', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.mortgageRate2, {'attr': {'class': 'input-base'}}) }}
-    </div>
-
-    <div>
-        {{ form_label(form.mortgageEndDate2, 'Fin de l\'hypothèque', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.mortgageEndDate2, {'attr': {'class': 'input-base'}}) }}
-    </div>
+    {{ macros.field(form.mortgageType2, 'Type d\'hypothèque', '') }}
+    {{ macros.field(form.mortgageRate2, 'Taux hypothécaire', '') }}
+    {{ macros.field(form.mortgageEndDate2, 'Fin de l\'hypothèque', '') }}
 
 </div>
 

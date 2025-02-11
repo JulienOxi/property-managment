@@ -1,24 +1,12 @@
+{% import 'form_macros.html.twig' as macros %}
 {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
 
 <div class="md:grid md:grid-cols md:gap-4">
 
-    <div>
-        {{ form_label(form.lastname, 'Nom', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.lastname, {'attr': {'class': 'input-base'}}) }}
-    </div>
-    <div>
-        {{ form_label(form.firstname, 'Prénom', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.firstname, {'attr': {'class': 'input-base'}}) }}
-    </div>  
-    <div>
-        {{ form_label(form.email, 'Email', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.email, {'attr': {'class': 'input-base'}}) }}
-    </div>
-
-    <div>
-        {{ form_label(form.phoneNumber, 'Numéro de téléphone', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.phoneNumber, {'attr': {'class': 'input-base'}}) }}
-    </div>
+    {{ macros.field(form.lastname, 'Nom', '') }}
+    {{ macros.field(form.firstname, 'Prénom', '') }}
+    {{ macros.field(form.email, 'Email', '') }}
+    {{ macros.field(form.phoneNumber, 'Numéro de téléphone', '') }}
 
     <div class="relative flex py-5 items-center col-span-2">
     <div class="flex-grow border-t border-gray-400"></div>
@@ -26,20 +14,14 @@
     <div class="flex-grow border-t border-gray-400"></div>
     </div>
 
-    <div>
-        {{ form_label(form.rentalStartDate, 'Date d\'entrée', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.rentalStartDate, {'attr': {'class': 'input-base'}}) }}
-    </div>    
-
-    <div>
-        {{ form_label(form.rentalEndDate, 'Fin de bail', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.rentalEndDate, {'attr': {'class': 'input-base'}}) }}
-    </div>
+    {{ macros.field(form.rentalStartDate, 'Date d\'entrée', '') }}
+    {{ macros.field(form.rentalEndDate, 'Fin de bail', '') }}
 
     <div class="md:col-span-2">
         {{ form_label(form.property, 'Appartement', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
         {{ form_widget(form.property, {'attr': {'class': 'input-base', 'onchange': 'addTenant(this.value)'}})  }}
     </div>
+    
 </div>
     <div id="tenant" class="col-span-2 text-sm font-medium text-gray-700 place-items-center spinner">
     </div>

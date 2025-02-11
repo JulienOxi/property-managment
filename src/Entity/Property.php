@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PropertyRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PropertyRepository::class)]
 class Property
@@ -19,10 +20,31 @@ class Property
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $name = null;
+    #[Assert\NotBlank(
+        message: 'Le nom ne peut pas être vide',
+    )]
+    #[Assert\Length(
+        min: 2,
+        max: 100,
+        minMessage: 'Le nom doit faire au minimum {{ limit }} caractères',
+        maxMessage: 'Le nom peut faire au maximum {{ limit }} caractères',
+    )]
+    #[Assert\NotBlank(
+        message: 'Le nom ne peut pas être vide',
+    )]
+    private string $name = '';
 
     #[ORM\Column(type: "text")]
-    private ?string $description = null;
+    #[Assert\NotBlank(
+        message: 'La description ne peut pas être vide',
+    )]
+    #[Assert\Length(
+        min: 5,
+        max: 1000000,
+        minMessage: 'La description doit faire au minimum {{ limit }} caractères',
+        maxMessage: 'La description peut faire au maximum {{ limit }} caractères',
+    )]
+    private string $description = '';
 
     #[ORM\Column(enumType: PropertyEnum::class)]
     private ?PropertyEnum $type = null;
@@ -32,12 +54,23 @@ class Property
     private ?Address $address = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    #[Assert\Positive(
+        message: 'Le prix d\'achat doit être supérieur à 0',
+    )]
+    #[Assert\Regex(
+        pattern: "/^(10(?:[.,]0{1,2})?|[0-9](?:[0-9']{0,2}(?:[0-9]{3})?)*(?:[.,][0-9]{1,2})?)$/",
+        message: 'Le prix d\'achat doit contenir uniquement des chiffres et des virgules',
+    )]
     private ?string $purchasePrice = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $purchaseDate = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    #[Assert\Regex(
+        pattern: "/^(10(?:[.,]0{1,2})?|[0-9](?:[.,][0-9]{1,2})?)$/",
+        message: 'Le taux hypothécaire doit contenir uniquement des chiffres et des virgules',
+    )]
     private ?string $mortgageRate = null;
 
     #[ORM\Column(enumType: MortgageEnum::class, nullable: true)]
@@ -47,6 +80,10 @@ class Property
     private ?\DateTimeInterface $mortgageEndDate = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    #[Assert\Regex(
+        pattern: "/^(10(?:[.,]0{1,2})?|[0-9](?:[.,][0-9]{1,2})?)$/",
+        message: 'Le taux hypothécaire doit contenir uniquement des chiffres et des virgules',
+    )]
     private ?string $mortgageRate2 = null;
 
     #[ORM\Column(enumType: MortgageEnum::class, nullable: true)]
@@ -62,9 +99,15 @@ class Property
     private Collection $accessControls;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Positive(
+        message: 'Le EWID doit être supérieur à 0',
+    )]
     private ?string $EWID = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Positive(
+        message: 'Le EGID doit être supérieur à 0',
+    )]
     private ?string $EGID = null;
 
     /**
@@ -121,7 +164,7 @@ class Property
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -133,7 +176,7 @@ class Property
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getDescription(): string
     {
         return $this->description;
     }

@@ -7,6 +7,7 @@ use App\Enum\PropertyRentType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PropertyRentRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PropertyRentRepository::class)]
 class PropertyRent
@@ -17,12 +18,28 @@ class PropertyRent
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(
+        message: 'La description ne peut pas être vide',
+    )]
+    #[Assert\Length(
+        min: 5,
+        max: 255,
+        minMessage: 'La description doit faire au minimum {{ limit }} caractères',
+        maxMessage: 'La description peut faire au maximum {{ limit }} caractères',
+    )]
     private ?string $description = null;
 
     #[ORM\Column(enumType: PropertyRentEnum::class)]
     private ?PropertyRentEnum $type = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 7, scale: 2)]
+    #[Assert\NotBlank]
+    #[Assert\Type(
+        type: "numeric",
+        message: 'Veuillez entrer une valeur numérique'
+    )]
+    #[Assert\GreaterThanOrEqual(0)]
+    #[Assert\Regex(pattern: "/^\d+(?:[\.,]\d{0,2})?$/", message: "Le montant peut avoir au maximum 2 décimales.")]
     private ?string $monthlyPrice = null;
 
     #[ORM\ManyToOne(inversedBy: 'propertyRents')]

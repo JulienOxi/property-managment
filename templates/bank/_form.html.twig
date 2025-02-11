@@ -1,34 +1,14 @@
+{% import 'form_macros.html.twig' as macros %}
 {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
 
-<div class="md:grid md:grid-cols-3 md:gap-4">
+<div class="md:grid md:grid-cols-4 md:gap-4">
 
-    <div class="">
-        {{ form_label(form.name, 'Nom de la banque', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.name, {'attr': {'class': 'input-base'}}) }}
-    </div>  
-
-    <div class="">
-        {{ form_label(form.email, 'Email', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.email, {'attr': {'class': 'input-base'}}) }}
-    </div>
-
-    <div class="">
-        {{ form_label(form.website, 'Site web', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.website, {'attr': {'class': 'input-base'}}) }}
-    </div>  
-
-    <div>
-        {{ form_label(form.bic, 'Bic', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.bic, {'attr': {'class': 'input-base'}}) }}
-    </div>
-    <div>
-        {{ form_label(form.iban, 'Compte Iban', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.iban, {'attr': {'class': 'input-base'}}) }}
-    </div>    
-    <div>
-        {{ form_label(form.clearingNumber, 'N° de clearing', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.clearingNumber, {'attr': {'class': 'input-base'}}) }}
-    </div>
+    {{ macros.field(form.name, 'Nom de la banque', 'col-span-4') }}
+    {{ macros.field(form.email, 'Email de contact', 'col-span-2') }}
+    {{ macros.field(form.website, 'Site web', 'col-span-2') }}
+    {{ macros.field(form.bic, 'Bic', '') }}
+    {{ macros.field(form.clearingNumber, 'N° de clearing', '') }}
+    {{ macros.field(form.iban, 'IBAN', 'col-span-2') }}
 
 </div>
 

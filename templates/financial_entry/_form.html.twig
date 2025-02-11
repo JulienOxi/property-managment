@@ -1,38 +1,15 @@
+{% import 'form_macros.html.twig' as macros %}
 {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
 
 <div class="md:grid md:grid-cols-3 md:gap-4">
 
-    <div>
-        {{ form_label(form.type, 'Type', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.type, {'attr': {'class': 'input-base'}}) }}
-    </div>  
-    <div class="md:col-span-2">
-        {{ form_label(form.property, 'Bien immobilier', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.property, {'attr': {'class': 'input-base'}}) }}
-    </div>
-
-    <div class="md:col-span-3">
-        {{ form_label(form.category, 'Category', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.category, {'attr': {'class': 'input-base'}}) }}
-    </div>
-
-    <div class="md:col-span-3">
-        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.description, {'attr': {'class': 'input-base'}}) }}
-    </div>
-
-    <div>
-        {{ form_label(form.amount, 'Montant', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.amount, {'attr': {'class': 'input-base'}}) }}
-    </div>  
-    <div>
-        {{ form_label(form.paidAt, 'Payé le', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.paidAt, {'attr': {'class': 'input-base focus:border-green-700'}}) }}
-    </div>
-    <div>
-        {{ form_label(form.isPaid, 'Montant payé', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.isPaid, {'attr': {'class': "input-base focus:border-green-700"}}) }}
-    </div>
+    {{ macros.field(form.type, 'Type', '') }}
+    {{ macros.field(form.property, 'Bien immobilier', 'md:col-span-2') }} 
+    {{ macros.field(form.category, 'Categorie', 'md:col-span-3') }} 
+    {{ macros.field(form.description, 'Description', 'md:col-span-3') }} 
+    {{ macros.field(form.amount, 'Montant', '') }} 
+    {{ macros.field(form.paidAt, 'Payé le', '') }} 
+    {{ macros.field(form.isPaid, 'Montant payé', '') }} 
 
 </div>
 

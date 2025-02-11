@@ -27,7 +27,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const amountRegex = /^\d+(?:[\.,]\d{0,2})?$/;
     const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(\d{4})$/;
-    const descriptionRegex = /^.{1,255}$/;
+    const descriptionRegex = /^.{2,255}$/;
 
     validateInput('financial_entry_new_amount', amountRegex, false)
     validateInput('financial_entry_new_paidAt', dateRegex, false)

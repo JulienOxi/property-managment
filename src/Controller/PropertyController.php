@@ -52,6 +52,7 @@ final class PropertyController extends AbstractController
             $property->setActualTenant($propertyService->getActualTenant($property));
         }
 
+
         return $this->render('property/index.html.twig', [
             'properties' => $properties,
             'images' => $images

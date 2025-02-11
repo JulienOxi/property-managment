@@ -1,38 +1,22 @@
+{% import 'form_macros.html.twig' as macros %}
 {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
 
 <div class="md:grid md:grid-cols-3 md:gap-4">
 
-    <div class="md:col-span-3">
-        {{ form_errors(form.description) }}
-        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.description, {'attr': {'class': 'input-base'}}) }}
-    </div>  
-    <div>
-        {{ form_label(form.type, 'Type de charge', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.type, {'attr': {'class': 'input-base'}}) }}
-    </div>        
-    <div>
-        {{ form_label(form.monthlyPrice, 'Montant mensuel', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.monthlyPrice, {'attr': {'class': 'input-base'}}) }}
-    </div>    
-    <div>
-        {{ form_label(form.fromAt, 'A partir du', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.fromAt, {'attr': {'class': 'input-base'}}) }}
-    </div>
-    <div>
-        {{ form_label(form.endedAt, 'Jusqu\'au', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.endedAt, {'attr': {'class': 'input-base'}}) }}
-    </div>
+    {{ macros.field(form.description, 'Description', 'md:col-span-3') }}
+    {{ macros.field(form.type, 'Type', '') }}
+    {{ macros.field(form.monthlyPrice, 'Montant mensuel', '') }}
+    {{ macros.field(form.fromAt, 'A partir du', '') }}
+    {{ macros.field(form.endedAt, 'Jusqu\'au', '') }}
+
 
     <div class="relative flex py-5 items-center col-span-3">
     <div class="flex-grow border-t border-gray-400"></div>
-    <span class="flex-shrink mx-4 text-gray-400">Hypotèque et achat</span>
+    <span class="flex-shrink mx-4 text-gray-400">Selection du bien immobilier</span>
     <div class="flex-grow border-t border-gray-400"></div>
     </div>
 
-
-
-    <div>
+    <div class="col-span-3">
         {{ form_label(form.property, 'Proprieté', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
         {{ form_widget(form.property, {'attr': {'class': 'input-base', 'onchange': 'addTenant(this.value)'}}) }}
     </div>

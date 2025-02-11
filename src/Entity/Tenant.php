@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TenantRepository::class)]
 class Tenant
@@ -17,15 +18,40 @@ class Tenant
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: 'Le prénom doit faire au minimum {{ limit }} caractères',
+        maxMessage: 'Le prénom peut faire au maximum {{ limit }} caractères',
+    )]
+    #[Assert\NotBlank(
+        message: 'Le prénom ne peut pas être vide',
+    )]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: 'Le nom doit faire au minimum {{ limit }} caractères',
+        maxMessage: 'Le nom peut faire au maximum {{ limit }} caractères',
+    )]
+    #[Assert\NotBlank(
+        message: 'Le nom ne peut pas être vide',
+    )]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Email(
+        message: 'l\'email {{ value }} n\'est pas un email valide.',
+    )]
     private ?string $email = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Assert\Regex(
+        pattern: "/^(\b(0041|0)|\B\+41)(\s?\(0\))?(\s)?[1-9]{2}(\s)?[0-9]{3}(\s)?[0-9]{2}(\s)?[0-9]{2}\b$/",
+        message: 'Le numéro de téléphone doit avoir le format d\'un numéro de téléphone suisse',
+    )]
     private ?string $phoneNumber = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
