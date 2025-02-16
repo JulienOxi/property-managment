@@ -94,7 +94,7 @@ final class PropertyController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_property_show', methods: ['GET'], requirements: ['id' => Requirement::POSITIVE_INT])]
-    public function show(Request $request, Property $property, PropertyService $propertyService, FinancialEntryRepository $financialEntryRepository, UploadFileRepository $uploadFileRepository): Response
+    public function show(Request $request, Property $property, PropertyService $propertyService, FinancialEntryRepository $financialEntryRepository, UploadFileRepository $uploadFileRepository, EntityManagerInterface $entityManager): Response
     {
 
         $propertyCheck = $this->accessControlService->canAccessProperty($this->getUser(), $property, AccessRoleEnum::MEMBER);
@@ -133,6 +133,13 @@ final class PropertyController extends AbstractController
 
         //selection des fichiers
         $uploadsFiles = $uploadFileRepository->findBy(['property' => $property->getId(), 'type' => 'document']);
+            foreach ($uploadsFiles as $key => $uploadsFile) {
+                if ($uploadsFile->getEntityClass() !== null) {
+                    $uploadsFiles[$key] = $uploadsFile->setLoadedEntity($entityManager->getRepository($uploadsFile->getEntityClass())->find($uploadsFile->getEntityId()));
+                } else {
+                    $uploadsFiles[$key] = $uploadsFile;
+                }
+            }
         $uploadsImages = $uploadFileRepository->findBy(['property' => $property->getId(), 'type' => 'image']);
 
         return $this->render('property/show.html.twig', [

@@ -49,6 +49,8 @@ class UploadFile
     #[ORM\JoinColumn(nullable: false)]
     private ?Property $property = null;
 
+    private $loadedEntity = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -183,6 +185,18 @@ class UploadFile
     public function setProperty(?Property $property): static
     {
         $this->property = $property;
+
+        return $this;
+    }
+
+    public function getLoadedEntity(): ?object
+    {
+        return $this->loadedEntity;
+    }
+
+    public function setLoadedEntity(?object $loadedEntity): static
+    {
+        $this->loadedEntity = $loadedEntity;
 
         return $this;
     }

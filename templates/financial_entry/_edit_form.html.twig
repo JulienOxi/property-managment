@@ -10,9 +10,30 @@
 
     {# //uniquement pour la mise à jour d'une transaction, on control si il existe déjà un fichier joint avec cette dernière #}
     {% if uploaded_file is defined and uploaded_file is not empty %}
-        {{uploaded_file.description}}
-    {% endif %}
-    
+        <div class="relative flex py-5 items-center col-span-3">
+            <div class="flex-grow border-t border-gray-400"></div>
+            <span class="flex-shrink mx-4 text-gray-400">Fichier joint</span>
+            <div class="flex-grow border-t border-gray-400"></div>
+        </div>
+        <div class="flex justify-between border-b pb-2 mt-4 col-span-3">
+            <p class="text-gray-600 text-sm">
+                {{ uploaded_file.description }}
+            </p>
+            <a href="{{ asset('uploads/' ~ financial_entry.property.id ~ '/' ~ uploaded_file.fileName) }}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
+                <span class="material-symbols-outlined text-base mr-1">
+                    picture_as_pdf
+                </span>
+                Voir le fichier
+            </a>
+            <div class="flex items-end">
+                {{ include('upload_file/_delete_form.html.twig', {'upload_file': uploaded_file}) }}
+            </div>
+        </div>
+        {# on rend quand même le chant uploadfile mais en invisible #}
+        <div class="hidden">
+        {{ macros.field(form.uploadFile, '', '') }} 
+        </div>
+    {% else %}
         {% if form.uploadFile.vars.choices is defined and form.uploadFile.vars.choices is not empty %}
             <div class="relative flex py-5 items-center col-span-3">
                 <div class="flex-grow border-t border-gray-400"></div>
@@ -25,6 +46,7 @@
             {{ macros.field(form.uploadFile, '', '') }} 
             </div>
         {% endif %}
+    {% endif %}
 
 </div>
 

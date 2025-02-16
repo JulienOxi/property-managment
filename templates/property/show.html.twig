@@ -480,8 +480,9 @@
 					<div class="space-y-2 mt-4">
 						{% for file in uploadsFiles %}
 							<div class="flex justify-between border-b pb-2">
-								<p class="text-gray-600 text-sm">
+								<p class="text-gray-600 text-sm">									
 									{{ file.description }}
+									{{ file.loadedEntity.id }}
 								</p>
 								<a href="{{ asset('uploads/' ~ property.id ~ '/' ~ file.fileName) }}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
 									<span class="material-symbols-outlined text-base mr-1">
