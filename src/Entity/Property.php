@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Enum\MortgageEnum;
 use App\Enum\PropertyEnum;
+use App\Enum\AccessRoleEnum;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PropertyRepository;
@@ -147,6 +148,12 @@ class Property
     #[ORM\ManyToOne]
     private ?User $updatedBy = null;
 
+    /**
+     * @var Collection<int, UploadFile>
+     */
+    #[ORM\OneToMany(targetEntity: UploadFile::class, mappedBy: 'property')]
+    private Collection $uploadFiles;
+
 
     public function __construct()
     {
@@ -157,6 +164,7 @@ class Property
         $this->financialEntries = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->uploadFiles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -541,6 +549,46 @@ class Property
     public function setUpdatedBy(?User $updatedBy): static
     {
         $this->updatedBy = $updatedBy;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        foreach ($this->accessControls as $accessControl) {
+            if ($accessControl->getRole() === AccessRoleEnum::OWNER) {
+                return $accessControl->getGrantedUser();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return Collection<int, UploadFile>
+     */
+    public function getUploadFiles(): Collection
+    {
+        return $this->uploadFiles;
+    }
+
+    public function addUploadFile(UploadFile $uploadFile): static
+    {
+        if (!$this->uploadFiles->contains($uploadFile)) {
+            $this->uploadFiles->add($uploadFile);
+            $uploadFile->setProperty($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUploadFile(UploadFile $uploadFile): static
+    {
+        if ($this->uploadFiles->removeElement($uploadFile)) {
+            // set the owning side to null (unless already changed)
+            if ($uploadFile->getProperty() === $this) {
+                $uploadFile->setProperty(null);
+            }
+        }
 
         return $this;
     }

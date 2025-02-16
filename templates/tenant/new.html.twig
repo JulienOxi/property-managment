@@ -75,4 +75,10 @@ addEventListener("load", (event) => {
     addTenant(document.getElementById('tenant_property').value);
 });
 </script>
+
+<script>
+window.addEventListener("load", () => {
+    document.getElementById("menu_btn_tenant").classList.add("menu-btn-active");
+})
+</script>
 {% endblock %}

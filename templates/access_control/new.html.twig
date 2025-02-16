@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New AccessControl{% endblock %}
+
+{% block body %}
+    <h1>Create new AccessControl</h1>
+
+    {{ include('access_control/_form.html.twig') }}
+
+    <a href="{{ path('app_access_control_index') }}">back to list</a>
+{% endblock %}

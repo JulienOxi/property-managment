@@ -11,6 +11,19 @@
     {{ macros.field(form.paidAt, 'Payé le', '') }} 
     {{ macros.field(form.isPaid, 'Montant payé', '') }} 
 
+    {% if form.uploadFile.vars.choices is not empty %}
+        <div class="relative flex py-5 items-center col-span-3">
+            <div class="flex-grow border-t border-gray-400"></div>
+            <span class="flex-shrink mx-4 text-gray-400">Optionnel</span>
+            <div class="flex-grow border-t border-gray-400"></div>
+        </div>
+        {{ macros.field(form.uploadFile, 'Joindre un fichier', '') }} 
+    {% else %}
+        <div class="hidden">
+        {{ macros.field(form.uploadFile, '', '') }} 
+        </div>
+    {% endif %}
+
 </div>
 
 <div>

@@ -3,61 +3,79 @@
 {% block title %}Authentification email{% endblock %}
 
 {% block body %}
-
 <main>
     <div class="md:grid md:grid-cols-3 h-screen">
 
     <!--login-->
-    <div class="">
-        <div class="ml-2 mt-2 text-xl font-thin">Property Manager App</div>
-        <div class="content-center mx-12 h-[90vh]">
-{% if authenticationError %}
-    <div class="row">
-        <div class="col-lg-6 col-md-8 col-12 mx-auto">
-            <div class="alert alert-danger text-white mb-5 text-center" role="alert">
-                <span class="alert-text"><strong>Warning! </strong>{{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}</span>
+        <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+            <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
+                <div>
+
+                    <!--login-->
+                    {% if authenticationError %}
+                        <div class="row">
+                            <div class="col-lg-6 col-md-8 col-12 mx-auto">
+                                <div class="alert alert-danger text-white mb-5 text-center" role="alert">
+                                    <span class="alert-text"><strong>Warning! </strong>{{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}        
+                    
+                    <form class="form" action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="post">
+
+                        <div class="flex flex-col items-center mb-6">
+                            <div class="relative w-[100px] h-[100px] mx-auto mt-2">
+                                <img src="{{ asset('media/logo_border.png') }}" alt="Logo" class="w-full h-full object-cover invert" />
+                                <h2 class="absolute bottom-0 left-1/2 transform -translate-x-1/2 px-1 text-lg font-bold text-center bottom-[-15px]">
+                                    {{ app_name }}
+                                </h2>
+                                <h2 class="absolute right-[-13px] bottom-[-5px] px-1 text-xs font-bold text-center bg-orange-500 rounded">
+                                    APP
+                                </h2>
+                            </div>
+                            <h2 class="mt-4 font-bold text-center text-gray-900 bg-gray-100 px-4 py-2 rounded-lg">
+                                Veuillez saisir votre code reçu par email
+                            </h2>
+                        </div>
+
+                            <label for="_auth_code" class="form-label">Code</label>
+                            <input
+                                id="_auth_code"
+                                type="text"
+                                name="{{ authCodeParameterName }}"
+                                autocomplete="one-time-code"
+                                class="input-base"
+                                required
+                                {#
+                                https://www.twilio.com/blog/html-attributes-two-factor-authentication-autocomplete
+                                If your 2fa methods are using numeric codes only, add these attributes for better user experience:
+                                inputmode="numeric"
+                                pattern="[0-9]*"
+                                #}
+                            />
+                            {% if displayTrustedOption %}
+                            <div class="form-check form-switch d-flex align-items-center mb-3">
+                                <input id="_trusted" type="checkbox" name="{{ trustedParameterName }}" class="form-check-input" />
+                                <label class="form-check-label mb-0 ms-3" for="_trusted">Se souvenir de moi</label>
+                            </div>
+                            {% endif %}
+
+                                <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
+
+                            <button class="mt-4 py-2 appearance-none w-full border rounded-md border-gray-300 bg-cyan-400 hover:bg-cyan-500" type="submit">
+                                Valider
+                            </button>
+                    </form>   
+                    <form class="form" action="{{ logoutPath }}" method="post">
+                            <button class="mt-4 py-2 appearance-none w-full border rounded-md border-red-300 bg-red-400 hover:bg-red-500" type="submit">
+                                Annuler
+                            </button>
+                    </form>            
+
+                </div>
             </div>
         </div>
-    </div>
-{% endif %}        
-            
-            <form class="form" action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="post">
-
-                <div class="my-3 py-2 text-xl text-center text-gray-600 font-bold">Veuillez saisir votre code reçu par email</div>
-
-                <hr class="h-50">
-
-                    <label for="_auth_code" class="form-label">Code</label>
-                    <input
-                        id="_auth_code"
-                        type="text"
-                        name="{{ authCodeParameterName }}"
-                        autocomplete="one-time-code"
-                        class="input-base"
-                        required
-                        {#
-                        https://www.twilio.com/blog/html-attributes-two-factor-authentication-autocomplete
-                        If your 2fa methods are using numeric codes only, add these attributes for better user experience:
-                        inputmode="numeric"
-                        pattern="[0-9]*"
-                        #}
-                    />
-                    {% if displayTrustedOption %}
-                    <div class="form-check form-switch d-flex align-items-center mb-3">
-                        <input id="_trusted" type="checkbox" name="{{ trustedParameterName }}" class="form-check-input" />
-                        <label class="form-check-label mb-0 ms-3" for="_trusted">Se souvenir de moi</label>
-                    </div>
-                    {% endif %}
-
-                        <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
-
-                    <button class="mt-8 py-2 appearance-none w-full border rounded-md border-gray-300 bg-cyan-400 hover:bg-cyan-500" type="submit">
-                        Valider
-                    </button>
-                    <a href="{{ logoutPath }}" class="mt-8 py-2 text-center appearance-none w-full border rounded-md border-gray-300 bg-red-400 hover:bg-red-500">{{ "cancel"|trans({}, 'SchebTwoFactorBundle') }}</a>
-            </form>    
-        </div>
-    </div>
 
         <!--image-->
         <div class="hidden md:block bg-cover bg-center col-span-2" style="background-image: url({{ asset('media/2fa.jpg') }})"></div>

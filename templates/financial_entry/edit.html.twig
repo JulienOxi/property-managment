@@ -1,15 +1,27 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit FinancialEntry{% endblock %}
+{% set pageName = 'Modifier une transaction financière' %}
+{% block pageName %}{{ pageName }}{% endblock %}
+{% block title %}{{ pageName }}{% endblock %}
 
 {% block body %}
-    <h1>Edit FinancialEntry</h1>
+    <div class="flex items-center justify-center min-h-screen bg-gray-100">
+        <div class="w-full max-w-2xl p-6 bg-white rounded-lg shadow-lg">
+            <h1 class="text-xl font-semibold text-center text-gray-800 mb-5 md:text-2xl">{{ pageName }}</h1>
 
-    {{ include('financial_entry/_form.html.twig', {'button_label': 'Modifier'}) }}
+            <div class="bg-gray-50 p-4 rounded-md mb-6">
+                {# <p class="text-gray-600">Veuillez remplir les informations ci-dessous :</p> #}
+            </div>
 
+            {{ include('financial_entry/_form.html.twig', {'button_label': 'Modifier'}) }}
+            
     <div class="my-2 flex justify-end">
         {{ include('financial_entry/_delete_form.html.twig') }}
+    </div>            
+
+        </div>
     </div>
+
 {% endblock %}
 
 {% block javascripts %}
@@ -23,5 +35,11 @@ document.addEventListener("DOMContentLoaded", () => {
     validateInput('financial_entry_paidAt', dateRegex, false)
     validateInput('financial_entry_description', descriptionRegex, false)
 });
+</script>
+
+<script>
+window.addEventListener("load", () => {
+    document.getElementById("menu_btn_finance").classList.add("menu-btn-active");
+})
 </script>
 {% endblock %}

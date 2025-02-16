@@ -12,7 +12,6 @@
 {% block importmap %}{{ importmap('app') }}{% endblock %}
 {% block javascripts %}
 {% endblock %}
-
         {% block stylesheets %}
         {% endblock %}  
        
@@ -29,10 +28,10 @@
 <body class="bg-gray-100 text-gray-800">
   <div class="flex min-h-screen">
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 bg-gray-800 text-white hidden sm:block">
+    <aside id="sidebar" class="w-64 bg-cyan-950 text-white hidden sm:block">
       <div class="relative w-[100px] h-[100px] mx-auto mt-2">
-          <img src="{{ asset('media/logo.png') }}" alt="Logo" class="w-full h-full object-cover" />
-          <h2 class="absolute bottom-0 left-1/2 transform -translate-x-1/2 px-1 text-lg font-bold text-center bottom-[-10px]">
+          <img src="{{ asset('media/logo_border.png') }}" alt="Logo" class="w-full h-full object-cover" />
+          <h2 class="absolute bottom-0 left-1/2 transform -translate-x-1/2 px-1 text-lg font-bold text-center bottom-[-15px]">
               {{ app_name }}
           </h2>
       </div>
@@ -45,23 +44,24 @@
             </svg>
             <a href="{{ path('app_home') }}">Home</a>
           </li> #}
-          <li class="p-4 flex items-center hover:bg-gray-700 transition">
+          <li class="p-4 flex items-center hover:bg-cyan-900 transition" id="menu_btn_property">
             <span class="material-symbols-outlined mr-2">apartment</span>
             <a href="{{ path('app_property_index') }}">Bien immobilier</a>
           </li>
-          <li class="p-4 flex items-center hover:bg-gray-700 transition">
+          <li class="p-4 flex items-center hover:bg-cyan-900 transition" id="menu_btn_tenant">
             <span class="material-symbols-outlined mr-2">group</span>
             <a href="{{ path('app_tenant_index') }}">Locataire</a>
           </li>     
-          <li class="p-4 flex items-center hover:bg-gray-700 transition">
+          <li class="p-4 flex items-center hover:bg-cyan-900 transition" id="menu_btn_rent">
             <span class="material-symbols-outlined mr-2">assured_workload</span>
             <a href="{{ path('app_property_rent_index') }}">Loyer</a>
           </li>      
-          <li class="p-4 flex items-center hover:bg-gray-700 transition">
+          <li class="p-4 flex items-center hover:bg-cyan-900 transition" id="menu_btn_finance">
             <span class="material-symbols-outlined mr-2">attach_money</span>
             <a href="{{ path('app_financial_entry_index') }}">Finance</a>
-          </li>           
-          <li class="p-4 flex items-center hover:bg-gray-700 transition">
+          </li>    
+          </a>       
+          <li class="p-4 flex items-center hover:bg-cyan-900 transition" id="menu_btn_bank">
             <span class="material-symbols-outlined mr-2">corporate_fare</span>
             <a href="{{ path('app_bank_index') }}">Banque</a>
           </li>  
@@ -100,12 +100,18 @@
               {# <div class="h-6 w-[1px] bg-gray-300"></div> #}
 
           <!-- User Menu -->
-          <div class="relative">
-            <button class="flex items-center gap-2 hover:text-blue-500 transition">
-              <span class="material-symbols-outlined">person</span>
-              <span>{{ app.user.profile.fullName }}</span>
-            </button>
-          </div>
+
+  <div class="dropdown inline-block relative">
+      <button class="flex items-center gap-2 hover:text-blue-500 transition">
+        <span class="material-symbols-outlined">person</span>
+        <span>{{ app.user.profile.fullName }}</span>
+      </button>
+    <ul class="dropdown-menu absolute hidden text-gray-700 pt-1">
+      <li class=""><a class="rounded-t bg-gray-200 hover:bg-gray-300 py-2 px-4 block whitespace-no-wrap" href="#">Profile</a></li>
+      <li class=""><a class="bg-red-500 hover:bg-red-600 py-2 px-4 block whitespace-no-wrap" href="{{ path('app_logout') }}">Logout</a></li>
+    </ul>
+  </div>
+{# -------------------------------------------------------------------------------------------------------- #}
 
         </div>
       </header>

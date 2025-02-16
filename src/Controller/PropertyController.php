@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -45,7 +46,7 @@ final class PropertyController extends AbstractController
         //on cherche les images liées aux propriétés pour afficher dans le card header
         $images = [];
         foreach ($properties as $property) {
-        $uploadsImages = $uploadFileRepository->findBy(['entityId' => $property->getId(), 'type' => 'image', 'entityClass' => 'Property']);
+        $uploadsImages = $uploadFileRepository->findBy(['property' => $property->getId(), 'type' => 'image']);
             if (!empty($uploadsImages)) { //on récupère la première immage
                 $images[$property->getId()] = array_values($uploadsImages)[0];
             }
@@ -92,7 +93,7 @@ final class PropertyController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_property_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'app_property_show', methods: ['GET'], requirements: ['id' => Requirement::POSITIVE_INT])]
     public function show(Request $request, Property $property, PropertyService $propertyService, FinancialEntryRepository $financialEntryRepository, UploadFileRepository $uploadFileRepository): Response
     {
 
@@ -131,8 +132,8 @@ final class PropertyController extends AbstractController
         }
 
         //selection des fichiers
-        $uploadsFiles = $uploadFileRepository->findBy(['entityId' => $property->getId(), 'type' => 'document', 'entityClass' => 'Property']);
-        $uploadsImages = $uploadFileRepository->findBy(['entityId' => $property->getId(), 'type' => 'image', 'entityClass' => 'Property']);
+        $uploadsFiles = $uploadFileRepository->findBy(['property' => $property->getId(), 'type' => 'document']);
+        $uploadsImages = $uploadFileRepository->findBy(['property' => $property->getId(), 'type' => 'image']);
 
         return $this->render('property/show.html.twig', [
             'year' => $year,
@@ -146,10 +147,10 @@ final class PropertyController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_property_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_property_edit', methods: ['GET', 'POST'], requirements: ['id' => Requirement::POSITIVE_INT])]
     public function edit(Request $request, Property $property, EntityManagerInterface $entityManager): Response
     {
-        $propertyCheck = $this->accessControlService->canAccessProperty($this->getUser(), $property, AccessRoleEnum::MEMBER);
+        $propertyCheck = $this->accessControlService->canAccessProperty($this->getUser(), $property, AccessRoleEnum::OWNER);
         if (!$propertyCheck) {
             throw $this->createAccessDeniedException('Vous n’avez pas accès à cette propriété.');
         }
@@ -181,10 +182,9 @@ final class PropertyController extends AbstractController
      * elle affiche un formulaire pour le partage d'un lien sinon
      * prend en param le ID de la propriété
      */
-    #[Route('/share/{id}', name: 'app_property_share', methods: ['GET', 'POST'])]
+    #[Route('/share/{id}', name: 'app_property_share', methods: ['GET', 'POST'], requirements: ['id' => Requirement::POSITIVE_INT])]
     public function share(Request $request, Property $property, AccessControlRepository $accessControlRepository, EntityManagerInterface $entityManager, UriSigner $uriSigner, MailerInterface $mailer): Response
-    {
-    
+    {    
     /////Partie validation du lien
         //on regarde si on trouve une url de validation valide
         if ($request->isMethod('GET') && $request->query->has('_hash') && $request->query->get('_expiration') && $request->query->get('email')) {
@@ -222,7 +222,7 @@ final class PropertyController extends AbstractController
                     // pass variables
                 ->context([
                     'owner_name' => $propertyOwner->getGrantedUser()->getProfile()->getFullName(),
-                    'property_link' => $this->generateUrl('app_property_share', ['id' => $property->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
+                    'property_link' => $this->generateUrl('app_property_show', ['id' => $property->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
                     'property_name' => $property->getType()->value.' - '.$property->getAddress()->getZipCode().' '.$property->getAddress()->getCity(),
                     'invited_user' => $this->getUser()->getProfile()->getFullName(),
                     'app_name' => $_ENV['APP_NAME']
@@ -239,7 +239,7 @@ final class PropertyController extends AbstractController
             $propertyCheck = $this->accessControlService->canAccessProperty($this->getUser(), $property, AccessRoleEnum::OWNER);
             if (!$propertyCheck) {
                 $this->addFlash('error','OUPS,Vous n’avez pas accès au partage de cette propriété.');
-                return $this->redirect($request->headers->get('referer'));
+                return $this->redirectToRoute('app_property_index', [], Response::HTTP_SEE_OTHER);
             }
         }
 

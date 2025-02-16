@@ -19,6 +19,7 @@ use App\Repository\FinancialEntryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -101,6 +102,7 @@ final class FinancialEntryController extends AbstractController
 
         // On Set le type si il est renseigné dans la route
         $request->query->get('type') ? $financialEntry->setType(TransactionEnum::fromName($request->query->get('type'))) : null;
+        $request->query->get('property') ? $financialEntry->setProperty($entityManager->getRepository(Property::class)->find($request->query->get('property'))) : null;
 
         $form = $this->createForm(FinancialEntryNewType::class, $financialEntry);
         $form->handleRequest($request);
@@ -111,6 +113,16 @@ final class FinancialEntryController extends AbstractController
                 ->setBank($financialEntry->getProperty()->getBank());
             $entityManager->persist($financialEntry);
             $entityManager->flush();
+
+            //Si l'utilisateur selectionne un fichier en rapport avec la dépense on le met à jour
+            if($form['uploadFile']->getData() !== null){
+                $uploadFile = $form['uploadFile']->getData();
+                $uploadFile
+                    ->setUpdatedBy($this->getUser())
+                    ->setEntityClass(FinancialEntry::class)
+                    ->setEntityId($financialEntry->getId());
+                $entityManager->flush();
+            };
 
             $this->addFlash('success', 'La transaction a bien été ajouté');
 
@@ -124,7 +136,7 @@ final class FinancialEntryController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_financial_entry_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_financial_entry_edit', methods: ['GET', 'POST'], requirements: ['id' => Requirement::POSITIVE_INT])]
     public function edit(Request $request, FinancialEntry $financialEntry, EntityManagerInterface $entityManager, RequestStack $requestStack): Response
     {
         $session = $request->getSession(); 
@@ -156,7 +168,7 @@ final class FinancialEntryController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_financial_entry_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'app_financial_entry_delete', methods: ['POST'], requirements: ['id' => Requirement::POSITIVE_INT])]
     public function delete(Request $request, FinancialEntry $financialEntry, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$financialEntry->getId(), $request->getPayload()->getString('_token'))) {
@@ -168,7 +180,7 @@ final class FinancialEntryController extends AbstractController
     }
 
     
-    #[Route('/generate/from_property_rent/{property_id}', name: 'app_financial_entry_generate_from_property_rent', methods: ['POST'])]
+    #[Route('/generate/from_property_rent/{property_id}', name: 'app_financial_entry_generate_from_property_rent', methods: ['POST'], requirements: ['property_id' => Requirement::POSITIVE_INT])]
     public function grnerateFromPropertyRent(FinancialEntryRepository $financialEntryRepository, Request $request, CsrfTokenManagerInterface $csrfTokenManager, EntityManagerInterface $em, DateService $dateService, EnumService $enumService, int $property_id = 0): Response
     {
         $token = $request->request->get('_csrf_token');

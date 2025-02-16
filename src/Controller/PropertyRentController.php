@@ -16,6 +16,7 @@ use App\Repository\PropertyRentRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -42,9 +43,9 @@ final class PropertyRentController extends AbstractController
         //on cherche les images liées aux propriétés pour afficher dans le card header
         $images = [];
         foreach ($properties as $property) {
-        $uploadsImages = $uploadFileRepository->findBy(['entityId' => $property->getId(), 'type' => 'image', 'entityClass' => 'Property']);
+        $uploadsImages = $uploadFileRepository->findOneBy(['property' => $property->getId(), 'type' => 'image']);
             if (!empty($uploadsImages)) { //on récupère la première immage
-                $images[$property->getId()] = array_values($uploadsImages)[0];
+                $images[$property->getId()] = $uploadsImages;
             }
         }
 
@@ -95,7 +96,7 @@ final class PropertyRentController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_property_rent_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_property_rent_edit', methods: ['GET', 'POST'], requirements: ['id' => Requirement::POSITIVE_INT])]
     public function edit(Request $request, PropertyRent $propertyRent, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(PropertyRentType::class, $propertyRent);
@@ -115,7 +116,7 @@ final class PropertyRentController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_property_rent_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'app_property_rent_delete', methods: ['POST'], requirements: ['id' => Requirement::POSITIVE_INT])]
     public function delete(Request $request, PropertyRent $propertyRent, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$propertyRent->getId(), $request->getPayload()->getString('_token'))) {
@@ -127,7 +128,7 @@ final class PropertyRentController extends AbstractController
     }
 
 
-    #[Route('/gettenant/{propertyId}', name: 'app_property_rent_get_tenant', methods: ['POST', 'GET'])]
+    #[Route('/gettenant/{propertyId}', name: 'app_property_rent_get_tenant', methods: ['POST', 'GET'], requirements: ['propertyId' => Requirement::POSITIVE_INT])]
     public function getTenantFromProperty($propertyId, PropertyService $propertyService, PropertyRepository $propertyRepository): JsonResponse
     {
         $tenant = $propertyService->getActualTenant($propertyRepository->findOneBy(['id' => $propertyId]));

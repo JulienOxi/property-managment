@@ -79,10 +79,12 @@
                     <span class="material-symbols-outlined text-sm mr-2">visibility</span>
                     Voir
                 </a>
-                <a href="{{ path('app_property_edit', {'id': property.id}) }}" class="inline-flex items-center border-[1px] border-lime-500 text-lime-500 font-semibold py-1 px-4 rounded hover:bg-lime-300 transition-colors">
-                    <span class="material-symbols-outlined text-sm mr-2">edit</span>
-                    Modifier
-                </a>
+                {% if property.Owner == app.user %}                
+                    <a href="{{ path('app_property_edit', {'id': property.id}) }}" class="inline-flex items-center border-[1px] border-lime-500 text-lime-500 font-semibold py-1 px-4 rounded hover:bg-lime-300 transition-colors">
+                        <span class="material-symbols-outlined text-sm mr-2">edit</span>
+                        Modifier
+                    </a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -96,4 +98,12 @@
 
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+window.addEventListener("load", () => {
+    document.getElementById("menu_btn_property").classList.add("menu-btn-active");
+})
+</script>
 {% endblock %}

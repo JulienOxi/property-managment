@@ -12,6 +12,7 @@ use App\Repository\FinancialEntryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -53,7 +54,7 @@ final class BankController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_bank_show', methods: ['GET', 'POST'])]
+    #[Route('/{id}', name: 'app_bank_show', methods: ['GET', 'POST'], requirements: ['id' => Requirement::POSITIVE_INT])]
     public function show(Bank $bank, Request $request, FinancialEntryRepository $financialEntryRepository, ChartBuilderInterface $chartBuilder): Response
     {
         if($bank->getCreatedBy() != $this->getUser()){
@@ -140,7 +141,7 @@ final class BankController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_bank_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_bank_edit', methods: ['GET', 'POST'], requirements: ['id' => Requirement::POSITIVE_INT])]
     public function edit(Request $request, Bank $bank, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(BankType::class, $bank);

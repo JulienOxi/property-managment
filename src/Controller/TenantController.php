@@ -7,7 +7,6 @@ use App\Entity\Property;
 use App\Form\TenantType;
 use App\Enum\AccessRoleEnum;
 use App\Service\PropertyService;
-use App\Repository\TenantRepository;
 use App\Service\AccessControlService;
 use App\Repository\PropertyRepository;
 use App\Repository\UploadFileRepository;
@@ -15,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/app/tenant')]
@@ -42,9 +42,9 @@ final class TenantController extends AbstractController
         $images = [];
         foreach ($tenants as $tenant) {
             $property = $tenant->getProperty();
-            $uploadsImages = $uploadFileRepository->findBy(['entityId' => $property->getId(), 'type' => 'image', 'entityClass' => 'Property']);
+            $uploadsImages = $uploadFileRepository->findOneBy(['property' => $property->getId(), 'type' => 'image']);
                 if (!empty($uploadsImages)) { //on récupère la première immage
-                    $images[$tenant->getId()] = array_values($uploadsImages)[0];
+                    $images[$tenant->getId()] = $uploadsImages;
                 }
             }
 
@@ -84,7 +84,7 @@ final class TenantController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_tenant_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'app_tenant_show', methods: ['GET'], requirements: ['id' => Requirement::POSITIVE_INT])]
     public function show(Tenant $tenant): Response
     {
         $propertyCheck = $this->accessControlService->canAccessProperty($this->getUser(), $tenant->getProperty(), AccessRoleEnum::MEMBER);
@@ -97,7 +97,7 @@ final class TenantController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_tenant_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_tenant_edit', methods: ['GET', 'POST'], requirements: ['id' => Requirement::POSITIVE_INT])]
     public function edit(Request $request, Tenant $tenant, EntityManagerInterface $entityManager, PropertyService $propertyService): Response
     {
         $propertyCheck = $this->accessControlService->canAccessProperty($this->getUser(), $tenant->getProperty(), AccessRoleEnum::MEMBER);
@@ -123,7 +123,7 @@ final class TenantController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_tenant_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'app_tenant_delete', methods: ['POST'], requirements: ['id' => Requirement::POSITIVE_INT])]
     public function delete(Request $request, Tenant $tenant, EntityManagerInterface $entityManager): Response
     {
         $propertyCheck = $this->accessControlService->canAccessProperty($this->getUser(), $tenant->getProperty(), AccessRoleEnum::MEMBER);
@@ -142,7 +142,7 @@ final class TenantController extends AbstractController
     /**
      * Route permettant de renouveler la location d'un locataire
      */
-    #[Route('/{id}/lease/renew', name: 'app_tenant_lease_renew', methods: ['GET'])]
+    #[Route('/{id}/lease/renew', name: 'app_tenant_lease_renew', methods: ['GET'], requirements: ['id' => Requirement::POSITIVE_INT])]
     public function leaseRenew(Request $request, Tenant $tenant, EntityManagerInterface $entityManager): Response
     {
         $propertyCheck = $this->accessControlService->canAccessProperty($this->getUser(), $tenant->getProperty(), AccessRoleEnum::MEMBER);

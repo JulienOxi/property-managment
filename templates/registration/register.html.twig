@@ -11,7 +11,6 @@
         <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
             <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
                 <div>
-                    <div class="text-2xl font-thin mb-4">{{ app_name }} App</div>
                         {# les erreurs #}
                         {% for flash_error in app.flashes('verify_email_error') %}
                             <div class="bg-red-600 w-full text-center text-white rounded" role="alert">{{ flash_error }}</div>
@@ -28,9 +27,15 @@
 
                         <div class="bg-red-600 w-full text-center text-white rounded mb-2" role="alert">{{ form_errors(registrationForm) }}</div>
                         <div class="flex flex-col items-center mb-6">
-                            <div class="w-40 h-40 mx-auto">
-                                <img src="{{ asset('media/logo.png') }}" alt="Logo" class="w-full h-full object-cover rounded-full" />
-                            </div>
+                  <div class="relative w-[100px] h-[100px] mx-auto mt-2">
+                      <img src="{{ asset('media/logo_border.png') }}" alt="Logo" class="w-full h-full object-cover invert" />
+                      <h2 class="absolute bottom-0 left-1/2 transform -translate-x-1/2 px-1 text-lg font-bold text-center bottom-[-15px]">
+                          {{ app_name }}
+                      </h2>
+                      <h2 class="absolute right-[-13px] bottom-[-5px] px-1 text-xs font-bold text-center bg-orange-500 rounded">
+                          APP
+                      </h2>
+                  </div>
                             <h2 class="mt-4 text-xl font-bold text-center text-gray-900 bg-gray-100 px-4 py-2 rounded-lg">
                                 Enregistrement nouvel utilisateur
                             </h2>

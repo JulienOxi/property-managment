@@ -33,10 +33,10 @@ class UploadFile
     #[ORM\JoinColumn(nullable: false)]
     private ?User $updatedBy = null;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(length: 100, nullable: true)]
     private ?string $entityClass = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private ?int $entityId = null;
 
     #[ORM\Column(length: 255)]
@@ -44,6 +44,10 @@ class UploadFile
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
+
+    #[ORM\ManyToOne(inversedBy: 'uploadFiles')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Property $property = null;
 
     public function getId(): ?int
     {
@@ -167,6 +171,18 @@ class UploadFile
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getProperty(): ?Property
+    {
+        return $this->property;
+    }
+
+    public function setProperty(?Property $property): static
+    {
+        $this->property = $property;
 
         return $this;
     }

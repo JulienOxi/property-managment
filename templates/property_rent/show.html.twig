@@ -44,3 +44,11 @@
 
     {{ include('property_rent/_delete_form.html.twig') }}
 {% endblock %}
+
+{% block javascripts %}
+    <script>
+    window.addEventListener("load", () => {
+        document.getElementById("menu_btn_rent").classList.add("menu-btn-active");
+    })
+    </script>
+{% endblock %}

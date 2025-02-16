@@ -1,13 +1,29 @@
 {% extends 'base.html.twig' %}
 
-{% set pageName = "Détail de la propriété" %}
+	{% set pageName = "Détail de la propriété" %}
 
-{% block title %}{{property.type.value}} - {{property.address.city}}{% endblock %}
-{% block pageName %}{{pageName}}{% endblock %}
+	{% block title %}
+		{{property.type.value}}
+		-
+		{{property.address.city}}
+	{% endblock %}
+	{% block pageName %}
+		{{pageName}}
+	{% endblock %}
+
+{% block stylesheets %}
+<style>
+	.showDescription {
+		display: block;
+		max-height: 500px;
+		overflow: auto;
+	}
+</style>
+{% endblock %}
 
 {% block body %}
 
-        {% set months = { 
+		{% set months = { 
             01 : 'Janvier',
             02 : 'Février',
             03 : 'Mars',
@@ -23,298 +39,483 @@
             } 
         %}
 
-    {# on regarde si il existe une deuxième hypothèque, si oui on met la variable hypo2 a true #}
-        {% set hypo2 = false %}
-        {% if property.mortgageType2 is not null %}
-            {% set hypo2 = true %}
-        {% endif %}
+		{# on regarde si il existe une deuxième hypothèque, si oui on met la variable hypo2 a true #}
+		{% set hypo2 = false %}
+		{% if property.mortgageType2 is not null %}
+			{% set hypo2 = true %}
+		{% endif %}
 
-<div class="container mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
+		<div class="container mx-auto p-6">
+			<h1 class="text-2xl font-bold mb-6 text-center md:hidden">
+				{{pageName}}
+			</h1>
 
-    <div class="mt-6 flex justify-between">
-        <div>
-            <a href="{{ path('app_property_edit', {'id': property.id}) }}" 
-            class="flex items-center px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 mr-2 space-x-2">
-                <span class="material-symbols-outlined text-base">edit</span>
-                <span>Modifier</span>
-            </a>
-        </div>
-            <a href="{{ path('app_property_share', {'id': property.id}) }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">Partager cette propriété</a>
-    </div>
+			{% if property.Owner == app.user %}
+				<div class="mt-6 flex flex-row-reverse ">
+					<div>
+						<a href="{{ path('app_property_edit', {'id': property.id}) }}" class="flex items-center px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 mr-2 space-x-2">
+							<span class="material-symbols-outlined text-base">
+								edit
+							</span>
+							<span>
+								Modifier
+							</span>
+						</a>
+					</div>
+				</div>
+			{% endif %}
+			<div class="rounded-lg p-6 mt-2 grid grid-cols-2 xl:grid-cols-6 gap-6">
+				<!-- Card Section -->
+				<div class="col-span-6 xl:col-span-2">
+					<div class="grid gap-4">
+						{# partage #}
+						<div class="bg-gray-50 p-4 rounded-lg border-[1px] border-solid border-stone-300 rounded-lg shadow col-span-2 hover:border-stone-800 hover:duration-[0.5s]">
+							<div class="flex justify-between mb-4">
+								<h2 class="text-xl font-semibold text-gray-700 mb-2">
+									Accès à la propriété
+								</h2>
+								<div>
+									<a href="{{ path('app_property_share', {'id': property.id}) }}" 
+									class="flex items-center p-1 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-100">
+										<span class="material-symbols-outlined text-base">share</span> 
+										Partager cette propriété
+									</a>
+								</div>
+							</div>
+							{% for accessControl in property.accessControls %}
+								<div class="grid grid-cols-3">
+									<p class="text-gray-600 py-0">
+										{{ accessControl.grantedUser.profile.firstname }} {{ accessControl.grantedUser.profile.lastname }}
+									</p>
+									{% if accessControl.grantedUser == property.owner %}
+										<p class="text-center inline-block bg-lime-200 text-lime-800 text-sm font-semibold mb-3 p-1 rounded">Propriétaire</p>
+									{% else %}
+										<p class="text-center inline-block bg-amber-200 text-amber-800 text-sm font-semibold mb-3 p-1 rounded">Membre</p>
+											{% if property.owner == app.user %}
+												{{ include('access_control/_delete_form.html.twig', {'access_control': accessControl, 'bgColor': 'bg-gray-50'}) }}
+											{% endif %}
+									{% endif %}
+								</div>
+							{% endfor %}
+						</div>
+						{# description #}
+						<div class="bg-gray-50 p-4 rounded-lg border-[1px] border-solid border-stone-300 rounded-lg shadow col-span-2 hover:border-stone-800 hover:duration-[0.5s] showDescription" id="description">
+							<div class="flex justify-between">
+								<h2 class="text-xl font-semibold text-gray-700 mb-2">
+									Description
+								</h2>
+								<span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
+									{{ property.type.value }}
+								</span>
+							</div>
+							<p class="text-gray-600 text-sm">
+								{{ property.name }}
+							</p>
+							<p class="text-gray-600">
+								{{ property.description|nl2br }}
+							</p>
+						</div>
+					</div>
+				</div>
+				{# loyers #}
+				<div class="col-span-6 xl:col-span-4">
+					<div class="grid gap-4">
+						<div class="h-fit bg-gray-50 p-4 rounded-lg col-span-6 border-[1px] border-solid border-stone-300 rounded-lg shadow hover:border-stone-800 hover:duration-[0.5s] xl:col-span-4">
+							<div class="flex justify-between">
+								<h2 class="text-xl font-semibold text-gray-700 mb-2">
+									Loyers
+								</h2>
+								<div class="flex justify-between gap-2">
+									<a href="{{path('app_property_show', {'id': property.id, 'year': year - 1})}}">
+										<<</a><spanclass="inline-blockbg-blue-200text-blue-800text-smfont-semiboldmb-3p-1rounded">Année | {{year}}</span><a href="{{path('app_property_show',{'id':property.id,'year':year+1})}}">>>
+									</a>
+								</div>
+								<div class="flex justify-between gap-2"></div>
+							</div>
+							<div class="relative">
+								<div class="flex overflow-x-auto gap-4">
+									<table class="table-auto w-full">
+										<thead>
+											<tr>
+												<th class="text-sm bg-cyan-900"></th>
+												<th class="text-sm bg-cyan-900 text-white hidden lg:table-cell">
+													Locataire
+												</th>
+												<th class="text-sm bg-cyan-900 text-white hidden md:table-cell">
+													Loyer
+												</th>
+												<th class="text-sm bg-cyan-900 text-white hidden md:table-cell">
+													Charges
+												</th>
+												<th class="text-sm bg-cyan-900 text-white hidden md:table-cell">
+													Parking
+												</th>
+												<th class="text-sm bg-cyan-900 text-white">
+													Total
+												</th>
+												<th class="text-sm bg-orange-200">
+													Charges PPE
+												</th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for key, month in months %}
+												{% if key < 10 %}
+													{% set formattedKey = '0' ~ key %}
+												{% else %}
+													{% set formattedKey = key %}
+												{% endif %}
 
-    <div class="bg-white shadow-md rounded-lg p-6 mt-2 grid grid-cols-2 xl:grid-cols-6 gap-6">
-        <!-- Card Section -->
-        <div class="col-span-2">
-            <div class="grid gap-4">
-            {# description #}
-                <div class="bg-gray-50 p-4 rounded-lg shadow hover:shadow-md">
-                    <div class="flex justify-between">
-                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Description</h2>
-                        <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">{{ property.type.value }}</span>
-                    </div>                      
-                    <p class="text-gray-600 text-sm">{{ property.name }}</p>                  
-                    <p class="text-gray-600">{{ property.description|nl2br }}</p>                  
-                </div>
-            {# Locataire #}
-                <div class="bg-gray-50 p-4 rounded-lg shadow hover:shadow-md">
-                    <div class="flex justify-between">
-                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Locataire</h2>
-                        {% if property.actualTenant is empty %}
-                            <span class="inline-block bg-orange-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">Disponible</span>
-                        {% else %}
-                            <span class="inline-block bg-green-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">Loué</span>
-                        {% endif %}
-                                                
-                    </div>               
-                    {% if property.actualTenant is empty %}
-                        <p class="text-gray-600">Actuellement aucun locataire</p>
-                    {% else %}
-                        <p class="text-gray-600">{{ property.actualTenant.firstname }} {{ property.actualTenant.lastname }}</p>   
-                        <p class="ml-4 font-thin">{{ property.actualTenant.phoneNumber }}</p>
-                        <p class="ml-4 font-thin">{{ property.actualTenant.email }}</p>
-                    {% endif %}       
-                </div>
-            </div>
-        </div>
-        {# loyers #}
-        <div class="bg-gray-50 p-4 rounded-lg shadow col-span-2 xl:col-span-4 hover:shadow-md">
-            <div class="flex justify-between">
-                <h2 class="text-xl font-semibold text-gray-700 mb-2">Loyers</h2>
-                <div class="flex justify-between gap-2">
-                    <a href="{{path('app_property_show', {'id': property.id, 'year': year - 1})}}"><<</a>
-                    <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">Année | {{year}}</span>
-                    <a href="{{path('app_property_show', {'id': property.id, 'year': year + 1})}}">>></a>
-                </div>
-                <div class="flex justify-between gap-2"></div>
-            </div>   
-            <div class="relative">
-                <div class="flex overflow-x-auto gap-4">
-                    <table class="table-auto w-full">
-                    <thead>
-                        <tr>
-                            <th class="text-sm bg-green-200"></th>
-                            <th class="text-sm bg-green-200 hidden lg:table-cell">Locataire</th>
-                            <th class="text-sm bg-green-200 hidden md:table-cell">Loyer</th>
-                            <th class="text-sm bg-green-200 hidden md:table-cell">Charges</th>
-                            <th class="text-sm bg-green-200 hidden md:table-cell">Parking</th>
-                            <th class="text-sm bg-green-200">Total</th>
-                            <th class="text-sm bg-orange-200">Charges PPE</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                        {% for key, month in months %}
-                            {% if key < 10 %}
-                                {% set formattedKey = '0' ~ key %}
-                            {% else %}
-                                {% set formattedKey = key %}
-                            {% endif %}
+												{% set total = 0 %}
 
-                            {% set total = 0 %}
-                            
-                            <tr class="hover:bg-gray-100">
-                                <td class="text-sm">{{ month }}</td>
-                                {% set rentKey = formattedKey ~ '-RENT' %}
-                                {% if rentKey in financialEntrys|keys %}
-                                    {% set selectedEntry = financialEntrys[rentKey] %}
-                                    <td class="text-xs hidden lg:table-cell">{{ selectedEntry.tenant.fullname }}</td>
-                                {% else %}
-                                    <td class="text-xs hidden lg:table-cell"></td>
-                                {% endif %}
-                                {% set rentKey = formattedKey ~ '-RENT' %}
-                                {% if rentKey in financialEntrys|keys %}
-                                    {% set selectedEntry = financialEntrys[rentKey] %}
-                                    {% set total = total + selectedEntry.amount %}
-                                    <td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }} hidden md:table-cell">
-                                        <a href="{{path('app_financial_entry_edit', {'id': selectedEntry.id})}}">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</a>
-                                    </td>
-                                {% else %}
-                                    <td class="hidden md:table-cell"></td>
-                                {% endif %}
-                                
-                                {% set chargesKey = formattedKey ~ '-CHARGES' %}
-                                {% if chargesKey in financialEntrys|keys %}
-                                    {% set selectedEntry = financialEntrys[chargesKey] %}
-                                    {% set total = total + selectedEntry.amount %}
-                                    <td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }} hidden md:table-cell">
-                                        <a href="{{path('app_financial_entry_edit', {'id': selectedEntry.id})}}">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</a>
-                                    </td>
-                                {% else %}
-                                    <td class="hidden md:table-cell"></td>
-                                {% endif %}
-                                
-                                {% set parkingKey = formattedKey ~ '-PARKING' %}
-                                {% if parkingKey in financialEntrys|keys %}
-                                    {% set selectedEntry = financialEntrys[parkingKey] %}
-                                    {% set total = total + selectedEntry.amount %}
-                                    <td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }} hidden md:table-cell">
-                                        <a href="{{path('app_financial_entry_edit', {'id': selectedEntry.id})}}">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</a>
-                                    </td>
-                                {% else %}
-                                    <td class="hidden md:table-cell"></td>
-                                {% endif %}
-                                {% if total > 0 %}
-                                <td class="text-sm text-center">{{ total|number_format(2, '.', '\'') }}</td>
-                                {% else %}
-                                    <td></td>
-                                {% endif %}
-                                    {% set chargesKey = formattedKey ~ '-CHARGES_DEPOSIT' %}
-                                {% if chargesKey in financialDeposit|keys %}
-                                    {% set selectedEntry = financialDeposit[chargesKey] %}
-                                    <td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }}">
-                                        <a href="{{path('app_financial_entry_edit', {'id': selectedEntry.id})}}">{{ selectedEntry.amount|number_format(2, '.', '\'') }}</a>
-                                    </td>
-                                {% else %}
-                                    <td></td>
-                                {% endif %}
-                            </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-                <div class="flex overflow-x-auto gap-4 mt-4">
-                    <table class="table-auto w-full">
-                    <thead>
-                        <tr>
-                            <th class="text-sm bg-orange-200">Période</th>
-                            <th class="text-sm bg-orange-200">Montant</th>
-                            {% if hypo2 %}                                
-                                <th class="text-sm bg-orange-200">Montant 2</th>
-                            {% endif %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="text-sm">1er Janvier au 31 Mars</td>
-                                <td class="text-center text-sm">
-                                    {{ mortgages['03-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
-                                </td>  
-                                {% if hypo2 %}           
-                                <td class="text-center text-sm">
-                                    {{ mortgages['03-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
-                                </td>  
-                                {% endif %}            
-                        </tr>
-                        <tr>
-                            <td class="text-sm">1er Avril au 30 Juin</td>
-                                <td class="text-center text-sm">
-                                    {{ mortgages['06-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
-                                </td>     
-                                {% if hypo2 %} 
-                                <td class="text-center text-sm">
-                                    {{ mortgages['06-MORTGAGE2'].amount|default('')|number_format(2, '.', '\'') }}
-                                </td>    
-                                {% endif %}                     
-                        </tr>
-                        <tr>
-                            <td class="text-sm">1er Juillet au 30 Septembre</td>
-                                <td class="text-center text-sm">
-                                    {{ mortgages['09-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
-                                </td>     
-                                {% if hypo2 %} 
-                                <td class="text-center text-sm">
-                                    {{ mortgages['09-MORTGAGE2'].amount|default('')|number_format(2, '.', '\'') }}
-                                </td>     
-                                {% endif %}
-                        </tr>
-                        <tr>
-                            <td class="text-sm">1er Octobre au 31 Décembre</td>
-                                <td class="text-center text-sm">
-                                    {{ mortgages['12-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
-                                </td>     
-                                {% if hypo2 %} 
-                                <td class="text-center text-sm">
-                                    {{ mortgages['12-MORTGAGE2'].amount|default('')|number_format(2, '.', '\'') }}
-                                </td>  
-                                {% endif %}  
-                        </tr>
-                    </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    {# Détail appartement #}
-        <div class="bg-gray-50 p-4 rounded-lg shadow col-span-2 hover:shadow-md xl:col-span-6" >
-            <h2 class="text-xl font-semibold text-gray-700 mb-2">Details</h2>
-            <div class="md:grid md:grid-cols-2 md:gap-2 md:ml-3">
-                <div class="col-span-2">
-                    <p class="text-lime-500 font-semibold">Banque</p>
-                    <p class="ml-4 font-thin">{{ property.bank.name }}</p>
-                </div>            
-                <div>
-                    <p class="text-lime-500 font-semibold">Prix d'achat</p>
-                    <p class="ml-4 font-thin">{{ property.purchasePrice|format_currency('CHF') }}</p>
-                </div>
-                <div>
-                    <p class="text-lime-500 font-semibold">Date d'achat</p>
-                    <p class="ml-4 font-thin">{{ property.purchaseDate ? property.purchaseDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
-                </div>
-                <div>
-                    <p class="text-lime-500 font-semibold">Taux hypotéquaire</p>
-                    <p class="ml-4 font-thin">{{ property.mortgageRate }}</p>
-                </div>
-                <div>
-                    <p class="text-lime-500 font-semibold">Type de taux</p>
-                    <p class="ml-4 font-thin">{{ property.mortgageType.value }}</p>
-                </div>
-                <div>
-                    <p class="text-lime-500 font-semibold">Fin de l'hypotèque</p>
-                    <p class="ml-4 font-thin">{{ property.mortgageEndDate ? property.mortgageEndDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
-                </div>
-                <div>
-                    <p class="text-lime-500 font-semibold">EWID</p>
-                    <p class="ml-4 font-thin">{{ property.EWID }}</p>
-                </div>
-                <div>
-                    <p class="text-lime-500 font-semibold">EGID</p>
-                    <p class="ml-4 font-thin">{{ property.EGID }}</p>
-                </div>
-            </div>
-        </div>
-        <!-- Gallery Section -->
-        <div class="bg-gray-50 p-4 rounded-lg shadow col-span-2 hover:shadow-md xl:col-span-3">
-            <div class="flex justify-between">
-                <h3 class="text-xl font-medium mb-4">Gallerie d'image</h3>
-                <a href="{{ path('app_upload_file_new', {'entityClass': 'Property', 'entityId': property.id, 'type': 'image'}) }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">Télécharger</a>
-            </div>
-                <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-                    {% for image in uploadsImages %}
-                            <div>
-                                <a href="{{ asset('uploads/' ~ property.id ~ '/' ~ image.fileName) }}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
-                                    <img src="{{ asset('uploads/' ~ property.id ~ '/' ~ image.fileName) }}" alt="{{ image.fileName }}" class="h-30 w-30 object-scale-down">
-                                </a>
-                                <div class="text-end -mt-6">
-                                    {{ include('upload_file/_delete_form.html.twig', {'upload_file': image, 'bgColor': 'bg-gray-50'}) }}
-                                </div>
-                            </div>
-                    {% else %}
-                        <p class="text-gray-500">No files available.</p>
-                    {% endfor %}
-                </div>
-        </div>
-        {# documents #}
-        <div class="bg-gray-50 p-4 rounded-lg shadow col-span-2 hover:shadow-md xl:col-span-3">
-            <div class="flex justify-between">
-                <h3 class="text-xl font-medium mb-4">Documents</h3>
-                <a href="{{ path('app_upload_file_new', {'entityClass': 'Property', 'entityId': property.id, 'type': 'document'}) }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">Télécharger</a>
-            </div>
-                <div class="space-y-2 mt-4">
-                    {% for file in uploadsFiles %}
-                        <div class="flex justify-between border-b pb-2">
-                            <p class="text-gray-600 text-sm">{{ file.description }}</p>
-                            <a href="{{ asset('uploads/' ~ property.id ~ '/' ~ file.fileName) }}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
-                                <span class="material-symbols-outlined text-base mr-1">picture_as_pdf</span>
-                                Voir le fichier
-                            </a>
-                            <div class="flex items-end">
-                            {{ include('upload_file/_delete_form.html.twig', {'upload_file': file}) }}
-                            </div>
-                        </div>
-                    {% else %}
-                        <p class="text-gray-500">No files available.</p>
-                    {% endfor %}
-                </div>
-        </div>
-    </div>
-</div>
+												<tr class="hover:bg-gray-100">
+													<td class="text-sm">
+														{{ month }}
+													</td>
+													{% set rentKey = formattedKey ~ '-RENT' %}
+													{% if rentKey in financialEntrys|keys %}
+														{% set selectedEntry = financialEntrys[rentKey] %}
+														<td class="text-xs hidden lg:table-cell">
+															{{ selectedEntry.tenant.fullname }}
+														</td>
+													{% else %}
+														<td class="text-xs hidden lg:table-cell"></td>
+													{% endif %}
+													{% set rentKey = formattedKey ~ '-RENT' %}
+													{% if rentKey in financialEntrys|keys %}
+														{% set selectedEntry = financialEntrys[rentKey] %}
+														{% set total = total + selectedEntry.amount %}
+														<td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }} hidden md:table-cell">
+															<a href="{{path('app_financial_entry_edit', {'id': selectedEntry.id})}}">
+																{{ selectedEntry.amount|number_format(2, '.', '\'') }}</a>
+														</td>
+													{% else %}
+														<td class="hidden md:table-cell"></td>
+													{% endif %}
+													
+													{% set chargesKey = formattedKey ~ '-CHARGES' %}
+													{% if chargesKey in financialEntrys|keys %}
+													{% set selectedEntry = financialEntrys[chargesKey] %}
+													{% set total = total + selectedEntry.amount %}
+														<td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }} hidden md:table-cell">
+															<a href="{{path('app_financial_entry_edit', {'id': selectedEntry.id})}}">{{ selectedEntry.amount|number_format(2, '.', '\'') }}
+															</a>
+														</td>
+													{% else %}
+														<td class="hidden md:table-cell"></td>
+													{% endif %}
+
+													{% set parkingKey = formattedKey ~ '-PARKING' %}
+													{% if parkingKey in financialEntrys|keys %}
+														{% set selectedEntry = financialEntrys[parkingKey] %}
+														{% set total = total + selectedEntry.amount %}
+														<td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }} hidden md:table-cell">
+															<a href="{{path('app_financial_entry_edit', {'id': selectedEntry.id})}}">
+																{{ selectedEntry.amount|number_format(2, '.', '\'') }}
+															</a>
+														</td>
+													{% else %}
+														<td class="hidden md:table-cell"></td>
+													{% endif %}
+													{% if total > 0 %}
+														<td class="text-sm text-center">{{ total|number_format(2, '.', '\'') }}
+														</td>
+													{% else %}
+														<td></td>
+													{% endif %}
+													{% set chargesKey = formattedKey ~ '-CHARGES_DEPOSIT' %}
+													{% if chargesKey in financialDeposit|keys %}
+														{% set selectedEntry = financialDeposit[chargesKey] %}
+														<td class="text-sm text-center {{selectedEntry.isPaid ? '' : 'text-red-500' }}">
+															<a href="{{path('app_financial_entry_edit', {'id': selectedEntry.id})}}">
+																{{ selectedEntry.amount|number_format(2, '.', '\'') }}
+															</a>
+														</td>
+													{% else %}
+														<td></td>
+													{% endif %}
+												</tr>
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+								<div class="flex overflow-x-auto gap-4 mt-4">
+									<table class="table-auto w-full">
+										<thead>
+											<tr>
+												<th class="text-sm bg-orange-200">Période</th>
+												<th class="text-sm bg-orange-200">Montant</th>
+												{% if hypo2 %}                                
+													<th class="text-sm bg-orange-200">Montant 2</th>
+												{% endif %}
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td class="text-sm">1er Janvier au 31 Mars</td>
+												<td class="text-center text-sm">
+													{{ mortgages['03-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
+												</td>
+												{% if hypo2 %}
+													<td class="text-center text-sm">
+														{{ mortgages['03-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
+													</td>  
+												{% endif %}            
+											</tr>
+											<tr>
+												<td class="text-sm">1er Avril au 30 Juin</td>
+												<td class="text-center text-sm">
+													{{ mortgages['06-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
+												</td>
+												{% if hypo2 %}
+													<td class="text-center text-sm">
+														{{ mortgages['06-MORTGAGE2'].amount|default('')|number_format(2, '.', '\'') }}
+													</td>    
+												{% endif %}                     
+											</tr>
+											<tr>
+												<td class="text-sm">1er Juillet au 30 Septembre</td>
+												<td class="text-center text-sm">
+													{{ mortgages['09-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
+												</td>
+												{% if hypo2 %}
+													<td class="text-center text-sm">
+														{{ mortgages['09-MORTGAGE2'].amount|default('')|number_format(2, '.', '\'') }}
+													</td>     
+												{% endif %}
+											</tr>
+											<tr>
+												<td class="text-sm">1er Octobre au 31 Décembre</td>
+												<td class="text-center text-sm">
+													{{ mortgages['12-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
+												</td>
+												{% if hypo2 %}
+													<td class="text-center text-sm">
+														{{ mortgages['12-MORTGAGE2'].amount|default('')|number_format(2, '.', '\'') }}
+													</td>  
+												{% endif %}  
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div> {# fin card loyer #}
+						{# Locataire #}
+						<div class="col-span-6 xl:col-span-2">
+							<div class="grid gap-4">
+								{# Locataire #}
+								<div class="h-fit bg-gray-50 p-4 rounded-lg border-[1px] border-solid border-stone-300 rounded-lg shadow col-span-2 hover:border-stone-800 hover:duration-[0.5s]">
+									<div class="flex justify-between">
+										<h2 class="text-xl font-semibold text-gray-700 mb-2">
+											Locataire
+										</h2>
+										{% if property.actualTenant is empty %}
+											<span class="inline-block bg-orange-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
+												Disponible
+											</span>
+										{% else %}
+											<span class="inline-block bg-green-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
+												Loué
+											</span>
+										{% endif %}
+									</div>
+									{% if property.actualTenant is empty %}
+										<p class="text-gray-600">
+											Actuellement aucun locataire
+										</p>
+									{% else %}
+										<p class="text-gray-600">
+											{{ property.actualTenant.firstname }}
+											{{ property.actualTenant.lastname }}
+										</p>
+										<p class="ml-4 font-thin">
+											{{ property.actualTenant.phoneNumber }}
+										</p>
+										<p class="ml-4 font-thin">
+											{{ property.actualTenant.email }}
+										</p>
+									{% endif %}
+								</div>
+								{# EWID  #}
+								<div class="h-fit bg-gray-50 p-4 rounded-lg border-[1px] border-solid border-stone-300 rounded-lg shadow col-span-2 hover:border-stone-800 hover:duration-[0.5s]">
+									<div class="grid grid-cols-2">
+										<h2 class="text-xl font-semibold text-gray-700 mb-2">
+											EWID
+										</h2>
+										<h2 class="text-xl font-semibold text-gray-700 mb-2">
+											EGID
+										</h2>
+										<p class="text-gray-600">
+											{{ property.ewid ? property.ewid : 'N/A' }}
+										</p>
+										<p class="text-gray-600">
+											{{ property.egid ? property.egid : 'N/A' }}
+										</p>		
+									</div>
+								</div>
+							</div>
+						</div>
+						{# Détail appartement #}
+						<div class="bg-gray-50 border-[1px] border-solid border-stone-300 rounded-lg shadow col-span-6 xl:col-span-2 hover:border-stone-800 hover:duration-[0.5s]" >
+							<h2 class="text-xl p-2 font-semibold text-gray-700 mb-2">Details financier</h2>
+							<div class="md:grid md:grid-cols-2">
+								<div class="col-span-2 bg-cyan-900">
+									<p class="ml-4 text-white font-medium">Banque</p>
+									<p class="ml-8 text-white font-thin">{{ property.bank.name }}</p>
+								</div>  
+							</div>
+							<div class="md:grid md:grid-cols-2">          
+								<div class="gap-2 ml-3 md:col-span-2">
+									<p class="text-neutral-900 font-semibold">Achat</p>
+									<p class="ml-4 font-thin"><b>{{ property.purchasePrice|format_currency('CHF') }}</b> le {{ property.purchaseDate ? property.purchaseDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
+								</div>
+
+								<div class="pl-2 bg-cyan-900 text-white mx-0 font-medium  md:col-span-2">	
+									{{ property.mortgageType2 ? 'Hypothèques' : 'Hypothèque' }}
+									
+								</div>
+								<div class="ml-4">
+									<p class="text-neutral-900 font-semibold">
+										Type de taux
+									</p>
+									<p class="ml-4 font-thin">
+										{{ property.mortgageType.value }}
+									</p>
+								</div>
+											{% if property.mortgageType2 is not null %}
+											<div class="ml-4">
+												<p class="text-neutral-900 font-semibold">
+													Type de taux
+												</p>
+												<p class="ml-4 font-thin">
+													{{ property.mortgageType2.value }}
+												</p>
+											</div>
+											{% else %}
+												<div></div>
+											{% endif %}
+								<div class="ml-4">
+									<p class="text-neutral-900 font-semibold">
+										Taux hypothécaire
+									</p>
+									<p class="ml-4 font-thin">
+										{{ property.mortgageRate }}
+									</p>
+								</div>
+										{% if property.mortgageRate2 is not null %}
+										<div class="ml-4">
+											<p class="text-neutral-900 font-semibold">
+												Taux hypothécaire
+											</p>
+											<p class="ml-4 font-thin">
+												{{ property.mortgageRate2 }}
+											</p>
+										</div>
+										{% else %}
+											<div></div>
+										{% endif %}
+								<div class="ml-4">
+									<p class="text-neutral-900 font-semibold">
+										Fin de l'hypotèque
+									</p>
+									<p class="ml-4 font-thin">
+										{{ property.mortgageEndDate ? property.mortgageEndDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}
+									</p>
+								</div>
+										{% if property.mortgageEndDate2 is not null %}
+										<div class="ml-4">
+											<p class="text-neutral-900 font-semibold">
+												Fin de l'hypotèque
+											</p>
+											<p class="ml-4 font-thin">
+												{{ property.mortgageEndDate2 ? property.mortgageEndDate2|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}
+											</p>
+										</div>
+										{% else %}
+											<div></div>
+										{% endif %}
+							</div>
+						</div>
+					</div>
+        		</div>
+
+			
+				<!-- Gallery Section -->
+				<div class="bg-gray-50 p-4 shadow col-span-6 border-[1px] border-solid border-stone-300 rounded-lg shadow hover:border-stone-800 hover:duration-[0.5s] xl:col-span-3">
+					<div class="flex justify-between">
+						<h3 class="text-xl font-medium mb-4">
+							Gallerie d'image
+						</h3>
+						<a href="{{ path('app_upload_file_new', {'id': property.id, 'type': 'image'}) }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">
+							Télécharger
+						</a>
+					</div>
+					<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+						{% for image in uploadsImages %}
+							<div>
+								<a href="{{ asset('uploads/' ~ property.id ~ '/' ~ image.fileName) }}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
+									<img src="{{ asset('uploads/' ~ property.id ~ '/' ~ image.fileName) }}" alt="{{ image.fileName }}" class="h-30 w-30 object-scale-down">
+								</a>
+								<div class="text-end -mt-6">
+									{{ include('upload_file/_delete_form.html.twig', {'upload_file': image, 'bgColor': 'bg-gray-50'}) }}
+								</div>
+							</div>
+						{% else %}
+							<p class="text-gray-500">
+								No files available.
+							</p>
+						{% endfor %}
+					</div>
+				</div>
+				{# documents #}
+				<div class="bg-gray-50 p-4 shadow col-span-6 border-[1px] border-solid border-stone-300 rounded-lg shadow hover:border-stone-800 hover:duration-[0.5s] xl:col-span-3">
+					<div class="flex justify-between">
+						<h3 class="text-xl font-medium mb-4">
+							Documents
+						</h3>
+						<a href="{{ path('app_upload_file_new', {'id': property.id, 'type': 'document'}) }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">
+							Télécharger
+						</a>
+					</div>
+					<div class="space-y-2 mt-4">
+						{% for file in uploadsFiles %}
+							<div class="flex justify-between border-b pb-2">
+								<p class="text-gray-600 text-sm">
+									{{ file.description }}
+								</p>
+								<a href="{{ asset('uploads/' ~ property.id ~ '/' ~ file.fileName) }}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
+									<span class="material-symbols-outlined text-base mr-1">
+										picture_as_pdf
+									</span>
+									Voir le fichier
+								</a>
+								<div class="flex items-end">
+									{{ include('upload_file/_delete_form.html.twig', {'upload_file': file}) }}
+								</div>
+							</div>
+						{% else %}
+							<p class="text-gray-500">
+								No files available.
+							</p>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	<script>
+		window.addEventListener("load", () => {
+		document.getElementById("menu_btn_property").classList.add("menu-btn-active");
+
+			let description = document.getElementById('description');
+
+			description.addEventListener('click', () => {
+				description.classList.toggle('showDescription');
+			})
+		})
+	</script>
+
 {% endblock %}

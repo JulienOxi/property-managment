@@ -9,18 +9,24 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class UploadFileType extends AbstractType
+class UploadFileEditType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
 
-        $data = $options['extra_data'] ?? [];
+        $extraData = $options['extra_data'] ?? [];
 
         $builder
             ->add('description')
             ->add('file', FileType::class)
+            ->add('entityId', HiddenType::class,[
+                'data' => $extraData['entityId'],
+            ])
+            ->add('entityClass', HiddenType::class,[
+                'data' => $extraData['entityClass'],
+            ])
             ->add('type', HiddenType::class,[
-                'data' => $data['type'],
+                'data' => $extraData['type'],
             ])
         ;
     }

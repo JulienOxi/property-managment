@@ -1,0 +1,5 @@
+* Ne pas pouvoir ajouter deux enregistrement simultanément au sein du même registre
+* Bouton grisé avec nom du User et timer m/s
+Tableau nb de ligne par registre
+Pouvoir changer role dans admin
+Logout tous les 4h

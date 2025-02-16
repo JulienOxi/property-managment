@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Property;
 use App\Entity\UploadFile;
 use App\Enum\AccessRoleEnum;
 use App\Form\UploadFileType;
@@ -11,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/app/upload-file')]
@@ -27,35 +29,47 @@ final class UploadFileController extends AbstractController
         $this->entityManager = $entityManager;
     }
     
-    #[Route('/new', name: 'app_upload_file_new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    #[Route('/new/{id}', name: 'app_upload_file_new', methods: ['GET', 'POST'], requirements: ['id' => Requirement::POSITIVE_INT])]
+    public function new(Property $id, Request $request): Response
     {
-        $data = $this->checkRequestValidity($request);
+            //on récupère le type de fichier (image ou document)
+            $type = $request->query->get('type');
+            if($type != 'image' && $type!= 'document'){
+                throw new \LogicException('Type non pris en charge');
+            }
 
         $uploadFile = new UploadFile();
         $form = $this->createForm(UploadFileType::class, $uploadFile, [
-            'extra_data' => $data//on passe les options au formulaire
+            'extra_data' => ['type' => $type]//on passe les options au formulaire
         ]);
 
         $form->handleRequest($request);
 
 
         if ($form->isSubmitted() && $form->isValid()) {
+                
+            //on verifie que l'extension est bonne
+            $extension = $request->files->get('upload_file')['file']->guessExtension();
+            //si le type est image, on verifie que l'extension est bonne
+            if ($type === 'image' && !in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
+                throw new \LogicException('Extension non prise en charge pour les images');
+            }            
             
-            $uploadFile->setUpdatedBy($this->getUser());
+            $uploadFile
+                ->setUpdatedBy($this->getUser())
+                ->setProperty($id);
 
             $this->entityManager->persist($uploadFile);
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Le fichier a été télécharger avec succès.');
 
-            return $this->redirectToRoute('app_upload_file_new', ['entityClass' => $data['entityClass'], 'entityId' => $data['entityId'], 'type' => $data['type']], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_upload_file_new', ['id' => $id->getId(), 'type' => $type], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('upload_file/new.html.twig', [
             'upload_file' => $uploadFile,
             'form' => $form,
-            'data' => $data,
         ]);
     }
 

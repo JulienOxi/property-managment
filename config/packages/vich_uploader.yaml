@@ -11,4 +11,4 @@ vich_uploader:
                 options: { length: 50 }
             directory_namer:
                 service: vich_uploader.namer_directory_property
-                options: { property: 'entityId', transliterate: true }     
+                options: { property: 'property.id', transliterate: true }     

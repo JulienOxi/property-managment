@@ -6,20 +6,22 @@
 {% block pageName %}{{pageName}}{% endblock %}
 
 {% block body %}
-<div class="container mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
+    <div class="flex items-center justify-center min-h-screen bg-gray-100">
+        <div class="w-full max-w-2xl p-6 bg-white rounded-lg shadow-lg">
+            <h1 class="text-xl font-semibold text-center text-gray-800 mb-5 md:text-2xl">{{ pageName }}</h1>
 
-{% if properties is not empty %}
+                {% if properties is not empty %}
 
-    {{ include('financial_entry/_form.html.twig') }}
+                    {{ include('financial_entry/_form.html.twig') }}
 
-{% else %}
-    <div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
-        Vous devez ajoutez une propriété avant de pouvoir ajouter une transaction financière.
+                {% else %}
+                    <div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
+                        Vous devez ajoutez une propriété avant de pouvoir ajouter une transaction financière.
+                    </div>
+                {% endif %}
+
+        </div>
     </div>
-{% endif %}
-
-</div>
 {% endblock %}
 
 {% block javascripts %}
@@ -38,14 +40,38 @@ document.addEventListener("DOMContentLoaded", () => {
 <script>
 //permet de generer l'url pour le tri des catégories et afficher uniquement les catégories en foncitron des "entrées" ou "sorties"
 document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
     const typeFields = document.querySelectorAll('select[name="financial_entry_new[type]"]');
-    const baseUrl = '{{ path("app_financial_entry_new") }}'; // Twig génère l'URL en tant que string JS
+    let baseUrl = '{{ path("app_financial_entry_new") }}'; // Twig génère l'URL en tant que string JS
 
     typeFields.forEach(field => {
         field.addEventListener("change", function () {
-            window.location.href = baseUrl + '?type=' + encodeURIComponent(this.value);
+            if (urlParams.has('property')) {
+                window.location.href = baseUrl + '?property=' + urlParams.get('property') + '&type=' + encodeURIComponent(this.value);
+            }else{
+                window.location.href = baseUrl + '?type=' + encodeURIComponent(this.value);
+            } 
         });
     });
+
+
+    const propertyFields = document.querySelectorAll('select[name="financial_entry_new[property]"]');
+
+    propertyFields.forEach(field => {
+        field.addEventListener("change", function () {
+            if (urlParams.has('type')) {
+                window.location.href = baseUrl + '?type=' + urlParams.get('type') + '&property=' + encodeURIComponent(this.value);
+            }else{
+                window.location.href = baseUrl + '?property=' + encodeURIComponent(this.value);
+            }        
+        });
+    })
 });
+</script>
+
+<script>
+window.addEventListener("load", () => {
+    document.getElementById("menu_btn_finance").classList.add("menu-btn-active");
+})
 </script>
 {% endblock %}
