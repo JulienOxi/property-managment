@@ -3,13 +3,15 @@
 
 <div class="md:grid md:grid-cols-3 md:gap-4">
 
-    {{ macros.field(form.type, 'Type', '') }}
-    {{ macros.field(form.property, 'Bien immobilier', 'md:col-span-2') }} 
-    {{ macros.field(form.category, 'Categorie', 'md:col-span-3') }} 
     {{ macros.field(form.description, 'Description', 'md:col-span-3') }} 
     {{ macros.field(form.amount, 'Montant', '') }} 
     {{ macros.field(form.paidAt, 'Payé le', '') }} 
     {{ macros.field(form.isPaid, 'Montant payé', '') }} 
+
+    {# //uniquement pour la mise à jour d'une transaction, on control si il existe déjà un fichier joint avec cette dernière #}
+    {% if uploaded_file is defined and uploaded_file is not empty %}
+        {{uploaded_file.description}}
+    {% endif %}
     
         {% if form.uploadFile.vars.choices is defined and form.uploadFile.vars.choices is not empty %}
             <div class="relative flex py-5 items-center col-span-3">

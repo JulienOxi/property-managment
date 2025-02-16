@@ -171,21 +171,23 @@ class FinancialEntryRepository extends ServiceEntityRepository
         public function findByPropertiesAndCategoriesAndTypes(
             User $user,
             AccessRoleEnum $requiredRole,
-            ?Property $property = null,
+            array $property = [],
             array $categories = [],
-            ?TransactionEnum $type = null
+            ?TransactionEnum $type = null,
+            int $limit = null
         ) {
             $qb = $this->createQueryBuilder('fe')
                 ->join('fe.property', 'p') // Associe la propriété à l'entité financière
                 ->join('p.accessControls', 'ac') // Associe les droits d'accès
                 ->where('ac.grantedUser = :user')
                 ->andWhere('ac.role IN (:roles)')
+                ->orderBy('fe.createdAt', 'DESC')
                 ->setParameter('user', $user)
                 ->setParameter('roles', $this->getRolesHierarchy($requiredRole));
             
             // Ajout du filtre par propriété
             if ($property) {
-                $qb->andWhere('fe.property = :property')
+                $qb->andWhere('fe.property IN (:property)')
                    ->setParameter('property', $property);
             }
             
@@ -200,17 +202,21 @@ class FinancialEntryRepository extends ServiceEntityRepository
                 $qb->andWhere('fe.type = :type')
                    ->setParameter('type', $type);
             }
+
+            if ($limit) {
+                $qb->setMaxResults($limit);
+            }
             
             return $qb->getQuery()->getResult();
         }
         
         private function getRolesHierarchy(AccessRoleEnum $requiredRole): array
         {
-            // Define the hierarchy of roles
+            // Si un role GUEST est defini on prétent que un role MEMBER et un ROLE OWNER auront aussi l'accès
             return match ($requiredRole) {
-                AccessRoleEnum::GUEST => [AccessRoleEnum::GUEST->value],
+                AccessRoleEnum::OWNER => [AccessRoleEnum::OWNER->value],
                 AccessRoleEnum::MEMBER => [AccessRoleEnum::MEMBER->value, AccessRoleEnum::GUEST->value],
-                AccessRoleEnum::OWNER => [AccessRoleEnum::OWNER->value, AccessRoleEnum::MEMBER->value, AccessRoleEnum::GUEST->value],
+                AccessRoleEnum::GUEST => [AccessRoleEnum::OWNER->value, AccessRoleEnum::MEMBER->value, AccessRoleEnum::GUEST->value],
             };
         }
         

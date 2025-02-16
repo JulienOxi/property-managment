@@ -15,39 +15,43 @@ import './styles/app.css';
 window.validateInput = function(inputId, regex, capitalize = true){
 
     const elem = document.getElementById(inputId);
-    //test avec le regex
-    const isValid = regex.test(elem.value);
-    //on load check
-    window.addEventListener("load", () => {
-      //test avec le regex  
-      if(isValid){
-        elem.classList.add("focus:border-green-700");
-      }
 
-        //ajoute le regex au input
-        let stringRegex = String(regex);
-        let regexHTML = stringRegex.slice(1,-1);
-        elem.setAttribute("pattern", regexHTML);      
-    });
-  
-    // Event listner
-    elem.addEventListener("input", () => {
-      //test avec le regex
-      const isValid = regex.test(elem.value);
-      if(capitalize){
-        //on met la première lettre en majuscule
-        let str = elem.value.charAt(0).toUpperCase() + elem.value.slice(1);
-        elem.value = str;
-      }
-  
-      if (isValid) {
+    if (typeof elem !== 'undefined') {// la variable est définie
+      
+        //test avec le regex
+        const isValid = regex.test(elem.value);
+        //on load check
+        window.addEventListener("load", () => {
+          //test avec le regex  
+          if(isValid){
             elem.classList.add("focus:border-green-700");
-            elem.classList.remove("focus:border-red-700");
-        }else{
-            elem.classList.add("focus:border-red-700");
-            elem.classList.remove("focus:border-green-700");
-        }
-    });
+          }
+
+            //ajoute le regex au input
+            let stringRegex = String(regex);
+            let regexHTML = stringRegex.slice(1,-1);
+            elem.setAttribute("pattern", regexHTML);      
+        });
+      
+        // Event listner
+        elem.addEventListener("input", () => {
+          //test avec le regex
+          const isValid = regex.test(elem.value);
+          if(capitalize){
+            //on met la première lettre en majuscule
+            let str = elem.value.charAt(0).toUpperCase() + elem.value.slice(1);
+            elem.value = str;
+          }
+      
+          if (isValid) {
+                elem.classList.add("focus:border-green-700");
+                elem.classList.remove("focus:border-red-700");
+            }else{
+                elem.classList.add("focus:border-red-700");
+                elem.classList.remove("focus:border-green-700");
+            }
+        });
+    }
   };
 
 

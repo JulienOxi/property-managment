@@ -10,10 +10,14 @@
             <h1 class="text-xl font-semibold text-center text-gray-800 mb-5 md:text-2xl">{{ pageName }}</h1>
 
             <div class="bg-gray-50 p-4 rounded-md mb-6">
-                {# <p class="text-gray-600">Veuillez remplir les informations ci-dessous :</p> #}
+                <div class="flex justify-end gap-2">          
+                    <p class="text-gray-100 bg-{{ financial_entry.type.name == 'EXPENSE' ? 'red' : 'green'}}-600 rounded-md px-1">{{ financial_entry.type.value }}</p>
+                    <p class="text-gray-100 bg-purple-600 rounded-md px-1">{{ financial_entry.category.value }}</p>
+                </div>            
+                <p class="text-gray-600 text-center">{{ financial_entry.property.name }}</p>
             </div>
 
-            {{ include('financial_entry/_form.html.twig', {'button_label': 'Modifier'}) }}
+            {{ include('financial_entry/_edit_form.html.twig', {'button_label': 'Modifier'}) }}
             
     <div class="my-2 flex justify-end">
         {{ include('financial_entry/_delete_form.html.twig') }}
@@ -31,9 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(\d{4})$/;
     const descriptionRegex = /^.{1,255}$/;
 
-    validateInput('financial_entry_amount', amountRegex, false)
-    validateInput('financial_entry_paidAt', dateRegex, false)
-    validateInput('financial_entry_description', descriptionRegex, false)
+    validateInput('financial_entry_new_amount', amountRegex, false)
+    validateInput('financial_entry_new_paidAt', dateRegex, false)
+    validateInput('financial_entry_new_description', descriptionRegex, false)
 });
 </script>
 

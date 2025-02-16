@@ -84,14 +84,21 @@ class TransactionFilterType extends AbstractType
                 'EXPENSE' => FinancialCategoryEnum::getByType('EXPENSE'),
                 default => null,//FinancialCategoryEnum::cases(),
             };
-        $form->add('category', ChoiceType::class, [
-            'choices' => $categories,
-            'choice_label' => fn(FinancialCategoryEnum $type) => $type->value,
-            'choice_value' => fn(?FinancialCategoryEnum $type) => $type?->name,
-            'placeholder' => 'Sélectionnez une catégorie',
-            'multiple' => true,
-            'expanded' => true,
-        ]);
+            if(null === $categories) {
+                $form->add('category', ChoiceType::class, [
+                    'choices' => null,
+                    'placeholder' => 'Sélectionnez un type de dépense pour commencer',      
+                ]);
+            }else{
+                $form->add('category', ChoiceType::class, [
+                    'choices' => $categories,
+                    'choice_label' => fn(FinancialCategoryEnum $type) => $type->value,
+                    'choice_value' => fn(?FinancialCategoryEnum $type) => $type?->name,
+                    'placeholder' => 'Sélectionnez une catégorie',
+                    'multiple' => true,
+                    'expanded' => true,
+                ]);
+            }
     }
 
     public function configureOptions(OptionsResolver $resolver): void

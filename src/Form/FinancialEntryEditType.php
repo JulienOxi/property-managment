@@ -25,7 +25,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-class FinancialEntryNewType extends AbstractType
+class FinancialEntryEditType extends AbstractType
 {
     private Security $security;
 
@@ -40,12 +40,6 @@ class FinancialEntryNewType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('type', ChoiceType::class, [
-                'choices' => TransactionEnum::cases(), // Liste des enums
-                'choice_label' => fn(TransactionEnum $type) => $type->value, // Affichage du label
-                'choice_value' => fn(?TransactionEnum $type) => $type?->name, // Utilisation du nom de l'enum pour la valeur
-                'placeholder' => 'Type de transaction', // Optionnel
-            ])
             ->add('amount')
             ->add('description')
             ->add('isPaid', ChoiceType::class, [
@@ -58,22 +52,6 @@ class FinancialEntryNewType extends AbstractType
                 'widget' => 'single_text',
                 'attr' => ['value' => Date('Y-m-d')],
             ])
-            ->add('property', EntityType::class, [
-                'class' => Property::class,
-                'query_builder' => function (PropertyRepository $propertyRepository) {
-                    return $propertyRepository->findAccessibleProperties($this->security->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER], false);
-                },
-                'choice_label' => 'name',
-                'placeholder' => 'Sélectionnez un bien',
-            ])
-            //ajout du chant Catégorie
-            ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-                $data = $event->getData();
-                $form = $event->getForm();
-                $type = $data->getType() ?? null; // Récupère le type sélectionné
-    
-                $this->updateCategoryField($form, $type);
-            })
             //Ajout du chant UploadFile
             ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {  
                 $data = $event->getData();
@@ -81,41 +59,6 @@ class FinancialEntryNewType extends AbstractType
                 $this->updateUploadFile($form, $data);
             })
         ;
-    }
-
-    /**
-     * Met à jour le champ "Catégorie" en fonction du type de transaction sélectionné.
-     *
-     * @param FormInterface $form Le formulaire.
-     * @param string|null   $type Le type de transaction.
-     */
-    private function updateCategoryField(FormInterface $form, String | TransactionEnum | null $type): void
-    {
-        if (null === $type) {
-            $categories = null;
-        }elseif ($type instanceof TransactionEnum) {
-            $type = $type->name;//on recupere le nom de l'enum
-        }elseif (is_string($type)) {
-            $type = $type;
-        }
-            $categories = match ($type) {
-                'INCOME' => FinancialCategoryEnum::getByType('INCOME'),
-                'EXPENSE' => FinancialCategoryEnum::getByType('EXPENSE'),
-                default => null,//FinancialCategoryEnum::cases(),
-            };
-            if(null === $categories) {
-                $form->add('category', ChoiceType::class, [
-                    'choices' => null,
-                    'placeholder' => 'Sélectionnez un type de dépense pour commencer',
-                ]);
-            }else{
-                $form->add('category', ChoiceType::class, [
-                    'choices' => $categories,
-                    'choice_label' => fn(FinancialCategoryEnum $type) => $type->value,
-                    'choice_value' => fn(?FinancialCategoryEnum $type) => $type?->name,
-                    'placeholder' => 'Sélectionnez une catégorie',
-                ]);
-            }
     }
 
     /**

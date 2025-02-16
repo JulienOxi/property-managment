@@ -52,17 +52,25 @@
                 </div>
 
                 <!-- Catégorie -->
-                <div>
-                    <h3 class="text-sm font-medium text-gray-900 mb-2">Catégories</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2" id="category-div">
-                        {% for child in form.category %}
-                            <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
-                                {{ form_widget(child) }}
-                                <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
-                            </label>
-                        {% endfor %}
+                {% if form.category is empty %}
+                    <div class="hidden">
+                    {# on affiche quand même la catégories mais cachée #}
+                        {{ form_row(form.category) }} 
                     </div>
-                </div>
+                {% else %}
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-900 mb-2">Catégories</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2" id="category-div">
+                                {% for child in form.category %}
+                                    <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
+                                        {{ form_widget(child) }}
+                                        <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
 
                 <div class="flex justify-center">
                     <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">Filtrer</button>

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Property;
+use App\Entity\UploadFile;
 use App\Enum\AccessRoleEnum;
 use App\Service\DateService;
 use App\Service\EnumService;
@@ -12,6 +13,7 @@ use App\Form\FinancialEntryType;
 use App\Enum\FinancialCategoryEnum;
 use App\Form\FinancialEntryNewType;
 use App\Form\TransactionFilterType;
+use App\Form\FinancialEntryEditType;
 use App\Repository\PropertyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -19,9 +21,9 @@ use App\Repository\FinancialEntryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -76,9 +78,9 @@ final class FinancialEntryController extends AbstractController
         }
         $request->query->get('type') ? $type = $request->query->get('type') : $type = null;
         if($property && $caterories && $type){
-            $query = $financialEntryRepository->findByPropertiesAndCategoriesAndTypes($this->getUser(), AccessRoleEnum::OWNER, $propertyRepository->find($property), $caterories, TransactionEnum::fromName($type));
+            $query = $financialEntryRepository->findByPropertiesAndCategoriesAndTypes($this->getUser(), AccessRoleEnum::OWNER, [$propertyRepository->find($property)], $caterories, TransactionEnum::fromName($type));
         }else{
-            $query = $financialEntryRepository->findByPropertiesAndCategoriesAndTypes($this->getUser(), AccessRoleEnum::OWNER, null, $caterories);
+            $query = $financialEntryRepository->findByPropertiesAndCategoriesAndTypes($this->getUser(), AccessRoleEnum::OWNER, $accessibleProperties, [], null, 100);
         }
 
         $financialEntries = $paginator->paginate(
@@ -140,10 +142,19 @@ final class FinancialEntryController extends AbstractController
     public function edit(Request $request, FinancialEntry $financialEntry, EntityManagerInterface $entityManager, RequestStack $requestStack): Response
     {
         $session = $request->getSession(); 
-        $form = $this->createForm(FinancialEntryType::class, $financialEntry);
+        
+        $form = $this->createForm(FinancialEntryEditType::class, $financialEntry);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            //Si l'utilisateur selectionne un fichier en rapport avec la dépense on le met à jour
+            if($form['uploadFile']->getData() !== null){
+                $uploadFile = $form['uploadFile']->getData();
+                $uploadFile
+                    ->setUpdatedBy($this->getUser())
+                    ->setEntityClass(FinancialEntry::class)
+                    ->setEntityId($financialEntry->getId());
+            };
             $entityManager->flush();
             
             $this->addFlash('success','Modification effectuée');
@@ -165,6 +176,7 @@ final class FinancialEntryController extends AbstractController
         return $this->render('financial_entry/edit.html.twig', [
             'financial_entry' => $financialEntry,
             'form' => $form,
+            'uploaded_file' => $entityManager->getRepository(UploadFile::class)->findOneBy(['entityClass' => FinancialEntry::class, 'entityId' => $financialEntry->getId()]),
         ]);
     }
 
