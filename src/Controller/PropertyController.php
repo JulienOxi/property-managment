@@ -24,6 +24,7 @@ use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/app/property')]
 final class PropertyController extends AbstractController
@@ -61,7 +62,7 @@ final class PropertyController extends AbstractController
     }
 
     #[Route('/new', name: 'app_property_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $property = new Property();
         $form = $this->createForm(PropertyType::class, $property);
@@ -69,6 +70,7 @@ final class PropertyController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            $property->setSlug(strtolower($slugger->slug($property->getName())->toString()));
             $property->setCreatedBy($this->getUser());
             $property->setUpdatedBy($this->getUser());
             
@@ -93,7 +95,7 @@ final class PropertyController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_property_show', methods: ['GET'], requirements: ['id' => Requirement::POSITIVE_INT])]
+    #[Route('/{id}-{slug}', name: 'app_property_show', methods: ['GET'], requirements: ['id' => Requirement::POSITIVE_INT, 'slug' => Requirement::ASCII_SLUG])]
     public function show(Request $request, Property $property, PropertyService $propertyService, FinancialEntryRepository $financialEntryRepository, UploadFileRepository $uploadFileRepository, EntityManagerInterface $entityManager): Response
     {
 
@@ -154,8 +156,8 @@ final class PropertyController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_property_edit', methods: ['GET', 'POST'], requirements: ['id' => Requirement::POSITIVE_INT])]
-    public function edit(Request $request, Property $property, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}-{slug}/edit', name: 'app_property_edit', methods: ['GET', 'POST'], requirements: ['id' => Requirement::POSITIVE_INT, 'slug' => Requirement::ASCII_SLUG])]
+    public function edit(Request $request, Property $property, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $propertyCheck = $this->accessControlService->canAccessProperty($this->getUser(), $property, AccessRoleEnum::OWNER);
         if (!$propertyCheck) {
@@ -167,8 +169,10 @@ final class PropertyController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+
             $property->setUpdatedBy($this->getUser())
-                ->setUpdatedAt(new \DateTimeImmutable());
+                ->setUpdatedAt(new \DateTimeImmutable())
+                ->setSlug(strtolower($slugger->slug($property->getName())->toString()));
 
             $entityManager->flush();
 

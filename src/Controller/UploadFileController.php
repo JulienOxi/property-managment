@@ -73,31 +73,6 @@ final class UploadFileController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_upload_file_show', methods: ['GET'])]
-    public function show(UploadFile $uploadFile): Response
-    {
-        return $this->render('upload_file/show.html.twig', [
-            'upload_file' => $uploadFile,
-        ]);
-    }
-
-    #[Route('/{id}/edit', name: 'app_upload_file_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, UploadFile $uploadFile, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(UploadFileType::class, $uploadFile);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_upload_file_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('upload_file/edit.html.twig', [
-            'upload_file' => $uploadFile,
-            'form' => $form,
-        ]);
-    }
 
     #[Route('/{id}', name: 'app_upload_file_delete', methods: ['POST'])]
     public function delete(Request $request, UploadFile $uploadFile, EntityManagerInterface $entityManager): Response

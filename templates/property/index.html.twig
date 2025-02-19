@@ -75,12 +75,12 @@
             <hr class="m-2">
 
             <div class="p-4 flex justify-center bg-white gap-4">
-                <a href="{{ path('app_property_show', {'id': property.id}) }}" class="inline-flex items-center border-[1px] border-blue-500 text-blue-500 font-semibold py-1 px-4 rounded hover:bg-blue-300 transition-colors">
+                <a href="{{ path('app_property_show', {'id': property.id, 'slug': property.slug}) }}" class="inline-flex items-center border-[1px] border-blue-500 text-blue-500 font-semibold py-1 px-4 rounded hover:bg-blue-300 transition-colors">
                     <span class="material-symbols-outlined text-sm mr-2">visibility</span>
                     Voir
                 </a>
                 {% if property.Owner == app.user %}                
-                    <a href="{{ path('app_property_edit', {'id': property.id}) }}" class="inline-flex items-center border-[1px] border-lime-500 text-lime-500 font-semibold py-1 px-4 rounded hover:bg-lime-300 transition-colors">
+                    <a href="{{ path('app_property_edit', {'id': property.id, 'slug': property.slug}) }}" class="inline-flex items-center border-[1px] border-lime-500 text-lime-500 font-semibold py-1 px-4 rounded hover:bg-lime-300 transition-colors">
                         <span class="material-symbols-outlined text-sm mr-2">edit</span>
                         Modifier
                     </a>

@@ -79,7 +79,13 @@ final class PropertyRentController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $propertyRent->setTenant($propertyService->getActualTenant($propertyRent->getProperty()));
+            //control que la date de début du loyer et la date de fin corresponde à une date de bail locataire
+            if($propertyService->haveTenantBetweenTwoDates($propertyRent->getProperty(), $propertyRent->getFromAt(), $propertyRent->getEndedAt()) === false){
+                $this->addFlash('error', 'Attention, la date de début et la date de fin ne correspondent pas à une date de bail locataire.');
+                return $this->redirectToRoute('app_property_rent_index', [], Response::HTTP_SEE_OTHER);
+            }
+
+            $propertyRent->setTenant($propertyService->getActualTenant($propertyRent->getProperty(), $propertyRent->getFromAt()));
             $propertyRent->setCreatedBy($this->getUser());
             $entityManager->persist($propertyRent);
             $entityManager->flush();
@@ -97,12 +103,20 @@ final class PropertyRentController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_property_rent_edit', methods: ['GET', 'POST'], requirements: ['id' => Requirement::POSITIVE_INT])]
-    public function edit(Request $request, PropertyRent $propertyRent, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, PropertyRent $propertyRent, EntityManagerInterface $entityManager, PropertyService $propertyService): Response
     {
         $form = $this->createForm(PropertyRentType::class, $propertyRent);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            //control que la date de début du loyer et la date de fin corresponde à une date de bail locataire
+            if($propertyService->haveTenantBetweenTwoDates($propertyRent->getProperty(), $propertyRent->getFromAt(), $propertyRent->getEndedAt()) == false)
+            {
+                $this->addFlash('error', 'Attention, la date de début et la date de fin ne correspondent pas à une date de bail locataire.');
+                return $this->redirectToRoute('app_property_rent_index', [], Response::HTTP_SEE_OTHER);
+            }
+
             $entityManager->flush();
             
             $this->addFlash('success','Modification effectuée');

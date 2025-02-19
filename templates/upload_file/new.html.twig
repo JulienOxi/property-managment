@@ -13,3 +13,26 @@
 </div>
 
 {% endblock %}
+
+{% block javascripts %}
+<script>
+const descriptionRegex = /^([A-Z]|[0-9]+)[-0-9a-zA-ZÀ-ú\s.]{2,255}$/;
+
+document.addEventListener("DOMContentLoaded", () => {
+    validateInput('upload_file_description', descriptionRegex)
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    let fileInput = document.getElementById('upload_file_file');
+    let descriptionInput = document.getElementById('upload_file_description');
+
+    fileInput.addEventListener('change', function() {
+        if (descriptionInput.value.trim() === '') {
+            let fileName = fileInput.files[0]?.name || '';
+            descriptionInput.value = fileName;
+            validateInput('upload_file_description', descriptionRegex)
+        }
+    });
+});
+</script>
+{% endblock %}

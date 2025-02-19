@@ -18,7 +18,9 @@ class UploadFileType extends AbstractType
 
         $builder
             ->add('description')
-            ->add('file', FileType::class)
+            ->add('file', FileType::class, [
+                'required' => true,
+            ])
             ->add('type', HiddenType::class,[
                 'data' => $data['type'],
             ])

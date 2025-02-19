@@ -154,4 +154,22 @@ function returnDatesBetweenTwo($date1, $date2, $format = 'd-m-Y', $week_end = tr
         // Vérifier si la date de paiement est dans l'intervalle
         return $dates;
     }
+
+    /**
+     * Retourne un DateTimeImmutable depuis une date donnée
+     * @param mixed $date
+     * @throws \InvalidArgumentException
+     * @return \DateTimeImmutable
+     */
+    public function getDateTimeImmutable($date): \DateTimeImmutable{
+
+        if($date instanceof \DateTimeImmutable){
+            return $date;
+        }
+        if($date instanceof DateTime){
+            return \DateTimeImmutable::createFromMutable( $date );
+        }
+
+        throw new \InvalidArgumentException('Invalid date format.');
+    }
 }

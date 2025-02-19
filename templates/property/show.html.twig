@@ -53,7 +53,7 @@
 			{% if property.Owner == app.user %}
 				<div class="mt-6 flex flex-row-reverse ">
 					<div>
-						<a href="{{ path('app_property_edit', {'id': property.id}) }}" class="flex items-center px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 mr-2 space-x-2">
+						<a href="{{ path('app_property_edit', {'id': property.id, 'slug': property.slug}) }}" class="flex items-center px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 mr-2 space-x-2">
 							<span class="material-symbols-outlined text-base">
 								edit
 							</span>
@@ -126,8 +126,8 @@
 									Loyers
 								</h2>
 								<div class="flex justify-between gap-2">
-									<a href="{{path('app_property_show', {'id': property.id, 'year': year - 1})}}">
-										<<</a><spanclass="inline-blockbg-blue-200text-blue-800text-smfont-semiboldmb-3p-1rounded">Année | {{year}}</span><a href="{{path('app_property_show',{'id':property.id,'year':year+1})}}">>>
+									<a href="{{path('app_property_show', {'id': property.id, 'slug': property.slug, 'year': year - 1})}}">
+										<<</a><spanclass="inline-blockbg-blue-200text-blue-800text-smfont-semiboldmb-3p-1rounded">Année | {{year}}</span><a href="{{path('app_property_show',{'id':property.id, 'slug':property.slug,'year':year+1})}}">>>
 									</a>
 								</div>
 								<div class="flex justify-between gap-2"></div>
@@ -440,8 +440,66 @@
         		</div>
 
 			
+				{# documents #}
+				<div class="bg-gray-50 p-4 shadow col-span-6 border border-stone-300 rounded-lg hover:border-stone-800 duration-500 xl:col-span-6">
+					<div class="flex justify-between items-center mb-4">
+						<h3 class="text-xl font-medium">Documents</h3>
+						<a href="{{ path('app_upload_file_new', {'id': property.id, 'type': 'document'}) }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">
+							Télécharger
+						</a>
+					</div>
+					<div class="flex flex-col w-full text-sm border border-gray-300 rounded-lg overflow-hidden">
+						<div class="flex bg-gray-200 font-medium py-2 px-4">
+							<div class="flex-1">Fichier</div>
+							<div class="w-32 text-center">Type</div>
+							<div class="w-32 text-center">Catégorie</div>
+							<div class="w-32 text-center">Montant</div>
+							<div class="w-48 text-center">Date de paiement</div>
+							<div class="w-24 text-center">Actions</div>
+						</div>
+						{% for file in uploadsFiles %}
+							<div class="flex border-t border-gray-300 py-2 px-4 items-center">
+								<div class="flex-1 truncate">
+									<a href="{{ asset('uploads/' ~ property.id ~ '/' ~ file.fileName) }}" target="_blank" class="text-blue-600 hover:text-blue-800">
+										{{ file.description ?: 'Aucune description' }}
+										{{ file.loadedEntity.description is defined ? ' / ' ~ file.loadedEntity.description : '' }}	
+									</a>
+								</div>
+								<div class="w-32 text-center">
+									{% if file.loadedEntity.type.name is defined %}									
+										<div class="w-auto text-center text-white bg-{{ file.loadedEntity.type.name == 'EXPENSE' ? 'red' : 'green'}}-600 rounded-md px-1 py-1 mx-2">
+											{{ file.loadedEntity.type.value }}
+										</div>
+									{% endif %}
+								</div>
+								<div class="w-32 text-center">
+									{% if file.loadedEntity.category.value is defined %}
+										<div class="text-center text-white bg-purple-600 rounded-md px-2 py-1">
+											{{ file.loadedEntity.category.value }}
+										</div>
+									{% endif %}
+								</div>
+								<div class="w-32 text-center text-blue-600">
+									{% if file.loadedEntity.amount is defined %}
+										<a href="{{ path('app_financial_entry_edit', {'id': file.loadedEntity.id}) }}">CHF {{ file.loadedEntity.amount }}</a>
+									{% endif %}
+								</div>
+								<div class="w-48 text-center text-gray-500">
+									{% if file.loadedEntity.paidAt is defined %}
+										{{ file.loadedEntity.paidAt|format_datetime(locale='fr', pattern="dd MMMM YYYY") }}
+									{% endif %}
+								</div>
+								<div class="w-24 text-center flex justify-center gap-2">
+									{{ include('upload_file/_delete_form.html.twig', {'upload_file': file}) }}
+								</div>
+							</div>
+						{% else %}
+							<div class="text-gray-500 text-center py-4">Actuellemnt aucun fichier</div>
+						{% endfor %}
+					</div>
+				</div>
 				<!-- Gallery Section -->
-				<div class="bg-gray-50 p-4 shadow col-span-6 border-[1px] border-solid border-stone-300 rounded-lg shadow hover:border-stone-800 hover:duration-[0.5s] xl:col-span-3">
+				<div class="bg-gray-50 p-4 shadow col-span-6 border-[1px] border-solid border-stone-300 rounded-lg shadow hover:border-stone-800 hover:duration-[0.5s] xl:col-span-6">
 					<div class="flex justify-between">
 						<h3 class="text-xl font-medium mb-4">
 							Gallerie d'image
@@ -462,41 +520,7 @@
 							</div>
 						{% else %}
 							<p class="text-gray-500">
-								No files available.
-							</p>
-						{% endfor %}
-					</div>
-				</div>
-				{# documents #}
-				<div class="bg-gray-50 p-4 shadow col-span-6 border-[1px] border-solid border-stone-300 rounded-lg shadow hover:border-stone-800 hover:duration-[0.5s] xl:col-span-3">
-					<div class="flex justify-between">
-						<h3 class="text-xl font-medium mb-4">
-							Documents
-						</h3>
-						<a href="{{ path('app_upload_file_new', {'id': property.id, 'type': 'document'}) }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">
-							Télécharger
-						</a>
-					</div>
-					<div class="space-y-2 mt-4">
-						{% for file in uploadsFiles %}
-							<div class="flex justify-between border-b pb-2">
-								<p class="text-gray-600 text-sm">									
-									{{ file.description }}
-									{{ file.loadedEntity.id }}
-								</p>
-								<a href="{{ asset('uploads/' ~ property.id ~ '/' ~ file.fileName) }}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
-									<span class="material-symbols-outlined text-base mr-1">
-										picture_as_pdf
-									</span>
-									Voir le fichier
-								</a>
-								<div class="flex items-end">
-									{{ include('upload_file/_delete_form.html.twig', {'upload_file': file}) }}
-								</div>
-							</div>
-						{% else %}
-							<p class="text-gray-500">
-								No files available.
+								Actuellemnt aucune image
 							</p>
 						{% endfor %}
 					</div>

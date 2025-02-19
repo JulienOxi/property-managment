@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UploadFileRepository;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UploadFileRepository::class)]
 #[Vich\Uploadable]
@@ -18,6 +19,27 @@ class UploadFile
     private ?int $id = null;
 
     #[Vich\UploadableField(mapping: 'uploads', fileNameProperty: 'fileName', size: 'fileSize')]
+    #[Assert\File(
+        maxSize: '10M',  // Taille max 10 Mo
+        mimeTypes: [
+            // Documents texte
+            'text/plain', 'text/csv', 'text/tab-separated-values', 'text/richtext',
+
+            // Documents Office
+            'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // DOC, DOCX
+            'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // XLS, XLSX
+            'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', // PPT, PPTX
+            'application/pdf', // PDF
+            'application/rtf', // RTF
+            'application/vnd.oasis.opendocument.text', // ODT
+            'application/vnd.oasis.opendocument.spreadsheet', // ODS
+            'application/vnd.oasis.opendocument.presentation', // ODP
+
+            // Images standards
+            'image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon'
+        ],
+        mimeTypesMessage: 'Seuls les fichiers texte, documents et images standards sont autorisés.'
+    )]
     private ?File $file = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]

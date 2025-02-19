@@ -37,43 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     validateInput('property_rent_description', descriptionRegex)
     validateInput('property_rent_monthlyPrice', monthlyPriceRegex)
+
+    //ajoute un an à la date de fin de location
+    addOneYearToInput(document.getElementById("property_rent_fromAt"), document.getElementById("property_rent_endedAt"));
 });
-
-//ajoute 1 an à la date de fin
-document.addEventListener("DOMContentLoaded", function () {
-    let startDateInput = document.getElementById("property_rent_fromAt");
-    let endDateInput = document.getElementById("property_rent_endedAt");
-
-    function getFirstDayOfNextMonth() {
-        let today = new Date();
-        return new Date(today.getFullYear(), today.getMonth() + 1, 2);
-    }
-
-    function updateEndDate() {
-        if (startDateInput.value) {
-            let startDate = new Date(startDateInput.value);
-            startDate.setFullYear(startDate.getFullYear() + 1);
-            startDate.setDate(startDate.getDate() - 1); // Soustrait un jour
-            endDateInput.value = startDate.toISOString().split('T')[0];
-        }
-    }
-
-    // Définir automatiquement la date de début au premier jour du mois suivant
-    let firstDayNextMonth = getFirstDayOfNextMonth();
-    startDateInput.value = firstDayNextMonth.toISOString().split('T')[0];
-
-    // Mettre à jour la date de fin automatiquement
-    updateEndDate();
-
-    startDateInput.addEventListener("change", updateEndDate);
-});
-
-//met à jour le nom du locataire
-addEventListener("load", (event) => {
-
-    addTenant(document.getElementById('property_rent_property').value);
-});
-
 
 </script>
 

@@ -9,52 +9,54 @@ import './styles/app.css';
 // Cette fonction prend l'ID du champ d'entrée (inputId) et une expression régulière (regex) comme paramètres.
 //exemple :   validateInput("_postal_code", '/^\d{5}$/');
 
-// Fonction pour valider un champ d'entrée basé sur une expression régulière
 
 
-window.validateInput = function(inputId, regex, capitalize = true){
+/**
+ * Fonction pour valider un champ d'entrée basé sur une expression régulière
+ * @param {*} inputId 
+ * @param {*} regex 
+ * @param {*} capitalize 
+ */
+window.validateInput = function(inputId, regex, capitalize = true) {
 
     const elem = document.getElementById(inputId);
 
-    if (typeof elem !== 'undefined') {// la variable est définie
-      
-        //test avec le regex
-        const isValid = regex.test(elem.value);
-        //on load check
-        window.addEventListener("load", () => {
-          //test avec le regex  
-          if(isValid){
-            elem.classList.add("focus:border-green-700");
-          }
+    if (!elem) return; // Vérifie si l'élément existe
 
-            //ajoute le regex au input
-            let stringRegex = String(regex);
-            let regexHTML = stringRegex.slice(1,-1);
-            elem.setAttribute("pattern", regexHTML);      
-        });
-      
-        // Event listner
-        elem.addEventListener("input", () => {
-          //test avec le regex
-          const isValid = regex.test(elem.value);
-          if(capitalize){
-            //on met la première lettre en majuscule
-            let str = elem.value.charAt(0).toUpperCase() + elem.value.slice(1);
-            elem.value = str;
-          }
-      
-          if (isValid) {
-                elem.classList.add("focus:border-green-700");
-                elem.classList.remove("focus:border-red-700");
-            }else{
-                elem.classList.add("focus:border-red-700");
-                elem.classList.remove("focus:border-green-700");
-            }
-        });
+    // Vérifie si la valeur actuelle est valide au chargement
+    const isValid = regex.test(elem.value);
+
+    if (isValid) {
+        elem.classList.add("focus:border-green-700");
     }
-  };
+
+    // Ajoute le pattern au champ input
+    const regexHTML = String(regex).slice(1, -1);
+    elem.setAttribute("pattern", regexHTML);
+
+    // Ajoute un écouteur d'événements sur l'input
+    elem.addEventListener("input", () => {
+        const isValid = regex.test(elem.value);
+
+        if (capitalize) {
+            elem.value = elem.value.charAt(0).toUpperCase() + elem.value.slice(1);
+        }
+
+        if (isValid) {
+            elem.classList.add("focus:border-green-700");
+            elem.classList.remove("focus:border-red-700");
+        } else {
+            elem.classList.add("focus:border-red-700");
+            elem.classList.remove("focus:border-green-700");
+        }
+    });
+};
 
 
+/**
+ * Ajoute le nom du locataire actuel à une div
+ * @param {*} property 
+ */
   window.addTenant = function(property){
     let div = document.getElementById("tenant");
     let spinner = document.getElementById("full-spinner");
@@ -86,5 +88,41 @@ window.validateInput = function(inputId, regex, capitalize = true){
                 // setTimeout(function(){ location.reload(); }, 2500);
         });  
 }
+
+
+
+/**
+ * Ajoute une année à une input depuis une date d'un autre input
+ * @param {*} input1  Date input default
+ * @param {*} input2  date input à ajouter
+ */
+window.addOneYearToInput =  function (input1, input2) {
+    let startDateInput = input1;
+    let endDateInput = input2;
+
+    function getFirstDayOfNextMonth() {
+        let today = new Date();
+        return new Date(today.getFullYear(), today.getMonth() + 1, 2);
+    }
+
+    function updateEndDate() {
+        if (startDateInput.value) {
+            let startDate = new Date(startDateInput.value);
+            startDate.setFullYear(startDate.getFullYear() + 1);
+            startDate.setDate(startDate.getDate() - 1); // Soustrait un jour
+            endDateInput.value = startDate.toISOString().split('T')[0];
+        }
+    }
+
+    // Définir automatiquement la date de début au premier jour du mois suivant
+    let firstDayNextMonth = getFirstDayOfNextMonth();
+    startDateInput.value = firstDayNextMonth.toISOString().split('T')[0];
+
+    // Mettre à jour la date de fin automatiquement
+    updateEndDate();
+
+    startDateInput.addEventListener("change", updateEndDate);
+};
+
 
 

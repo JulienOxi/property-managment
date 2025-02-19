@@ -59,6 +59,8 @@ document.addEventListener("DOMContentLoaded", () => {
     validateInput('property_address_zipCode', zipCodeRegex, false)
     validateInput('property_address_city', cityRegex)
 
+    //ajoute un an à la date de fin de location
+    addOneYearToInput(document.getElementById("property_purchaseDate"), document.getElementById("property_mortgageEndDate"));
 
 });
 </script>

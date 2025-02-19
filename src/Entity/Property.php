@@ -154,6 +154,9 @@ class Property
     #[ORM\OneToMany(targetEntity: UploadFile::class, mappedBy: 'property')]
     private Collection $uploadFiles;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $slug = null;
+
 
     public function __construct()
     {
@@ -589,6 +592,18 @@ class Property
                 $uploadFile->setProperty(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(?string $slug): static
+    {
+        $this->slug = $slug;
 
         return $this;
     }

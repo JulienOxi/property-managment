@@ -109,6 +109,12 @@ final class TenantController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            //check que la date d'entrée ne correspond pas à une date déjà louée
+            if($propertyService->haveTenantBetweenTwoDates($tenant->getProperty(), $tenant->getRentalStartDate(), $tenant->getRentalEndDate()))
+            {
+                $this->addFlash('warning', 'Date de location ce chevauche avec les locations en cours. Veuillez choisir une autre date de location.');
+                return $this->redirectToRoute('app_tenant_index', [$tenant], Response::HTTP_SEE_OTHER);
+            }
             
             $entityManager->flush();
 
