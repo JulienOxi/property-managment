@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Documentation utilisateur!{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+
+{# {% block importmap %}{{ importmap('app') }}{% endblock %} #}
+       
+
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 bg-fuchsia-950 text-white hidden sm:block">
+      <div class="relative w-[100px] h-[100px] mx-auto mt-2">
+        <a href="{{ path('app_home') }}">
+          <img src="{{ asset('media/logo_border.png') }}" alt="Logo" class="w-full h-full object-cover" />
+          <h2 class="absolute bottom-0 left-1/2 transform -translate-x-1/2 px-1 text-lg font-bold text-center bottom-[-15px]">
+              {{ app_name }}
+          </h2>
+        </a>
+      </div>
+
+    <nav class="w-64 text-white p-4">
+        <h2 class="text-xl font-semibold mb-4">Documentation</h2>
+        <ul class="space-y-2">
+            <li><a href="#introduction" class="block py-2 px-3 hover:bg-gray-700 rounded">Introduction</a></li>
+            <li><a href="#installation" class="block py-2 px-3 hover:bg-gray-700 rounded">Installation</a></li>
+            <li><a href="#usage" class="block py-2 px-3 hover:bg-gray-700 rounded">Utilisation de base</a></li>
+        </ul>
+    </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+      <!-- Header -->
+      <header class="bg-white shadow p-4 flex justify-between items-center">
+        <h1 class="hidden text-xl font-semibold md:block">{% block pageName %}{% endblock %}</h1>
+
+        <div class="flex items-center gap-6">     
+
+        </div>
+      </header>
+      <!-- Main Section -->
+      <main class="p-4">
+
+        {# spinner pleine page pour indiquer un chargement #}
+        <div id="full-spinner" class="hidden absolute inset-0 flex items-center justify-center bg-gray-200/50">
+            <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-blue-500"></div>
+        </div>
+        
+        {% for message in app.flashes('success') %}
+        <div class="w-full flex justify-center bg-lime-500 px-5 mt-2 rounded-lg" id="alert">
+            <div class="py-2 font-bold text-gray-900">{{ message }}</div>
+        </div>
+        {% endfor %}
+        {% for message in app.flashes('warning') %}
+        <div class="w-full flex justify-center bg-amber-500 px-5 mt-2 rounded-lg" id="alert">
+            <div class="py-2 font-bold text-gray-900">{{ message }}</div>
+        </div>
+        {% endfor %}
+        {% for message in app.flashes('error') %}
+        <div class="w-full flex justify-center bg-red-500 px-5 mt-2 rounded-lg" id="alert">
+            <div class="py-2 font-bold text-gray-50">{{ message }}</div>
+        </div>
+        {% endfor %}
+
+        <h1 class="text-3xl font-bold mb-6">Guide d'utilisation</h1>
+
+
+        </section>
+
+        </main>
+    </div>
+  </div>
+  <!--footer-->
+  <footer>
+    <div class="bg-gray-700 text-white text-center py-4">
+    <footer>
+    © 2025 Tellaris - Gestion Immobilière
+</footer>
+    </div>
+  </footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let converter = new showdown.Converter();
+
+        let mdContent = document.getElementById("markdown-content").innerText;
+        document.getElementById("markdown-content").innerHTML = converter.makeHtml(mdContent);
+    });
+</script>
+</body>
+</html>
+

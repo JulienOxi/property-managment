@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des fichiers{% endblock %}
+
+{% block stylesheets %}
+ <link rel="stylesheet" href="{{ asset('styles/fileManager.css')}}" >
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4 md:hidden">
+      <div class="w-full flex justify-center bg-lime-500 px-5 mt-2 rounded-lg">
+        <div class="py-2 font-bold text-gray-900">Le file manager n'est actuellement pas disponible en version mobile</div>
+      </div>
+    
+</div>
+<div class="hidden md:block">
+    <file-manager endpoint="{{ app.request.getSchemeAndHttpHost() }}/api" layout="grid"></file-manager>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script type="module" defer>
+    import {FileManager} from "{{ asset('fileManager.js') }}";
+FileManager.register();
+
+const filemanager = document.querySelector('file-manager');
+
+filemanager.addEventListener('selectfile', (event) => {
+    window.open(event.detail.url);
+});
+
+</script>
+{% endblock %}

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Bank;
+use App\Entity\Folder;
 use App\Entity\Property;
 use App\Form\PropertyType;
 use App\Enum\AccessRoleEnum;
@@ -20,11 +21,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/app/property')]
 final class PropertyController extends AbstractController
@@ -74,12 +75,19 @@ final class PropertyController extends AbstractController
             $property->setCreatedBy($this->getUser());
             $property->setUpdatedBy($this->getUser());
             
+            //création des accès de propriétaire
             $accessControl = new AccessControl();
             $accessControl->setGrantedUser($this->getUser())
                 ->setRole(AccessRoleEnum::OWNER)
                 ->setProperty($property);
+            
+            //création du dossier "Home" pour les fichiers
+            $folder = new Folder();
+            $folder->setName('Home')
+                ->setProperty($property);
 
             $entityManager->persist($accessControl);
+            $entityManager->persist($folder);
             $entityManager->persist($property);
             $entityManager->flush();
 
@@ -214,7 +222,7 @@ final class PropertyController extends AbstractController
                 //on control que l'utilisateur n'aille pas déjà un accès à cette propriété
                 if($accessControlGranted = $accessControlRepository->findOneBy(['property' => $property, 'grantedUser' => $this->getUser()])) {
                     $this->addFlash('warning','OUPS,Vous avez déjà accès à cette propriété comme '.$accessControlGranted->getRole()->value.'.');
-                    return $this->redirectToRoute('app_property_show', ['id' => $property->getId()]);
+                    return $this->redirectToRoute('app_property_show', ['id' => $property->getId(), 'slug' => $property->getSlug()]);
                 }
                 //si l'utilisateur n'a pas encore accès à la propriété on lui accorde un accès en tant que membre
                 $accessControl = new AccessControl();
@@ -226,14 +234,14 @@ final class PropertyController extends AbstractController
 
             //email au propriétaire
                 $templateEmail = (new TemplatedEmail())
-                ->from($this->getUser()->getEmail())
+                ->from("info@tellaris.ch")
                 ->to($propertyOwner->getGrantedUser()->getEmail())
                 ->subject('Votre invitation a été acceptée')
                 ->htmlTemplate('emails/ownerConfirmSharing.html.twig')
                     // pass variables
                 ->context([
                     'owner_name' => $propertyOwner->getGrantedUser()->getProfile()->getFullName(),
-                    'property_link' => $this->generateUrl('app_property_show', ['id' => $property->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
+                    'property_link' => $this->generateUrl('app_property_show', ['id' => $property->getId(), 'slug' => $property->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL),
                     'property_name' => $property->getType()->value.' - '.$property->getAddress()->getZipCode().' '.$property->getAddress()->getCity(),
                     'invited_user' => $this->getUser()->getProfile()->getFullName(),
                     'app_name' => $_ENV['APP_NAME']
@@ -266,7 +274,7 @@ final class PropertyController extends AbstractController
 
             //envoi de l'email au destinataire
             $templateEmail = (new TemplatedEmail())
-            ->from($this->getUser()->getEmail())
+            ->from("info@tellaris.ch")
             ->to($email)
             ->subject('Invitation à rejoindre une propriété')
             ->htmlTemplate('emails/shareLink.html.twig')
@@ -280,7 +288,7 @@ final class PropertyController extends AbstractController
 
             $this->addFlash('success','Un lien de partage vient d\'être envoyé à '.$email);
 
-            return $this->redirectToRoute('app_property_show', ['id' => $property->getId()]);
+            return $this->redirectToRoute('app_property_show', ['id' => $property->getId(), 'slug' => $property->getSlug()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('property/share.html.twig', [

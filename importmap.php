@@ -32,4 +32,16 @@ return [
     'chart.js' => [
         'version' => '3.9.1',
     ],
+    'svelte/internal' => [
+        'version' => '3.59.2',
+    ],
+    'svelte/transition' => [
+        'version' => '3.59.2',
+    ],
+    'svelte' => [
+        'version' => '3.59.2',
+    ],
+    'svelte/store' => [
+        'version' => '3.59.2',
+    ],
 ];

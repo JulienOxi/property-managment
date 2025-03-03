@@ -22,7 +22,7 @@ class AuthCodeMailer implements AuthCodeMailerInterface
 
 
         $email = (new TemplatedEmail())
-            ->from('noreply@property-managment.ch')
+            ->from('info@tellaris.ch')
             ->to($user->getEmail())
             ->subject('Votre code d’authentification')
             ->htmlTemplate('emails/authCodeMailer.html.twig')

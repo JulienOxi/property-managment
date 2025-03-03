@@ -78,22 +78,28 @@
 									<a href="{{ path('app_property_share', {'id': property.id}) }}" 
 									class="flex items-center p-1 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-100">
 										<span class="material-symbols-outlined text-base">share</span> 
-										Partager cette propriété
+										<p class="hidden md:block">Partager cette propriété</p>
 									</a>
 								</div>
 							</div>
 							{% for accessControl in property.accessControls %}
-								<div class="grid grid-cols-3">
-									<p class="text-gray-600 py-0">
+								<div class="grid grid-cols-10 gap-2">
+									<p class="text-gray-600 py-0 col-span-4">
 										{{ accessControl.grantedUser.profile.firstname }} {{ accessControl.grantedUser.profile.lastname }}
 									</p>
 									{% if accessControl.grantedUser == property.owner %}
-										<p class="text-center inline-block bg-lime-200 text-lime-800 text-sm font-semibold mb-3 p-1 rounded">Propriétaire</p>
+										<p class="text-center bg-lime-200 text-lime-800 text-sm font-semibold mb-3 p-1 rounded col-span-4">
+											Propriétaire
+										</p>
 									{% else %}
-										<p class="text-center inline-block bg-amber-200 text-amber-800 text-sm font-semibold mb-3 p-1 rounded">Membre</p>
-											{% if property.owner == app.user %}
+										<p class="text-center bg-amber-200 text-amber-800 text-sm font-semibold mb-3 p-1 rounded col-span-4">
+											Membre
+										</p>
+										{% if property.owner == app.user %}
+											<div class="col-span-2">
 												{{ include('access_control/_delete_form.html.twig', {'access_control': accessControl, 'bgColor': 'bg-gray-50'}) }}
-											{% endif %}
+											</div>
+										{% endif %}
 									{% endif %}
 								</div>
 							{% endfor %}
@@ -176,7 +182,7 @@
 													{% if rentKey in financialEntrys|keys %}
 														{% set selectedEntry = financialEntrys[rentKey] %}
 														<td class="text-xs hidden lg:table-cell">
-															{{ selectedEntry.tenant.fullname }}
+															{{ selectedEntry.tenant ? selectedEntry.tenant.fullname : 'NULL' }}
 														</td>
 													{% else %}
 														<td class="text-xs hidden lg:table-cell"></td>
@@ -451,11 +457,11 @@
 					<div class="flex flex-col w-full text-sm border border-gray-300 rounded-lg overflow-hidden">
 						<div class="flex bg-gray-200 font-medium py-2 px-4">
 							<div class="flex-1">Fichier</div>
-							<div class="w-32 text-center">Type</div>
-							<div class="w-32 text-center">Catégorie</div>
+							<div class="w-32 text-center hidden md:block">Type</div>
+							<div class="w-32 text-center hidden lg:block">Catégorie</div>
 							<div class="w-32 text-center">Montant</div>
-							<div class="w-48 text-center">Date de paiement</div>
-							<div class="w-24 text-center">Actions</div>
+							<div class="w-48 text-center hidden xl:block">Date de paiement</div>
+							<div class="w-15 text-center">Actions</div>
 						</div>
 						{% for file in uploadsFiles %}
 							<div class="flex border-t border-gray-300 py-2 px-4 items-center">
@@ -465,14 +471,14 @@
 										{{ file.loadedEntity.description is defined ? ' / ' ~ file.loadedEntity.description : '' }}	
 									</a>
 								</div>
-								<div class="w-32 text-center">
+								<div class="w-32 text-center hidden md:block">
 									{% if file.loadedEntity.type.name is defined %}									
 										<div class="w-auto text-center text-white bg-{{ file.loadedEntity.type.name == 'EXPENSE' ? 'red' : 'green'}}-600 rounded-md px-1 py-1 mx-2">
 											{{ file.loadedEntity.type.value }}
 										</div>
 									{% endif %}
 								</div>
-								<div class="w-32 text-center">
+								<div class="w-32 text-center hidden lg:block">
 									{% if file.loadedEntity.category.value is defined %}
 										<div class="text-center text-white bg-purple-600 rounded-md px-2 py-1">
 											{{ file.loadedEntity.category.value }}
@@ -484,17 +490,17 @@
 										<a href="{{ path('app_financial_entry_edit', {'id': file.loadedEntity.id}) }}">CHF {{ file.loadedEntity.amount }}</a>
 									{% endif %}
 								</div>
-								<div class="w-48 text-center text-gray-500">
+								<div class="w-48 text-center text-gray-500 hidden xl:block">
 									{% if file.loadedEntity.paidAt is defined %}
 										{{ file.loadedEntity.paidAt|format_datetime(locale='fr', pattern="dd MMMM YYYY") }}
 									{% endif %}
 								</div>
-								<div class="w-24 text-center flex justify-center gap-2">
+								<div class="w-15 text-center flex justify-center gap-2">
 									{{ include('upload_file/_delete_form.html.twig', {'upload_file': file}) }}
 								</div>
 							</div>
 						{% else %}
-							<div class="text-gray-500 text-center py-4">Actuellemnt aucun fichier</div>
+							<div class="text-gray-500 text-center py-4">Actuelemnt aucun fichier</div>
 						{% endfor %}
 					</div>
 				</div>

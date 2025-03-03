@@ -8,7 +8,7 @@ scheb_two_factor:
     email:
         digits: 6
         enabled: true
-        sender_email: julien.ochsenbein@gmail.com
+        sender_email: info@tellaris.ch
         sender_name: PropertyManagment  # Optional     
         template: security/2fa_form.html.twig  
         mailer: App\Security\AuthCodeMailer

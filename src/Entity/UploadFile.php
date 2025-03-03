@@ -36,7 +36,7 @@ class UploadFile
             'application/vnd.oasis.opendocument.presentation', // ODP
 
             // Images standards
-            'image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon'
+            'image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'
         ],
         mimeTypesMessage: 'Seuls les fichiers texte, documents et images standards sont autorisés.'
     )]
@@ -72,6 +72,9 @@ class UploadFile
     private ?Property $property = null;
 
     private $loadedEntity = null;
+
+    #[ORM\ManyToOne(inversedBy: 'uploadFiles')]
+    private ?Folder $folder = null;
 
     public function getId(): ?int
     {
@@ -219,6 +222,18 @@ class UploadFile
     public function setLoadedEntity(?object $loadedEntity): static
     {
         $this->loadedEntity = $loadedEntity;
+
+        return $this;
+    }
+
+    public function getFolder(): ?Folder
+    {
+        return $this->folder;
+    }
+
+    public function setFolder(?Folder $folder): static
+    {
+        $this->folder = $folder;
 
         return $this;
     }

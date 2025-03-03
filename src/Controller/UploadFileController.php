@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Folder;
 use App\Entity\Property;
 use App\Entity\UploadFile;
 use App\Enum\AccessRoleEnum;
@@ -57,7 +58,8 @@ final class UploadFileController extends AbstractController
             
             $uploadFile
                 ->setUpdatedBy($this->getUser())
-                ->setProperty($id);
+                ->setProperty($id)
+                ->setFolder($this->entityManager->getRepository(Folder::class)->findOneBy(['property' => $id, 'name' => "Home"]));
 
             $this->entityManager->persist($uploadFile);
             $this->entityManager->flush();

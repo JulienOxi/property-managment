@@ -25,4 +25,13 @@ class AppController extends AbstractController
     {
         return $this->redirectToRoute('app_home');
     }
+
+    #[Route('/documentation', name: 'app_doc')]
+    public function documentation(): Response
+    {
+        
+        return $this->render('documentation.html.twig', [
+
+        ]);
+    }
 }

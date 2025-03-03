@@ -1,0 +1,4 @@
+Gestion optimisée du partage de bien (Voir avec qui je partage mes bien)
+(Voir qui est le propriétaire quand on reçois un bien)
+
+Création automatique des loyers le dernier jours du mois en les mettant non validé

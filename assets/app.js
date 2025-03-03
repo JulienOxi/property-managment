@@ -5,12 +5,10 @@
  * which should already be in your base.html.twig.
  */
 import './styles/app.css';
+
 //fonction de validation des formulaire
 // Cette fonction prend l'ID du champ d'entrée (inputId) et une expression régulière (regex) comme paramètres.
 //exemple :   validateInput("_postal_code", '/^\d{5}$/');
-
-
-
 /**
  * Fonction pour valider un champ d'entrée basé sur une expression régulière
  * @param {*} inputId 

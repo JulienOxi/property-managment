@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des fichiers{% endblock %}
+
+{% block body %}
+<div x-data="fileManager" class="flex h-screen space-x-4">
+    <!-- Sidebar (Dossiers) -->
+    <div class="w-1/4 bg-white shadow-md p-4 rounded-lg">
+        <div x-data="fileManager">
+            <!-- Liste des biens -->
+            <h2 class="text-xl font-bold mb-4">Biens immobiliers</h2>
+            <ul>
+                <template x-for="(folders, propertyName) in properties" :key="propertyName">
+                    <li class="p-2 cursor-pointer hover:bg-gray-200 rounded"
+                        @click="selectProperty(propertyName)">
+                        <span x-text="propertyName"></span>
+                    </li>
+                </template>
+            </ul>
+
+            <!-- Liste des dossiers si une propriété est sélectionnée -->
+            <template x-if="selectedProperty">
+                <div class="mt-4">
+                    <h3 class="text-lg font-semibold">Dossiers de "<span x-text="selectedProperty"></span>"</h3>
+                    <ul>
+                        <template x-if="currentFolder">
+                            <template x-for="folder in [currentFolder]" :key="folder.id">
+                                <li class="p-2 cursor-pointer hover:bg-gray-200 rounded"
+                                    @click="selectFolder(folder)">
+                                    <span x-text="folder.name"></span>
+
+                                    <!-- Affichage récursif des enfants -->
+                                    <ul x-show="folder.children.length">
+                                        <template x-for="child in folder.children" :key="child.id">
+                                            <li class="pl-4 p-2 cursor-pointer hover:bg-gray-100 rounded"
+                                                @click.stop="selectFolder(child)">
+                                                <span x-text="child.name"></span>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </li>
+                            </template>
+                        </template>
+                    </ul>
+                </div>
+            </template>
+        </div>
+        <button class="mt-4 px-3 py-2 bg-blue-500 text-white rounded" @click="addFolder">+ Ajouter un dossier</button>
+    </div>
+
+    <!-- Contenu Principal -->
+    <div class="flex-1 bg-white shadow-md p-6 rounded-lg">
+        <h2 class="text-lg font-semibold mb-4">Fichiers dans "<span x-text="currentFolder"></span>"</h2>
+
+        <div class="border-2 border-dashed border-gray-300 p-6 text-center"
+             @drop="handleDrop($event, $data)"
+             @dragover.prevent>
+            <p class="text-gray-600">Glissez-déposez des fichiers ici</p>
+            <input type="file" class="mt-2" @change="uploadFile">
+        </div>
+
+        <ul class="mt-4">
+            <template x-for="file in files.filter(f => f.folder === currentFolder)" :key="file.name">
+                <li class="p-2 bg-gray-100 rounded mt-2" x-text="file.name"></li>
+            </template>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+console.log(JSON.parse("{{folders|json_encode}}".replace(/&quot;/g,'"')));
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('fileManager', () => ({
+                properties: JSON.parse("{{folders|json_encode}}".replace(/&quot;/g,'"')),
+                selectedProperty: null,
+                currentFolder: null,
+
+                selectProperty(propertyName) {
+                    this.selectedProperty = propertyName;
+                    this.currentFolder = this.properties[propertyName]; // Charge les dossiers associés
+                },
+
+                selectFolder(folder) {
+                    this.currentFolder = folder;
+                }
+            }));
+        });
+    </script>
+    <script>
+        function handleDrop(event, fileManager) {
+            event.preventDefault();
+            let file = event.dataTransfer.files[0];
+            if (file) {
+                fileManager.files.push({ name: file.name, folder: fileManager.currentFolder });
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none; }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.addEventListener("dragover", function(event) {
+                event.preventDefault();
+            });
+            document.addEventListener("drop", function(event) {
+                event.preventDefault();
+            });
+        });
+    </script>
+{% endblock %}

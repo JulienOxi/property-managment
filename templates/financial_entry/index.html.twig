@@ -110,9 +110,9 @@
                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.category.value }}</td>
                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.amount }} CHF</td>
                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden xl:table-cell">{{ financial_entry.description }}</td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden xl:table-cell">{{ financial_entry.createdAt ? financial_entry.createdAt|date('Y-m-d H:i:s') : 'N/A' }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden xl:table-cell">{{ financial_entry.createdAt ? financial_entry.createdAt|date('d-m-Y') : 'N/A' }}</td>
                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.isPaid ? '<p class="text-green-500">Oui</p>' : '<p class="text-red-500">Non</p>' }}</td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">{{ financial_entry.paidAt ? financial_entry.paidAt|date('Y-m-d H:i:s') : 'N/A' }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">{{ financial_entry.paidAt ? financial_entry.paidAt|date('d-m-Y') : 'N/A' }}</td>
                         <td class="px-2 py-4 whitespace-nowrap text-sm font-medium">
                             <a href="{{ path('app_financial_entry_edit', {'id': financial_entry.id}) }}" class="hidden border-[1px] border-lime-500 text-lime-500 font-semibold pt-1 pb-0 px-1 rounded hover:bg-lime-200 md:inline-block">
                                <span class="material-symbols-outlined text-sm">edit</span> 

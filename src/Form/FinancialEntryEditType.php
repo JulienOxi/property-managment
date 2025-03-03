@@ -50,7 +50,6 @@ class FinancialEntryEditType extends AbstractType
             ])
             ->add('paidAt', DateType::class, [
                 'widget' => 'single_text',
-                'attr' => ['value' => Date('Y-m-d')],
             ])
             //Ajout du chant UploadFile
             ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {  

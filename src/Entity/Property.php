@@ -157,6 +157,12 @@ class Property
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $slug = null;
 
+    /**
+     * @var Collection<int, Folder>
+     */
+    #[ORM\OneToMany(targetEntity: Folder::class, mappedBy: 'property')]
+    private Collection $folders;
+
 
     public function __construct()
     {
@@ -168,6 +174,7 @@ class Property
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
         $this->uploadFiles = new ArrayCollection();
+        $this->folders = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -604,6 +611,36 @@ class Property
     public function setSlug(?string $slug): static
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Folder>
+     */
+    public function getFolders(): Collection
+    {
+        return $this->folders;
+    }
+
+    public function addFolder(Folder $folder): static
+    {
+        if (!$this->folders->contains($folder)) {
+            $this->folders->add($folder);
+            $folder->setProperty($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFolder(Folder $folder): static
+    {
+        if ($this->folders->removeElement($folder)) {
+            // set the owning side to null (unless already changed)
+            if ($folder->getProperty() === $this) {
+                $folder->setProperty(null);
+            }
+        }
 
         return $this;
     }
