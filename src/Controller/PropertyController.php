@@ -10,6 +10,7 @@ use App\Enum\AccessRoleEnum;
 use App\Entity\AccessControl;
 use App\Form\PropertyShareType;
 use App\Service\PropertyService;
+use Symfony\Component\Mime\Address;
 use App\Service\AccessControlService;
 use App\Repository\PropertyRepository;
 use App\Repository\UploadFileRepository;
@@ -142,7 +143,8 @@ final class PropertyController extends AbstractController
         }
 
         //selection des fichiers
-        $uploadsFiles = $uploadFileRepository->findBy(['property' => $property->getId(), 'type' => 'document']);
+        $uploadsFiles = $uploadFileRepository->findFilesWithoutEntity($property->getId(), 'document');
+
             foreach ($uploadsFiles as $key => $uploadsFile) {
                 if ($uploadsFile->getEntityClass() !== null) {
                     $uploadsFiles[$key] = $uploadsFile->setLoadedEntity($entityManager->getRepository($uploadsFile->getEntityClass())->find($uploadsFile->getEntityId()));
@@ -234,7 +236,7 @@ final class PropertyController extends AbstractController
 
             //email au propriétaire
                 $templateEmail = (new TemplatedEmail())
-                ->from("info@tellaris.ch")
+                ->from(new Address('info@tellaris.ch', 'App Tallaris'))
                 ->to($propertyOwner->getGrantedUser()->getEmail())
                 ->subject('Votre invitation a été acceptée')
                 ->htmlTemplate('emails/ownerConfirmSharing.html.twig')
@@ -274,7 +276,7 @@ final class PropertyController extends AbstractController
 
             //envoi de l'email au destinataire
             $templateEmail = (new TemplatedEmail())
-            ->from("info@tellaris.ch")
+            ->from(new Address('info@tellaris.ch', 'App Tallaris'))
             ->to($email)
             ->subject('Invitation à rejoindre une propriété')
             ->htmlTemplate('emails/shareLink.html.twig')

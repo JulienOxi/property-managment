@@ -13,6 +13,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {% for property in properties %}
     <div class="flex flex-col">
+    <a href="{{ path('app_property_show', {'id': property.id, 'slug': property.slug}) }}" class="">
         <div class="flex flex-col bg-white shadow-md rounded-lg overflow-hidden border-4 border-white hover:shadow-xl">
             {% if images[property.id] is defined %}
                 {% set path = asset('uploads/' ~ property.id ~ '/' ~ images[property.id].fileName) %}
@@ -39,9 +40,28 @@
 
             <div class="bg-white p-4">
                 <ul>
-                    <li><strong>Prix d'achat:</strong> {{ property.purchasePrice|format_currency('CHF') }}</li>
-                    <li><strong>Date d'achat:</strong> {{ property.purchaseDate ? property.purchaseDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</li>
-
+                    <li>
+                    {% if property.actualTenant is empty %}
+                        <span class="inline-block bg-orange-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
+                            Disponible
+                        </span>
+                    {% else %}
+                        <span class="inline-block bg-green-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
+                            Loué
+                        </span>
+                    {% endif %}
+                    </li>                    
+                    {% if property.actualTenant is not null %}
+                        <li><strong>Locataire:</strong> {{ property.actualTenant.firstname }} {{ property.actualTenant.lastname }}</li>
+                    {% endif %}
+                    {% set rentTotal = 0 %}
+                    {% for property_rent in property.propertyRents %}
+                        {% if property_rent.type.name != 'CHARGES_DEPOSIT' %}
+                            {% set rentTotal = rentTotal + property_rent.monthlyPrice %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <li><strong>Loyer mensuel:</strong> {{ rentTotal }} CHF</li>
                     <li><hr class="m-2"></li>
                     
                     <li><strong>Taux hypothécaire:</strong> {{ property.mortgageRate }}%</li>
@@ -54,39 +74,11 @@
                     <li><strong>Type d'hypothèque:</strong> {{ property.mortgageType2.value }}</li>
                     <li><strong>Fin de l'hypothèque:</strong> {{ property.mortgageEndDate2 ? property.mortgageEndDate2|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</li>
                     {% endif %}
-                    
-                    <li><hr class="m-2"></li>
-                    
-                    {% set rentTotal = 0 %}
-                    {% for property_rent in property.propertyRents %}
-                        {% if property_rent.type.name != 'CHARGES_DEPOSIT' %}
-                            {% set rentTotal = rentTotal + property_rent.monthlyPrice %}
-                        {% endif %}
-                    {% endfor %}
-                    
-                    <li><strong>Loyer mensuel:</strong> {{ rentTotal }} CHF</li>
-                    
-                    {% if property.actualTenant is not null %}
-                        <li><strong>Locataire:</strong> {{ property.actualTenant.firstname }} {{ property.actualTenant.lastname }}</li>
-                    {% endif %}
                 </ul>
             </div>
-
-            <hr class="m-2">
-
-            <div class="p-4 flex justify-center bg-white gap-4">
-                <a href="{{ path('app_property_show', {'id': property.id, 'slug': property.slug}) }}" class="inline-flex items-center border-[1px] border-blue-500 text-blue-500 font-semibold py-1 px-4 rounded hover:bg-blue-300 transition-colors">
-                    <span class="material-symbols-outlined text-sm mr-2">visibility</span>
-                    Voir
-                </a>
-                {% if property.Owner == app.user %}                
-                    <a href="{{ path('app_property_edit', {'id': property.id, 'slug': property.slug}) }}" class="inline-flex items-center border-[1px] border-lime-500 text-lime-500 font-semibold py-1 px-4 rounded hover:bg-lime-300 transition-colors">
-                        <span class="material-symbols-outlined text-sm mr-2">edit</span>
-                        Modifier
-                    </a>
-                {% endif %}
-            </div>
+        </a>
         </div>
+    </a>
     </div>
 {% else %}
     <div class="col-span-full text-center text-gray-600">

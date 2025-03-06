@@ -2,13 +2,16 @@
 
 namespace App\Form;
 
+use Dom\Entity;
 use App\Entity\User;
 use App\Entity\Tenant;
 use App\Entity\Property;
 use App\Entity\PropertyRent;
 use App\Enum\AccessRoleEnum;
 use App\Enum\PropertyRentEnum;
+use App\Repository\TenantRepository;
 use App\Repository\PropertyRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -20,10 +23,12 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 class PropertyRentType extends AbstractType
 {
     private Security $security;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(Security $security)
+    public function __construct(Security $security, EntityManagerInterface $entityManager)
     {
         $this->security = $security;
+        $this->entityManager = $entityManager;        
     }
     
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -37,19 +42,17 @@ class PropertyRentType extends AbstractType
                 )
             ])
             ->add('monthlyPrice')
-            ->add('fromAt', DateType::class, [
-                'widget' => 'single_text',
-                'attr' => ['value' => Date('Y-m-d')],
-            ])
-            ->add('endedAt', DateType::class, [
-                'widget' => 'single_text',
-            ])
-            ->add('property', EntityType::class, [
-                'class' => Property::class,
-                'query_builder' => function (PropertyRepository $propertyRepository) {
-                    return $propertyRepository->findAccessibleProperties($this->security->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER], false);
+            ->add('tenant', EntityType::class, [
+                'class' => Tenant::class,
+                'query_builder' => function (TenantRepository $tenantRepository) {
+                    return $tenantRepository->createQueryBuilder('t')
+                        ->innerJoin('t.property', 'p')
+                        ->where('p IN (:properties)')
+                        ->setParameter('properties', $this->entityManager->getRepository(Property::class)->findAccessibleProperties($this->security->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]));
                 },
-                'choice_label' => 'name',
+                'choice_label' => function (Tenant $tenant) {
+                    return $tenant->getFullName() . ' - ' . $tenant->getProperty()->getName();
+                },
             ])
         ;
     }

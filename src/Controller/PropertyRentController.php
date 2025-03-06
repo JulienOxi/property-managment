@@ -79,14 +79,13 @@ final class PropertyRentController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            //control que la date de début du loyer et la date de fin corresponde à une date de bail locataire
-            if($propertyService->haveTenantBetweenTwoDates($propertyRent->getProperty(), $propertyRent->getFromAt(), $propertyRent->getEndedAt()) === false){
-                $this->addFlash('error', 'Attention, la date de début et la date de fin ne correspondent pas à une date de bail locataire.');
-                return $this->redirectToRoute('app_property_rent_index', [], Response::HTTP_SEE_OTHER);
-            }
+            $tenant = $propertyRent->getTenant();
+            $propertyRent
+                ->setFromAt(\DateTimeImmutable::createFromMutable($tenant->getRentalStartDate()))
+                ->setEndedAt(\DateTimeImmutable::createFromMutable($tenant->getRentalEndDate()))	
+                ->setProperty($tenant->getProperty())
+                ->setCreatedBy($this->getUser());
 
-            $propertyRent->setTenant($propertyService->getActualTenant($propertyRent->getProperty(), $propertyRent->getFromAt()));
-            $propertyRent->setCreatedBy($this->getUser());
             $entityManager->persist($propertyRent);
             $entityManager->flush();
 
@@ -136,7 +135,9 @@ final class PropertyRentController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$propertyRent->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($propertyRent);
             $entityManager->flush();
+            $this->addFlash('success','Le loyer à bien été supprimé');
         }
+
 
         return $this->redirectToRoute('app_property_rent_index', [], Response::HTTP_SEE_OTHER);
     }

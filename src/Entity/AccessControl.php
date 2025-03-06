@@ -23,7 +23,7 @@ class AccessControl
     #[ORM\Column(length: 50)]
     private AccessRoleEnum $role;
 
-    #[ORM\ManyToOne(inversedBy: 'AccessControls')]
+    #[ORM\ManyToOne(inversedBy: 'accessControls')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Property $property = null;
 

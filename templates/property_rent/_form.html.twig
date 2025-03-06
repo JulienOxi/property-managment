@@ -1,24 +1,22 @@
 {% import 'form_macros.html.twig' as macros %}
 {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
 
-<div class="md:grid md:grid-cols-3 md:gap-4">
+<div class="md:grid md:grid-cols-4 md:gap-4">
 
-    {{ macros.field(form.description, 'Description', 'md:col-span-3') }}
-    {{ macros.field(form.type, 'Type', '') }}
-    {{ macros.field(form.monthlyPrice, 'Montant mensuel', '') }}
-    {{ macros.field(form.fromAt, 'A partir du', '') }}
-    {{ macros.field(form.endedAt, 'Jusqu\'au', '') }}
+    {{ macros.field(form.description, 'Description', 'md:col-span-4') }}
+    {{ macros.field(form.type, 'Type', 'md:col-span-2') }}
+    {{ macros.field(form.monthlyPrice, 'Montant mensuel', 'md:col-span-2') }}
 
 
-    <div class="relative flex py-5 items-center col-span-3">
+    <div class="relative flex py-5 items-center col-span-4">
     <div class="flex-grow border-t border-gray-400"></div>
-    <span class="flex-shrink mx-4 text-gray-400">Selection du bien immobilier</span>
+    <span class="flex-shrink mx-4 text-gray-400">Selection du locataire</span>
     <div class="flex-grow border-t border-gray-400"></div>
     </div>
 
-    <div class="col-span-3">
-        {{ form_label(form.property, 'Proprieté', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-        {{ form_widget(form.property, {'attr': {'class': 'input-base', 'onchange': 'addTenant(this.value)'}}) }}
+    <div class="col-span-4">
+        {{ form_label(form.tenant, 'Locataire', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+        {{ form_widget(form.tenant, {'attr': {'class': 'input-base', 'onchange': 'addTenant(this.value)'}}) }}
     </div>
 
     <div id="tenant" class="col-span-2 text-sm font-medium text-gray-700 place-items-center spinner">
@@ -28,11 +26,15 @@
 
 </div>
 
-<div>
-    <button class="mt-4 py-2 px-4 bg-blue-600 text-white font-bold rounded hover:bg-blue-700">
-        {{ button_label|default('Enregistrer') }}
-    </button>
-    <button onclick="history.back()" class="mt-4 py-2 px-4 bg-red-600 text-white font-bold rounded hover:bg-red-700">Annuler</button>
+<div class="grid grid-cols-3 gap-4">
+    <div class="col-span-2 text-left">
+        <button class="mt-4 py-2 px-4 bg-blue-600 text-white font-bold rounded hover:bg-blue-700">
+            {{ button_label|default('Enregistrer') }}
+        </button>
+        {{ form_end(form) }}
+        <button onclick="history.back()" class="mt-4 py-2 px-4 bg-purple-600 text-white font-bold rounded hover:bg-purple-700">Annuler</button>
+    </div>
+    <div class="col-span-1 text-right">
+        {% if type == 'edit' %}{% include('property_rent/_delete_form.html.twig') %}{% endif %}
+    </div>
 </div>
-
-{{ form_end(form) }}

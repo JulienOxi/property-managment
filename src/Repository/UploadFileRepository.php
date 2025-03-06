@@ -31,13 +31,17 @@ class UploadFileRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?UploadFile
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findFilesWithoutEntity($property, $type, $entityClass = 'App\Entity\FinancialEntry'): ?array
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.property = :property')
+            ->andWhere('u.type = :type')
+            ->andWhere('u.entityClass = :entityClass')
+            ->setParameter('property', $property)
+            ->setParameter('type', $type)
+            ->setParameter('entityClass', $entityClass)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

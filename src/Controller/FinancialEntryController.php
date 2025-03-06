@@ -236,11 +236,12 @@ final class FinancialEntryController extends AbstractController
                             //defini la periode de recherche (entre le 25 du mois d'avant et le 5 du mois en cours)
                             $withinRentPaymentDates = $dateService->withinRentPaymentPeriod($monthAndYear['month'], $monthAndYear['year']);
                             //on regarde si on trouve une entrée dans le laps de temps dans la même catégory et le même type
-                            $financialEntry = $financialEntryRepository->findOneBetweenTwoDates($rent->getproperty(), $withinRentPaymentDates['start'], $withinRentPaymentDates['end'], TransactionEnum::INCOME, $enumService->mapPropertyRentToFinancialCategory($key));
-                            $financialDeposit = $financialEntryRepository->findOneBetweenTwoDates($rent->getproperty(),$withinRentPaymentDates['start'], $withinRentPaymentDates['end'], TransactionEnum::EXPENSE, FinancialCategoryEnum::CHARGES_DEPOSIT);
+                            $financialEntry = $financialEntryRepository->findBetweenTwoDates($rent->getproperty(), $withinRentPaymentDates['start'], $withinRentPaymentDates['end'], TransactionEnum::INCOME, $enumService->mapPropertyRentToFinancialCategory($key));
+                            $financialDeposit = $financialEntryRepository->findBetweenTwoDates($rent->getproperty(),$withinRentPaymentDates['start'], $withinRentPaymentDates['end'], TransactionEnum::EXPENSE, FinancialCategoryEnum::CHARGES_DEPOSIT);
+
 
                             //si il n'y a pas de loyer on le créer
-                            if(!$financialEntry && $enumService->mapPropertyRentToFinancialCategory($key) != FinancialCategoryEnum::CHARGES_DEPOSIT){
+                            if(count($financialDeposit) == 0 && !$financialEntry && $enumService->mapPropertyRentToFinancialCategory($key) != FinancialCategoryEnum::CHARGES_DEPOSIT){
                                 $financialEntry = new FinancialEntry();
                                 $financialEntry->setType(TransactionEnum::INCOME);
                                 $financialEntry->setPaidAt(new \DateTimeImmutable('01.'.$monthAndYear['month'].'.'.$monthAndYear['year']));
@@ -257,7 +258,7 @@ final class FinancialEntryController extends AbstractController
                                 $createdEntry++;
                             }
                             //si il n'y a pas de charges on les crée
-                            if(!$financialDeposit && $enumService->mapPropertyRentToFinancialCategory($key) == FinancialCategoryEnum::CHARGES_DEPOSIT){
+                            if(count($financialDeposit) == 0 && !count($financialEntry) && $enumService->mapPropertyRentToFinancialCategory($key) == FinancialCategoryEnum::CHARGES_DEPOSIT){
                                 $financialDeposit = new FinancialEntry();
                                 $financialDeposit->setType(TransactionEnum::EXPENSE);
                                 $financialDeposit->setPaidAt(new \DateTimeImmutable('01.'.$monthAndYear['month'].'.'.$monthAndYear['year']));

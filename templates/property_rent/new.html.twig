@@ -15,7 +15,7 @@
                         <p class="text-gray-600">Veuillez remplir les informations ci-dessous :</p>
                     </div>
 
-                    {{ include('property_rent/_form.html.twig') }}
+                    {{ include('property_rent/_form.html.twig', {'type': 'new'}) }}
                 {% else %}  
                         <div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
                             Vous devez ajoutez une propriété avant de pouvoir ajouter un locataire.

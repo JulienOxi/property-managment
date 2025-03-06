@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use Symfony\Component\Mime\Address;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Scheb\TwoFactorBundle\Mailer\AuthCodeMailerInterface;
@@ -22,7 +23,7 @@ class AuthCodeMailer implements AuthCodeMailerInterface
 
 
         $email = (new TemplatedEmail())
-            ->from('info@tellaris.ch')
+            ->from(new Address('info@tellaris.ch', 'App Tallaris'))
             ->to($user->getEmail())
             ->subject('Votre code d’authentification')
             ->htmlTemplate('emails/authCodeMailer.html.twig')

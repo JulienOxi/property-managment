@@ -45,7 +45,7 @@
 			{% set hypo2 = true %}
 		{% endif %}
 
-		<div class="container mx-auto p-6">
+		<div class="container mx-auto px-4 p-6">
 			<h1 class="text-2xl font-bold mb-6 text-center md:hidden">
 				{{pageName}}
 			</h1>
@@ -64,7 +64,7 @@
 					</div>
 				</div>
 			{% endif %}
-			<div class="rounded-lg p-6 mt-2 grid grid-cols-2 xl:grid-cols-6 gap-6">
+			<div class="rounded-lg mt-2 grid grid-cols-2 sm:p-6 xl:grid-cols-6 gap-6">
 				<!-- Card Section -->
 				<div class="col-span-6 xl:col-span-2">
 					<div class="grid gap-4">
@@ -449,11 +449,14 @@
 				{# documents #}
 				<div class="bg-gray-50 p-4 shadow col-span-6 border border-stone-300 rounded-lg hover:border-stone-800 duration-500 xl:col-span-6">
 					<div class="flex justify-between items-center mb-4">
-						<h3 class="text-xl font-medium">Documents</h3>
+						<h3 class="text-xl font-medium">Documents financier</h3>
 						<a href="{{ path('app_upload_file_new', {'id': property.id, 'type': 'document'}) }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">
 							Télécharger
 						</a>
 					</div>
+						<div class="w-full flex justyfy-center rounded-lg bg-yellow-400 p-2 mb-2">
+							<span class="material-symbols-outlined text-black pr-2">info</span><p class="text-xs text-black text-center mt-1">Ici s'affichent uniquement les fichiers avec une transaction financière associée.</p>
+						</div>
 					<div class="flex flex-col w-full text-sm border border-gray-300 rounded-lg overflow-hidden">
 						<div class="flex bg-gray-200 font-medium py-2 px-4">
 							<div class="flex-1">Fichier</div>
@@ -500,7 +503,7 @@
 								</div>
 							</div>
 						{% else %}
-							<div class="text-gray-500 text-center py-4">Actuelemnt aucun fichier</div>
+							<div class="text-gray-500 text-center py-4">Actuellement, aucun fichier.</div>
 						{% endfor %}
 					</div>
 				</div>
@@ -526,7 +529,7 @@
 							</div>
 						{% else %}
 							<p class="text-gray-500">
-								Actuellemnt aucune image
+								Actuellement, aucune image.
 							</p>
 						{% endfor %}
 					</div>

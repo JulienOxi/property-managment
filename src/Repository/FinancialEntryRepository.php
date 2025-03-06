@@ -27,7 +27,7 @@ class FinancialEntryRepository extends ServiceEntityRepository
        /**
         * @return FinancialEntry Returns an array of FinancialEntry objects
         */
-        public function findOneBetweenTwoDates(Property $property, $dateFrom, $dateEnded, $type, $category): ?FinancialEntry
+        public function findBetweenTwoDates(Property $property, $dateFrom, $dateEnded, $type, $category): ?array 
         {
             return $this->createQueryBuilder('f')
                 ->where('f.paidAt BETWEEN :dateFrom AND :dateEnded')
@@ -42,7 +42,7 @@ class FinancialEntryRepository extends ServiceEntityRepository
                     new Parameter('category', $category),
                 ]))
                 ->getQuery()
-                ->getOneOrNullResult()
+                ->getResult()
             ;
         }
 
