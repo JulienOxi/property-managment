@@ -28,7 +28,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-#[Route('/app/property')]
+#[Route('/property')]
 final class PropertyController extends AbstractController
 {
 

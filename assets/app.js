@@ -6,6 +6,7 @@ import './bootstrap.js';
  * which should already be in your base.html.twig.
  */
 import './styles/app.css';
+import './styles/filemanager.css';
 
 //fonction de validation des formulaire
 // Cette fonction prend l'ID du champ d'entrée (inputId) et une expression régulière (regex) comme paramètres.

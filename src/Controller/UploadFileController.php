@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-#[Route('/app/upload-file')]
+#[Route('/upload-file')]
 #[Route('/', name: 'app_upload_file_index', methods: ['GET', 'POST'])]
 final class UploadFileController extends AbstractController
 {

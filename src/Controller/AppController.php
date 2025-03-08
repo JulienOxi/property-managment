@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Repository\UserRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\UX\Chartjs\Model\Chart;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -15,41 +17,10 @@ class AppController extends AbstractController
         private TexterInterface $texter,
     ) {
     }
-    #[Route('/app', name: 'app_home')]
+    #[Route('/', name: 'app_home')]
     public function app(ChartBuilderInterface $chartBuilder): Response
     {
-        $chart = $chartBuilder->createChart(Chart::TYPE_LINE);
-
-        $chart->setData([
-            'labels' => ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            'datasets' => [
-                [
-                    'label' => 'My First dataset',
-                    'backgroundColor' => 'rgb(255, 99, 132)',
-                    'borderColor' => 'rgb(255, 99, 132)',
-                    'data' => [0, 10, 5, 2, 20, 30, 45],
-                ],
-            ],
-        ]);
-
-        $chart->setOptions([
-            'scales' => [
-                'y' => [
-                    'suggestedMin' => 0,
-                    'suggestedMax' => 100,
-                ],
-            ],
-        ]);
-
-        return $this->render('app/index.html.twig', [
-            'chart' => $chart,
-        ]);
-    }
-
-    #[Route('/', name: 'index')]
-    public function index(): Response
-    {
-        return $this->redirectToRoute('app_home');
+        return $this->redirectToRoute('app_property_index', [], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/documentation', name: 'app_doc')]
@@ -58,6 +29,14 @@ class AppController extends AbstractController
         
         return $this->render('documentation.html.twig', [
 
+        ]);
+    }
+
+    #[Route('/xy', name: 'xy')]
+    public function xy(UserRepository $userRepository): JsonResponse
+    {
+        return new JsonResponse([
+            'Users' => $userRepository->count(),
         ]);
     }
 }

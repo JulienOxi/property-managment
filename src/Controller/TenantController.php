@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-#[Route('/app/tenant')]
+#[Route('/tenant')]
 final class TenantController extends AbstractController
 {
     private AccessControlService $accessControlService;

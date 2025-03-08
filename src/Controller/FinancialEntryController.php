@@ -27,7 +27,7 @@ use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-#[Route('/app/financialentry')]
+#[Route('/financialentry')]
 final class FinancialEntryController extends AbstractController
 {
     #[Route(name: 'app_financial_entry_index', methods: ['GET', 'POST'])]

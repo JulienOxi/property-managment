@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-#[Route('/app/property/accesscontrol')]
+#[Route('/property/accesscontrol')]
 final class AccessControlController extends AbstractController
 {
 

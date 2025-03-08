@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-#[Route('app/file/manager')]
+#[Route('/file/manager')]
 class FileManagerController extends AbstractController
 {
 

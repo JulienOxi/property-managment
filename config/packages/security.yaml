@@ -38,6 +38,7 @@ security:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
+                default_target_path: /
                 # by default, the feature is enabled by checking a checkbox in the
                 # login form, uncomment the following line to always enable it.
                 #always_remember_me: true
@@ -51,9 +52,11 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/app, roles: ROLE_USER }
-        - { path: ^/api, roles: ROLE_USER }
+        - { path: ^/security, roles: PUBLIC_ACCESS  }
         - { path: ^/admin, roles: ROLE_SUPER_ADMIN }
+        - { path: ^/api, roles: ROLE_USER }
+        - { path: ^/, roles: ROLE_USER }
+
 
     role_hierarchy:
         ROLE_ADMIN : [ROLE_USER]
