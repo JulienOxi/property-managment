@@ -1,23 +1,95 @@
 {% extends 'base.html.twig' %}
 
-{% set pageName = "Accueil" %}
+{% set pageName = "Dashboard" %}
 
-{% block title %}{{pageName}}{% endblock %}
-{% block pageName %}{{pageName}}{% endblock %}
-
+{% block title %}{{ pageName }}{% endblock %}
+{% block pageName %}{{ pageName }}{% endblock %}
 
 {% block body %}
+{% set solde = totalRents - totalUnpaidRents - totalExpenses %}
+{% set propertyCount = properties|length %}
 <div class="container mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
+    <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{ pageName }}</h1>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white p-6 rounded-lg border-[1px] border-solid text-center hover:border-stone-800 hover:duration-[0.5s]">
+        <span class="text-[32px] material-symbols-outlined text-amber-700">account_balance</span>
+            <h2 class="text-lg font-semibold">Résumé financier annuel</h2>
+            <p class="text-lg font-bold text-green-600">+ {{ totalRents|number_format(2, '.', '\'') }} CHF</p>
+            <p class="text-lg font-bold text-red-600">- {{ totalExpenses|number_format(2, '.', '\'') }} CHF</p>
+            <p class="text-lg font-bold text-orange-600">~ {{ totalUnpaidRents|number_format(2, '.', '\'') }} CHF </p>
+            <p class="text-sm text-gray-950">Solde net : {{ solde|number_format(2, '.', '\'') }} CHF </p>
+        </div>
+        <div class="bg-white p-6 rounded-lg border-[1px] border-solid text-center hover:border-stone-800 hover:duration-[0.5s]">
+        <span class="text-[32px] material-symbols-outlined text-fuchsia-700">all_inclusive</span>
+            <h2 class="text-lg font-semibold">Prochaine échéance(s)</h2>
+            {% for mortgageEndDate in mortgagesEndDate|slice(0, 2) %}
+                <hr>
+                <p class="text-sm text-gray-950">{{ mortgageEndDate.date|date('d/m/Y') }}</p>
+                <p class="text-sm text-gray-950 ml-2 text-left">{{ mortgageEndDate.bank }}</p>
+                <p class="text-sm text-gray-950 ml-2 text-left">{{ mortgageEndDate.property }}</p>
+            {% endfor %}
+            
+        </div>
+        <div class="bg-white p-6 rounded-lg border-[1px] border-solid text-center hover:border-stone-800 hover:duration-[0.5s]">
+            <span class="text-[32px] material-symbols-outlined text-green-600">home</span>
+            <h2 class="text-lg font-semibold">{% if propertyCount > 1 %} Biens Immobiliers {% else %}Bien immobilier{% endif %}</h2>
+            <p class="text-lg font-bold text-gray-950">{{ propertyCount }} bien{% if propertyCount > 1 %}s{% endif %}</p>
+            <p class="text-lg font-bold text-green-600">{{ totalPropertyWithTenant }} loué{% if totalPropertyWithTenant > 1 %}s{% endif %}</p>
+            <p class="text-lg font-bold text-red-600">{{ totalPropertyWithoutTenant }} vacant{% if totalPropertyWithoutTenant > 1 %}s{% endif %}</p>
+        </div>
+    </div>
+    
+    <div class="mt-6">
+        <label for="property-select" class="block text-lg font-semibold mb-2">Sélectionner un bien :</label>
+        <select id="property-select" class="w-full p-2 border rounded-lg shadow-md">
+            <option value="all">Séléctionner</option>
+            {% for property in properties %}
+                <option value="{{ property.id }}">{{ property.name }}</option>
+            {% endfor %}
+        </select>
+        
+        <div id="all" class="mt-4">
+            {% for property in properties %}
+                <div class="property-details hidden" data-id="{{ property.id }}">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                        <div class="bg-white p-6 rounded-lg border-[1px] border-solid text-center hover:border-stone-800 hover:duration-[0.5s]">
+                            <h2 class="text-xl font-semibold">Revenus annuel</h2>
+                            <p class="text-2xl font-bold text-green-600">{{ property.totalRents|number_format(2, '.', '\'') }}</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg border-[1px] border-solid text-center hover:border-stone-800 hover:duration-[0.5s]">
+                            <h2 class="text-xl font-semibold">Dépenses annuel</h2>
+                            <p class="text-2xl font-bold text-red-600">{{ property.totalExpenses|number_format(2, '.', '\'') }}</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg border-[1px] border-solid text-center hover:border-stone-800 hover:duration-[0.5s]">
+                            <h2 class="text-xl font-semibold">Loyers impayés</h2>
+                            <p class="text-2xl font-bold text-orange-600">{{ property.unpaidRents|number_format(2, '.', '\'') }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
-            <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div>
-                    {{ render_chart(chart) }}
-                </div>
-                <!-- Actions -->
-                <div class="flex place-items-end">
-hello
-                </div>
-            </div>    
+{% endblock %}
 
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const propertySelect = document.getElementById('property-select');
+        const propertyDetails = document.querySelectorAll('.property-details');
+
+        propertySelect.addEventListener('change', function() {
+            const selectedId = propertySelect.value;
+            
+            propertyDetails.forEach(detail => {
+                if (detail.getAttribute('data-id') === selectedId) {
+                    detail.classList.remove('hidden');
+                } else {
+                    detail.classList.add('hidden');
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

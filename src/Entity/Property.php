@@ -136,6 +136,10 @@ class Property
 
     private float $totalRents = 0;
 
+    private float $totalExpenses = 0;
+
+    private float $unpaidRents = 0;
+
     #[ORM\ManyToOne]
     private ?User $createdBy = null;
 
@@ -511,6 +515,30 @@ class Property
     public function setTotalRents(float $totalRents): static
     {
         $this->totalRents = $totalRents;
+
+        return $this;
+    }
+    
+    public function getTotalExpenses(): float
+    {
+        return $this->totalExpenses;
+    }
+
+    public function setTotalExpenses(float $totalExpenses): static
+    {
+        $this->totalExpenses = $totalExpenses;
+
+        return $this;
+    }
+
+    public function getUnpaidRents(): float
+    {
+        return $this->unpaidRents;
+    }
+
+    public function setUnpaidRents(float $unpaidRents): static
+    {
+        $this->unpaidRents = $unpaidRents;
 
         return $this;
     }

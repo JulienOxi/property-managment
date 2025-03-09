@@ -2,10 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\User;
 use App\Entity\Tenant;
-use App\Enum\AccessRoleEnum;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 

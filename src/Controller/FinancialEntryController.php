@@ -9,7 +9,6 @@ use App\Service\DateService;
 use App\Service\EnumService;
 use App\Enum\TransactionEnum;
 use App\Entity\FinancialEntry;
-use App\Form\FinancialEntryType;
 use App\Enum\FinancialCategoryEnum;
 use App\Form\FinancialEntryNewType;
 use App\Form\TransactionFilterType;

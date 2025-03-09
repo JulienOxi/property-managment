@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\Property;
+
 class PropertyService{
 
     private $dateService;

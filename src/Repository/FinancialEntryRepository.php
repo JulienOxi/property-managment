@@ -52,39 +52,41 @@ class FinancialEntryRepository extends ServiceEntityRepository
          * @param \App\Entity\Property $property
          * @param int $year
          * @param bool $deposit //true pour les charges, false pour les loyers
+         * @param mixed $isPaid //null pour toutes les entrées, true pour les entrées payées, false pour les entrées non payées
          * @return mixed
          */
-        public function findEntryByPropertyAndYear(Property $property, int $year, bool $deposit = false): ?array
+        public function findEntryByPropertyAndYear(Property $property, int $year, bool $deposit = false, $isPaid = null): ?array
         {
-            if ($deposit) {
-                return $this->createQueryBuilder('f')
-                    ->where('f.property = :property')
-                    ->andWhere('f.paidAt LIKE :year')
-                    ->andWhere('f.type = :type')
-                    ->andWhere('f.category = :category')
-                    ->setParameters(new ArrayCollection([
-                        new Parameter('property', $property),
-                        new Parameter('year', '%'.$year.'%'),
-                        new Parameter('type', TransactionEnum::EXPENSE),
-                        new Parameter('category', FinancialCategoryEnum::CHARGES_DEPOSIT),
-                    ]))
-                    ->getQuery()
-                    ->getResult()
-                ;
-            }else{
-                return $this->createQueryBuilder('f')
+            $queryBuilder = $this->createQueryBuilder('f');
+
+            $queryBuilder
                 ->where('f.property = :property')
                 ->andWhere('f.paidAt LIKE :year')
-                ->andWhere('f.type = :type')
-                ->setParameters(new ArrayCollection([
-                    new Parameter('property', $property),
-                    new Parameter('year', '%'.$year.'%'),
-                    new Parameter('type', TransactionEnum::INCOME),
-                ]))
-                ->getQuery()
-                ->getResult()
-            ;
+                ->setParameter('property', $property)
+                ->setParameter('year', '%'.$year.'%');
+
+            if ($deposit) {
+                $queryBuilder
+                    ->andWhere('f.type = :type')
+                    ->andWhere('f.category = :category')
+                    ->setParameter('type', TransactionEnum::EXPENSE)
+                    ->setParameter('category', FinancialCategoryEnum::CHARGES_DEPOSIT);
+            }else{
+                $queryBuilder
+                    ->andWhere('f.type = :type')
+                    ->setParameter('type', TransactionEnum::INCOME)
+                    ;
             }
+
+            if ($isPaid !== null) {
+                $queryBuilder
+                    ->andWhere('f.isPaid = :isPaid')
+                    ->setParameter('isPaid', $isPaid);
+            }
+
+            return $queryBuilder
+                ->getQuery()
+                ->getResult();
         }
         
 
@@ -141,32 +143,6 @@ class FinancialEntryRepository extends ServiceEntityRepository
                 ->getQuery()
                 ->getSingleScalarResult();
         }
-        
-
-        public function OLDfindByPropertiesAndCategoriesAndTypes(?Property $property, array $categories, ?TransactionEnum $type)
-        {
-            $qb = $this->createQueryBuilder('fe');
-        
-            // Filtre sur la propriété
-            if ($property) {
-                $qb->andWhere('fe.property = :property')
-                   ->setParameter('property', $property);
-            }
-        
-            // Filtre sur les catégories
-            if (!empty($categories)) {
-                $qb->andWhere('fe.category IN (:categories)')
-                   ->setParameter('categories', $categories);
-            }
-        
-            // Filtre sur le type
-            if ($type) {
-                $qb->andWhere('fe.type = :type')
-                   ->setParameter('type', $type);
-            }
-        
-            return $qb->getQuery();
-        }
 
         public function findByPropertiesAndCategoriesAndTypes(
             User $user,
@@ -218,6 +194,19 @@ class FinancialEntryRepository extends ServiceEntityRepository
                 AccessRoleEnum::MEMBER => [AccessRoleEnum::MEMBER->value, AccessRoleEnum::GUEST->value],
                 AccessRoleEnum::GUEST => [AccessRoleEnum::OWNER->value, AccessRoleEnum::MEMBER->value, AccessRoleEnum::GUEST->value],
             };
+        }
+
+        public function getUnpaidRents(Property $property): ?float
+        {
+            return $this->createQueryBuilder('f')
+                ->select('COALESCE(SUM(f.amount), 0) as totalAmount')
+                ->where('f.property = :property')
+                ->andWhere('f.type = :type')
+                ->andWhere('f.isPaid = false')
+                ->setParameter('property', $property)
+                ->setParameter('type', TransactionEnum::INCOME)
+                ->getQuery()
+                ->getSingleScalarResult();
         }
         
 }
