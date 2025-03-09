@@ -8,6 +8,12 @@
 {% block body %}
 {% set solde = totalRents - totalUnpaidRents - totalExpenses %}
 {% set propertyCount = properties|length %}
+{% if propertyCount == 0 %}
+      <div class="w-full flex justify-center bg-amber-500 px-5 mt-2 rounded-lg">
+        <div class="py-2 font-bold text-gray-900">L’ambiance est encore un peu calme ici, pourquoi ne pas par ajouter un bien immobilier pour commencer ?! 🏠🚀</div>
+      </div>
+{% endif %}
+
 <div class="container mx-auto px-4 py-6">
     <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{ pageName }}</h1>
     
