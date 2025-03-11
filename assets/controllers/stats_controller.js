@@ -31,6 +31,13 @@ export default class extends Controller {
             console.error("Erreur de chargement des statistiques", error);
         }
     }
+
+    // Fonction pour récupérer les noms des mois jusqu'au mois actuel
+    getMonthNamesUpToNow() {
+        const monthNames = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+        const currentMonth = new Date().getMonth(); // Numéro du mois actuel (0-11)
+        return monthNames.slice(0, currentMonth + 1); // Retourne les mois jusqu'à aujourd'hui
+    }
     
 
 
@@ -39,12 +46,31 @@ export default class extends Controller {
         new Chart(ctx, {
             type: this.typeValue,
             data: {
-                labels: [data.nom],
-                datasets: [{
-                    label: "Statistiques financières",
-                    data: [data.value],
-                    backgroundColor: ["#4CAF50"],
-                }]
+                labels: this.getMonthNamesUpToNow(),
+                datasets: [
+                    {
+                        label: 'Revenus',
+                        data: JSON.parse(data.incomeByMonth),
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Dépenses',
+                        data: JSON.parse(data.expensesByMonth),
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
             }
         });
     }

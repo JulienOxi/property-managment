@@ -20,6 +20,12 @@ class PropertyRepository extends ServiceEntityRepository
     }
 
 
+    /**
+     * @param User $user
+     * @param AccessRoleEnum|array $requiredRoles
+     * @param bool $result
+     * @return Property[]|QueryBuilder
+     */
     public function findAccessibleProperties(User $user, AccessRoleEnum|array $requiredRoles, $result = true): array | QueryBuilder
     {
         // Normaliser les rôles en un tableau

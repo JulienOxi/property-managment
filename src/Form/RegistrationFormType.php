@@ -37,6 +37,9 @@ class RegistrationFormType extends AbstractType
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'first_options'  => [
+                    'toggle' => true,
+                    'hidden_label' => 'Masquer',
+                    'visible_label' => 'Afficher',
                     'label' => 'Mot de passe', 
                     'hash_property_path' => 'password', 
                     'attr' => [
@@ -44,6 +47,9 @@ class RegistrationFormType extends AbstractType
                     ]
                 ],
                 'second_options'  => [
+                    'toggle' => true,
+                    'hidden_label' => 'Masquer',
+                    'visible_label' => 'Afficher',
                     'label' => 'Répéter le mot de passe', 
                     'attr' => [
                         'class' => 'input-base'

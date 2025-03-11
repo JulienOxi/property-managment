@@ -11,7 +11,6 @@
 <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
     <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
         <div>
-            
             <form method="post">
                 {% if error %}
                     <div class="bg-red-600 w-full text-center text-white rounded py-2 mb-4">
@@ -56,10 +55,24 @@
 
                 <div class="mb-6">
                     <label class="block font-thin mb-2" for="password">Password</label>
-                    <input type="password" name="_password" id="password" class="input-base" autocomplete="current-password" required>
+                    <input 
+                      type="password" 
+                      name="_password" 
+                      id="password" 
+                      class="input-base" 
+                      autocomplete="current-password" 
+                      required
+                      {{ stimulus_controller('symfony/ux-toggle-password/toggle-password', {
+                          visibleLabel: 'Afficher',
+                          hiddenLabel: 'Masquer',
+                          visibleIcon: 'Default',
+                          hiddenIcon: 'Default',
+                          buttonClasses: ['toggle-password-button'],
+                      }) }}
+                    >
                 </div>
 
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}" />
 
                     <button class="mt-8 py-2 appearance-none w-full border rounded-md border-gray-300 bg-cyan-400 hover:bg-cyan-500" type="submit">
                         Login !

@@ -44,6 +44,13 @@
             <p class="text-lg font-bold text-green-600">{{ totalPropertyWithTenant }} loué{% if totalPropertyWithTenant > 1 %}s{% endif %}</p>
             <p class="text-lg font-bold text-red-600">{{ totalPropertyWithoutTenant }} vacant{% if totalPropertyWithoutTenant > 1 %}s{% endif %}</p>
         </div>
+        <div class="bg-white p-6 rounded-lg border-[1px] border-solid text-center hover:border-stone-800 hover:duration-[0.5s]">
+            <canvas data-controller="stats"
+                data-stats-api-value="{{path('api_properties_evolution')}}"
+                data-stats-type-value="line"
+                data-stats-target="chart">
+            </canvas>
+        </div>
     </div>
     
     <div class="mt-6">

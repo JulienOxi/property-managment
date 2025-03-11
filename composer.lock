@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0308f7b56af0fc1b0a4445b5c5c2a0ec",
+    "content-hash": "78a46202a3c6cbe95723ea1a4f4e3a77",
     "packages": [
         {
             "name": "beberlei/doctrineextensions",
@@ -1855,16 +1855,16 @@
         },
         {
             "name": "knplabs/knp-paginator-bundle",
-            "version": "v6.6.1",
+            "version": "v6.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KnpLabs/KnpPaginatorBundle.git",
-                "reference": "1a00f88149d25418bd99d8954eba951f04cc3acf"
+                "reference": "a346431b9f0cddac8cd03d63e70911b6bf70ffde"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KnpLabs/KnpPaginatorBundle/zipball/1a00f88149d25418bd99d8954eba951f04cc3acf",
-                "reference": "1a00f88149d25418bd99d8954eba951f04cc3acf",
+                "url": "https://api.github.com/repos/KnpLabs/KnpPaginatorBundle/zipball/a346431b9f0cddac8cd03d63e70911b6bf70ffde",
+                "reference": "a346431b9f0cddac8cd03d63e70911b6bf70ffde",
                 "shasum": ""
             },
             "require": {
@@ -1923,9 +1923,9 @@
             ],
             "support": {
                 "issues": "https://github.com/KnpLabs/KnpPaginatorBundle/issues",
-                "source": "https://github.com/KnpLabs/KnpPaginatorBundle/tree/v6.6.1"
+                "source": "https://github.com/KnpLabs/KnpPaginatorBundle/tree/v6.7.0"
             },
-            "time": "2024-10-07T16:11:50+00:00"
+            "time": "2025-03-02T16:36:05+00:00"
         },
         {
             "name": "lcobucci/clock",
@@ -7442,6 +7442,86 @@
                 }
             ],
             "time": "2025-01-05T13:18:49+00:00"
+        },
+        {
+            "name": "symfony/ux-toggle-password",
+            "version": "v2.23.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/ux-toggle-password.git",
+                "reference": "ed8ec4139f0d64125eb682af8f54a518bf182151"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/ux-toggle-password/zipball/ed8ec4139f0d64125eb682af8f54a518bf182151",
+                "reference": "ed8ec4139f0d64125eb682af8f54a518bf182151",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "symfony/config": "^5.4|^6.0|^7.0",
+                "symfony/dependency-injection": "^5.4|^6.0|^7.0",
+                "symfony/form": "^5.4|^6.0|^7.0",
+                "symfony/http-kernel": "^5.4|^6.0|^7.0",
+                "symfony/options-resolver": "^5.4|^6.0|^7.0",
+                "symfony/translation": "^5.4|^6.0|^7.0"
+            },
+            "require-dev": {
+                "symfony/framework-bundle": "^5.4|^6.0|^7.0",
+                "symfony/phpunit-bridge": "^5.4|^6.0|^7.0",
+                "symfony/twig-bundle": "^5.4|^6.0|^7.0",
+                "symfony/var-dumper": "^5.4|^6.0|^7.0",
+                "twig/twig": "^2.14.7|^3.0.4"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/ux",
+                    "name": "symfony/ux"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\UX\\TogglePassword\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Félix Eymonot",
+                    "email": "felix.eymonot@alximy.io"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Toggle visibility of password inputs for Symfony Forms",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "symfony-ux"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/ux-toggle-password/tree/v2.23.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2024-12-05T16:05:57+00:00"
         },
         {
             "name": "symfony/validator",

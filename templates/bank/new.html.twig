@@ -12,7 +12,9 @@
             <div class="bg-gray-50 p-4 rounded-md mb-6">
                 <p class="text-gray-600">Veuillez remplir les informations ci-dessous :</p>
             </div>
-                 {{ include('bank/_form.html.twig') }}
+            <turbo-frame id="new_bank">
+                {{ include('bank/_form.html.twig') }}
+            </turbo-frame>
         </div>
     </div>
 {% endblock %}

@@ -65,4 +65,7 @@ return [
     'chart.js/auto' => [
         'version' => '4.4.8',
     ],
+    '@hotwired/turbo' => [
+        'version' => '7.3.0',
+    ],
 ];
