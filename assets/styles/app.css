@@ -23,6 +23,10 @@
     .menu-btn-active{
         @apply bg-cyan-900;
     }
+
+    .btn-blue-to-emrald {
+      @apply px-6 py-2 text-white font-semibold rounded-lg bg-gradient-to-r from-blue-500 to-emerald-600 hover:from-blue-600 hover:to-emerald-700;
+    }
 }
 
 .dropdown:hover .dropdown-menu {

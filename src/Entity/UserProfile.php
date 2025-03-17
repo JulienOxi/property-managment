@@ -23,6 +23,9 @@ class UserProfile
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Address $address = null;
 
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $birthday = null;    
+
     public function getId(): ?int
     {
         return $this->id;
@@ -65,6 +68,18 @@ class UserProfile
     public function setAddress(?Address $address): static
     {
         $this->address = $address;
+
+        return $this;
+    }
+    
+    public function getBirthday(): ?\DateTimeInterface
+    {
+        return $this->birthday;
+    }
+
+    public function setBirthday(?\DateTimeInterface $birthday): static
+    {
+        $this->birthday = $birthday;
 
         return $this;
     }

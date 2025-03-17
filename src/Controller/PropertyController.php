@@ -179,7 +179,6 @@ final class PropertyController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-
             $property->setUpdatedBy($this->getUser())
                 ->setUpdatedAt(new \DateTimeImmutable())
                 ->setSlug(strtolower($slugger->slug($property->getName())->toString()));

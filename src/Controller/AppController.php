@@ -33,15 +33,15 @@ class AppController extends AbstractController
         $totalUnpaidRents = 0;
         $totalPropertyWithTenant = 0;
         $totalPropertyWithoutTenant = 0;
-        $mortgagesEndDate = []; //array Banque => date de fin de prêt => property
+        $deadlines = []; //array type => bank ou loyer / name => (nom banque ou locataire) / preoperty => property.name
         foreach ($properties as $key => $property) {
             $rent = $entityManager->getRepository(FinancialEntry::class)->findSumAmountBetweenTwoDates($property->getBank(), date('Y-01-01'), date('Y-12-31'), TransactionEnum::INCOME, $property);
             $expenses = $entityManager->getRepository(FinancialEntry::class)->findSumAmountBetweenTwoDates($property->getBank(), date('Y-01-01'), date('Y-12-31'), TransactionEnum::EXPENSE, $property);
             $unpaidRents = $entityManager->getRepository(FinancialEntry::class)->getUnpaidRents($property);
 
-            $property->setTotalRents($rent);//ajoute le total des loyers
-            $property->setTotalExpenses($expenses); //ajoute le total des dépenses
-            $property->setUnpaidRents($unpaidRents); //ajoute le total des loyers impayés
+            $property->setTotalRents($rent ? $rent : 0);//ajoute le total des loyers
+            $property->setTotalExpenses($expenses ? $expenses : 0); //ajoute le total des dépenses
+            $property->setUnpaidRents($unpaidRents ? $unpaidRents : 0); //ajoute le total des loyers impayés
             $totalRents += $rent; //ajoute le total des loyers général
             $totalExpenses += $expenses;    //ajoute le total des dépenses général	
             $totalUnpaidRents += $unpaidRents; //ajoute le total des loyers impayés général
@@ -55,12 +55,15 @@ class AppController extends AbstractController
             }
 
             //ajoute toutes les hypotèques à la liste
-            array_push($mortgagesEndDate,['bank' => $property->getBank()->getName(), 'date' => $property->getMortgageEndDate(), 'property' => $property->getName()]);
+            array_push($deadlines,['type' => 'Bancaire', 'name' => $property->getBank()->getName(), 'date' => $property->getMortgageEndDate(), 'property' => $property->getName()]);
+            if($property->getActualTenant() != null){
+                array_push($deadlines,['type' => 'Bail à loyer', 'name' => $property->getActualTenant()->getFullName(), 'date' => $property->getActualTenant()->getRentalEndDate(), 'property' => $property->getName()]);
+            }
             if($property->getMortgageEndDate2() != null){
-                array_push($mortgagesEndDate,['bank' => $property->getBank()->getName(), 'date' => $property->getMortgageEndDate2(), 'property' => $property->getName()]);
+                array_push($deadlines,['type' => 'Bancaire', 'name' => $property->getBank()->getName(), 'date' => $property->getMortgageEndDate2(), 'property' => $property->getName()]);
             }
             // Fonction de comparaison pour trier par date décroissante
-            usort($mortgagesEndDate, function($a, $b) {
+            usort($deadlines, function($a, $b) {
                 return $a['date'] <=> $b['date'];
             });
         }
@@ -73,7 +76,7 @@ class AppController extends AbstractController
             'totalUnpaidRents' => $totalUnpaidRents,
             'totalPropertyWithTenant' => $totalPropertyWithTenant,
             'totalPropertyWithoutTenant' => $totalPropertyWithoutTenant,
-            'mortgagesEndDate' => $mortgagesEndDate
+            'deadlines' => $deadlines
         ]);
     }
 
@@ -83,14 +86,6 @@ class AppController extends AbstractController
         
         return $this->render('documentation.html.twig', [
 
-        ]);
-    }
-
-    #[Route('/xy', name: 'xy')]
-    public function xy(UserRepository $userRepository): JsonResponse
-    {
-        return new JsonResponse([
-            'Users' => $userRepository->count(),
         ]);
     }
 }

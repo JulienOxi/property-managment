@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% set pageName = "Profile" %}
+{% block title %}{{pageName}}{% endblock %}
+{% block pageName %}{{pageName}}{% endblock %}
+
+{% block body %}
+<div class="">
+<div class="container max-w-6xl mx-auto p-6 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
+    <!-- Profil Card -->
+<div class="h-48 bg-white shadow-lg rounded-lg p-6 col-span-3 bg-[url({{asset('media/user-background.jpg')}})] bg-cover bg-center relative">
+    <div class="absolute bottom-4 left-4 text-white bg-black/50 px-4 py-2 rounded-lg">
+        <h2 class="text-xl md:text-2xl font-semibold">{{ user.profile.fullName }}</h2>
+        <p class="text-sm opacity-80">{{ user.email }}</p>
+    </div>
+</div>
+    
+    <!-- Statistiques Card -->
+    <div class="bg-white shadow-lg rounded-lg p-6 text-center">
+        <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Statistiques</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+            <div class="p-4 bg-blue-100 text-blue-600 rounded-lg">
+                <p class="text-xl font-bold">120</p>
+                <p class="text-sm">Connexions</p>
+            </div>
+            <div class="p-4 bg-green-100 text-green-600 rounded-lg">
+                <p class="text-xl font-bold">45</p>
+                <p class="text-sm">Fichiers Uploadés</p>
+            </div>
+            <div class="p-4 bg-red-100 text-red-600 rounded-lg">
+                <p class="text-xl font-bold">3</p>
+                <p class="text-sm">Alertes</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Informations Personnelles Card -->
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Informations personnelles</h3>
+        <div class="mt-4 space-y-2 text-gray-600">
+            <p><strong>Adresse :</strong> 123 Rue de la Paix, Paris</p>
+            <p><strong>Téléphone :</strong> +33 6 12 34 56 78</p>
+            <p><strong>Date de naissance :</strong> 15 Avril 1990</p>
+        </div>
+    </div>
+    
+    <!-- Préférences Card -->
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Préférences</h3>
+        <div class="mt-4 space-y-3">
+            <label class="flex items-center space-x-3">
+                <input type="checkbox" class="form-checkbox text-blue-500" checked>
+                <span class="text-gray-600">Recevoir les notifications</span>
+            </label>
+            <label class="flex items-center space-x-3">
+                <input type="checkbox" class="form-checkbox text-blue-500">
+                <span class="text-gray-600">Activer le mode sombre</span>
+            </label>
+        </div>
+    </div>
+    
+    <!-- Sécurité Card -->
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Sécurité</h3>
+        <div class="mt-4 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+            <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">Changer de mot de passe</button>
+            <button class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg">Activer 2FA</button>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

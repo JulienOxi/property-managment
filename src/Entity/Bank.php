@@ -58,10 +58,6 @@ class Bank
     #[Assert\NotBlank(
         message: 'Le IBAN ne peut pas être vide',
     )]
-    #[Assert\Regex(
-        pattern: '/^[A-Z]{2}[0-9]{2}(?:[ ]?[0-9]{4}){4}(?:[ ]?[0-9]{1,2})?$/',
-        message: 'Le IBAN {{ value }} n\'est pas un IBAN valide.',
-    )]
     private ?string $iban = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]

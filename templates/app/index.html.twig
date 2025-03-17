@@ -29,11 +29,24 @@
         <div class="bg-white p-6 rounded-lg border-[1px] border-solid text-center hover:border-stone-800 hover:duration-[0.5s]">
         <span class="text-[32px] material-symbols-outlined text-fuchsia-700">all_inclusive</span>
             <h2 class="text-lg font-semibold">Prochaine échéance(s)</h2>
-            {% for mortgageEndDate in mortgagesEndDate|slice(0, 2) %}
+            {% for deadline in deadlines|slice(0, 2) %}
                 <hr>
-                <p class="text-sm text-gray-950">{{ mortgageEndDate.date|date('d/m/Y') }}</p>
-                <p class="text-sm text-gray-950 ml-2 text-left">{{ mortgageEndDate.bank }}</p>
-                <p class="text-sm text-gray-950 ml-2 text-left">{{ mortgageEndDate.property }}</p>
+                <div class="relative inset-0 flex items-start justify-between w-full">
+                    <span class="inline-block bg-orange-200 text-orange-800 text-sm font-semibold px-2.5 py-0.5 rounded mt-2 z-10 mx-auto">
+                        {{ deadline.date|date('d/m/Y') }}
+                    </span>
+                    {% if deadline.type == 'Bancaire' %}
+                    <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold px-2.5 py-0.5 rounded mt-2 z-10">
+                        {{ deadline.type }}
+                    </span>
+                    {% else %}
+                    <span class="inline-block bg-lime-200 text-lime-800 text-sm font-semibold px-2.5 py-0.5 rounded mt-2 z-10">
+                        {{ deadline.type }}
+                    </span>
+                    {% endif %}
+                </div>
+                <p class="text-sm text-gray-950 ml-2 text-left">{{ deadline.name }}</p>
+                <p class="text-sm text-gray-950 ml-2 text-left">{{ deadline.property }}</p>
             {% endfor %}
             
         </div>

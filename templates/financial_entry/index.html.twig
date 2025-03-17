@@ -10,7 +10,7 @@
 <div class="container mx-auto px-4 py-6">
     <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
     <div class="my-2 flex justify-center">
-        <a href="{{ path('app_financial_entry_new') }}" class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">Nouvelle transaction financière</a>
+        <a href="{{ path('app_financial_entry_new') }}" class="bg-blue-500 btn-blue-to-emrald">Nouvelle transaction financière</a>
     </div>
 
     <div class="relative flex py-5 items-center col-span-3">
@@ -25,29 +25,31 @@
     <div class="my-2 flex justify-center">
         {{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
             <div class="space-y-4">
-                <!-- Propriété -->
-                <div>
-                    <h3 class="text-sm font-medium text-gray-900 mb-2">Propriétés</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        {% for child in form.property %}
-                            <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
-                                {{ form_widget(child) }}
-                                <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
-                            </label>
-                        {% endfor %}
+                <div data-controller='update-financial-url' data-update-financial-url-base-url-value="{{ path('app_financial_entry_index') }}">
+                    <!-- Propriétés -->
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-900 mb-2">Propriétés</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            {% for child in form.property %}
+                                <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
+                                    {{ form_widget(child) }}
+                                    <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
                     </div>
-                </div>
 
-                <!-- Type -->
-                <div>
-                    <h3 class="text-sm font-medium text-gray-900 mb-2">Types de Transaction</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        {% for child in form.type %}
-                            <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
-                                {{ form_widget(child) }}
-                                <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
-                            </label>
-                        {% endfor %}
+                    <!-- Type -->
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-900 mb-2">Types de Transaction</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            {% for child in form.type %}
+                                <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
+                                    {{ form_widget(child) }}
+                                    <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
 
@@ -58,16 +60,27 @@
                         {{ form_row(form.category) }} 
                     </div>
                 {% else %}
-                        <div>
-                            <h3 class="text-sm font-medium text-gray-900 mb-2">Catégories</h3>
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2" id="category-div">
-                                {% for child in form.category %}
-                                    <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
-                                        {{ form_widget(child) }}
-                                        <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
-                                    </label>
-                                {% endfor %}
-                            </div>
+                    <div data-controller="checkbox-selector">
+                        <h3 class="text-sm font-medium text-gray-900 mb-2">Catégories</h3>
+
+                        <!-- Checkbox "Tout sélectionner" -->
+                        <label class="flex items-center p-2 border rounded-lg shadow-sm bg-white text-sm">
+                            <input 
+                                type="checkbox" 
+                                data-action="change->checkbox-selector#toggleSelection"
+                                data-checkbox-selector-target="selectAll"
+                            >
+                            <span class="ml-2 font-semibold text-gray-900">Tout sélectionner</span>
+                        </label>
+
+                        <!-- Liste des catégories -->
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2" data-checkbox-selector-target="checkboxes">
+                            {% for child in form.category %}
+                                <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
+                                    {{ form_widget(child, {'attr': {'data-checkbox-selector-target': 'checkbox'}}) }}
+                                    <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
+                                </label>
+                            {% endfor %}
                         </div>
                     </div>
                 {% endif %}
@@ -179,19 +192,6 @@
 {% endblock %}
 
 {% block javascripts %}
-<script>
-//permet de generer l'url pour le tri des catégories et afficher uniquement les catégories en foncitron des "entrées" ou "sorties"
-document.addEventListener("DOMContentLoaded", function () {
-    const typeFields = document.querySelectorAll('input[name="transaction_filter[type]"]');
-    const baseUrl = '{{ path("app_financial_entry_index") }}'; // Twig génère l'URL en tant que string JS
-
-    typeFields.forEach(field => {
-        field.addEventListener("change", function () {
-            window.location.href = baseUrl + '?type=' + encodeURIComponent(this.value);
-        });
-    });
-});
-</script>
 
 <script>
 window.addEventListener("load", () => {

@@ -112,17 +112,23 @@
         <span class="material-symbols-outlined">person</span>
         <span>{{ app.user.profile.fullName }}</span>
       </button>
-    <ul class="dropdown-menu absolute hidden text-gray-700 pt-1">
-      <li class=""><a class="rounded-t bg-gray-200 hover:bg-gray-300 py-2 px-4 block whitespace-no-wrap" href="#">Profile</a></li>
-      <li class=""><a class="bg-red-500 hover:bg-red-600 py-2 px-4 block whitespace-no-wrap" href="{{ path('app_logout') }}">Logout</a></li>
-    </ul>
+<ul class="dropdown-menu absolute hidden bg-white border border-black rounded-lg shadow-lg text-gray-700 py-1 w-36">
+    <li>
+        <a class="block px-4 py-2 hover:bg-gray-100 transition-colors" href="{{ path('app_user_profile', {'id': app.user.id}) }}">Profile</a>
+    </li>
+    <li>
+        <a class="block px-4 py-2 hover:bg-red-500 hover:text-white transition-colors" href="{{ path('app_logout') }}">
+            Logout
+        </a>
+    </li>
+</ul>
   </div>
 {# -------------------------------------------------------------------------------------------------------- #}
 
         </div>
       </header>
       <!-- Main Section -->
-      <main class="sm:p-4">
+      <main class="sm:p-4">  
 
         {# spinner pleine page pour indiquer un chargement #}
         <div id="full-spinner" class="hidden absolute inset-0 flex items-center justify-center bg-gray-200/50">
