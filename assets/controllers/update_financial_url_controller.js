@@ -4,7 +4,6 @@ export default class extends Controller {
     static values = { baseUrl: String };
 
     connect() {
-        console.log("Base URL récupérée :", this.baseUrlValue); // Vérifie l'URL récupérée
 
         this.element.querySelectorAll('input[name="transaction_filter[type]"]').forEach(field => {
             field.addEventListener("change", () => this.updateUrl());

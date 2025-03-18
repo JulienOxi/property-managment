@@ -111,18 +111,6 @@ class Property
     )]
     private ?string $EGID = null;
 
-    /**
-     * @var Collection<int, PropertyRent>
-     */
-    #[ORM\OneToMany(targetEntity: PropertyRent::class, mappedBy: 'property')]
-    private Collection $propertyRents;
-
-    /**
-     * @var Collection<int, Tenant>
-     */
-    #[ORM\OneToMany(targetEntity: Tenant::class, mappedBy: 'property', orphanRemoval: true)]
-    private Collection $tenants;
-
     private ?Tenant $actualTenant = null;
 
     /**
@@ -160,7 +148,6 @@ class Property
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $slug = null;
-
     /**
      * @var Collection<int, Folder>
      */
@@ -172,8 +159,6 @@ class Property
     {
         $this->accessControls = new ArrayCollection();
         $this->AccessControl = new ArrayCollection();
-        $this->propertyRents = new ArrayCollection();
-        $this->tenants = new ArrayCollection();
         $this->financialEntries = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
@@ -389,54 +374,6 @@ class Property
     public function setEGID(?string $EGID): static
     {
         $this->EGID = $EGID;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, PropertyRent>
-     */
-    public function getPropertyRents(): Collection
-    {
-        return $this->propertyRents;
-    }
-
-    public function addPropertyRent(PropertyRent $propertyRent): static
-    {
-        if (!$this->propertyRents->contains($propertyRent)) {
-            $this->propertyRents->add($propertyRent);
-            $propertyRent->setProperty($this);
-        }
-
-        return $this;
-    }
-
-    public function removePropertyRent(PropertyRent $propertyRent): static
-    {
-        if ($this->propertyRents->removeElement($propertyRent)) {
-            // set the owning side to null (unless already changed)
-            if ($propertyRent->getProperty() === $this) {
-                $propertyRent->setProperty(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Tenant>
-     */
-    public function getTenants(): Collection
-    {
-        return $this->tenants;
-    }
-
-    public function addTenant(Tenant $tenant): static
-    {
-        if (!$this->tenants->contains($tenant)) {
-            $this->tenants->add($tenant);
-            $tenant->setProperty($this);
-        }
 
         return $this;
     }

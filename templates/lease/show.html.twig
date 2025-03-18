@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Lease{% endblock %}
+
+{% block body %}
+    <h1>Lease</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ lease.id }}</td>
+            </tr>
+            <tr>
+                <th>FromAt</th>
+                <td>{{ lease.fromAt ? lease.fromAt|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>ToAt</th>
+                <td>{{ lease.toAt ? lease.toAt|date('Y-m-d') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_lease_index') }}">back to list</a>
+
+    <a href="{{ path('app_lease_edit', {'id': lease.id}) }}">edit</a>
+
+    {{ include('lease/_delete_form.html.twig') }}
+{% endblock %}

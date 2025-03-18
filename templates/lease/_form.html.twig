@@ -1,0 +1,27 @@
+{% import 'form_macros.html.twig' as macros %}
+{{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+
+<div class="md:grid md:grid-cols-3 md:gap-4">
+
+    {{ macros.field(form.property, 'Objet locatif', 'md:col-span-3') }}
+    {{ macros.field(form.fromAt, 'Le bail commence', 'md:col-span-2') }}
+    {{ macros.field(form.toAt, 'Le bail se termine', 'md:col-span-3') }}
+
+    <div class="relative flex py-5 items-center col-span-3">
+        <div class="flex-grow border-t border-gray-400"></div>
+        <span class="flex-shrink mx-4 text-gray-400">Adresse</span>
+        <div class="flex-grow border-t border-gray-400"></div>
+    </div>
+
+    {{ macros.field(form.tenants, 'Locataire', 'col-span-2') }}
+
+</div>
+
+<div>
+    <button class="mt-4 py-2 px-4 bg-blue-600 text-white font-bold rounded hover:bg-blue-700">
+        {{ button_label|default('Enregistrer') }}
+    </button>
+    <button onclick="history.back()" class="mt-4 py-2 px-4 bg-red-600 text-white font-bold rounded hover:bg-red-700">Annuler</button>
+</div>
+
+{{ form_end(form) }}

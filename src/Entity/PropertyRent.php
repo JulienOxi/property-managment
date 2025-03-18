@@ -42,9 +42,6 @@ class PropertyRent
     #[Assert\Regex(pattern: "/^\d+(?:[\.,]\d{0,2})?$/", message: "Le montant peut avoir au maximum 2 décimales.")]
     private ?string $monthlyPrice = null;
 
-    #[ORM\ManyToOne(inversedBy: 'propertyRents')]
-    private ?Property $property = null;
-
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -55,12 +52,11 @@ class PropertyRent
     #[ORM\Column]
     private ?\DateTimeImmutable $endedAt = null;
 
-    #[ORM\ManyToOne(inversedBy: 'propertyRents')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Tenant $tenant = null;
-
     #[ORM\Column]
     private ?\DateTimeImmutable $fromAt = null;
+
+    #[ORM\ManyToOne(inversedBy: 'propertyRent')]
+    private ?Lease $lease = null;
 
     public function __construct(){
         $this->createdAt = new \DateTimeImmutable();
@@ -107,18 +103,6 @@ class PropertyRent
         return $this;
     }
 
-    public function getProperty(): ?Property
-    {
-        return $this->property;
-    }
-
-    public function setProperty(?Property $property): static
-    {
-        $this->property = $property;
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
@@ -155,18 +139,6 @@ class PropertyRent
         return $this;
     }
 
-    public function getTenant(): ?Tenant
-    {
-        return $this->tenant;
-    }
-
-    public function setTenant(?Tenant $tenant): static
-    {
-        $this->tenant = $tenant;
-
-        return $this;
-    }
-
     public function getFromAt(): ?\DateTimeImmutable
     {
         return $this->fromAt;
@@ -175,6 +147,18 @@ class PropertyRent
     public function setFromAt(\DateTimeImmutable $fromAt): static
     {
         $this->fromAt = $fromAt;
+
+        return $this;
+    }
+
+    public function getLease(): ?Lease
+    {
+        return $this->lease;
+    }
+
+    public function setLease(?Lease $lease): static
+    {
+        $this->lease = $lease;
 
         return $this;
     }

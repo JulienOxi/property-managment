@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Lease index{% endblock %}
+
+{% block body %}
+    <h1>Lease index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>FromAt</th>
+                <th>ToAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for lease in leases %}
+            <tr>
+                <td>{{ lease.id }}</td>
+                <td>{{ lease.fromAt ? lease.fromAt|date('Y-m-d') : '' }}</td>
+                <td>{{ lease.toAt ? lease.toAt|date('Y-m-d') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_lease_show', {'id': lease.id}) }}">show</a>
+                    <a href="{{ path('app_lease_edit', {'id': lease.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_lease_new') }}">Create new</a>
+{% endblock %}

@@ -29,19 +29,6 @@ class TenantType extends AbstractType
             ->add('lastname')
             ->add('email')
             ->add('phoneNumber')
-            ->add('rentalStartDate', DateType::class, [
-                'widget' => 'single_text',
-            ])
-            ->add('rentalEndDate', DateType::class, [
-                'widget' => 'single_text',
-            ])
-            ->add('property', EntityType::class, [
-                'class' => Property::class,
-                'query_builder' => function (PropertyRepository $propertyRepository) {
-                    return $propertyRepository->findAccessibleProperties($this->security->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER], false);
-                },
-                'choice_label' => 'name',
-            ])
         ;
     }
 

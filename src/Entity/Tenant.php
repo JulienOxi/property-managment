@@ -54,27 +54,14 @@ class Tenant
     )]
     private ?string $phoneNumber = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $rentalStartDate = null;
-
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $rentalEndDate = null;
-
-    #[ORM\ManyToOne(inversedBy: 'tenants')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Property $property = null;
-
-    /**
-     * @var Collection<int, PropertyRent>
-     */
-    #[ORM\OneToMany(targetEntity: PropertyRent::class, mappedBy: 'tenant', orphanRemoval: true)]
-    private Collection $propertyRents;
-
     /**
      * @var Collection<int, FinancialEntry>
      */
     #[ORM\OneToMany(targetEntity: FinancialEntry::class, mappedBy: 'tenant')]
     private Collection $financialEntries;
+
+    #[ORM\ManyToOne(inversedBy: 'tenants')]
+    private ?Lease $lease = null;
 
     public function __construct()
     {
@@ -140,72 +127,6 @@ class Tenant
         return $this;
     }
 
-    public function getRentalStartDate(): ?\DateTimeInterface
-    {
-        return $this->rentalStartDate;
-    }
-
-    public function setRentalStartDate(\DateTimeInterface $rentalStartDate): static
-    {
-        $this->rentalStartDate = $rentalStartDate;
-
-        return $this;
-    }
-
-    public function getRentalEndDate(): ?\DateTimeInterface
-    {
-        return $this->rentalEndDate;
-    }
-
-    public function setRentalEndDate(\DateTimeInterface $rentalEndDate): static
-    {
-        $this->rentalEndDate = $rentalEndDate;
-
-        return $this;
-    }
-
-    public function getProperty(): ?Property
-    {
-        return $this->property;
-    }
-
-    public function setProperty(?Property $property): static
-    {
-        $this->property = $property;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, PropertyRent>
-     */
-    public function getPropertyRents(): Collection
-    {
-        return $this->propertyRents;
-    }
-
-    public function addPropertyRent(PropertyRent $propertyRent): static
-    {
-        if (!$this->propertyRents->contains($propertyRent)) {
-            $this->propertyRents->add($propertyRent);
-            $propertyRent->setTenant($this);
-        }
-
-        return $this;
-    }
-
-    public function removePropertyRent(PropertyRent $propertyRent): static
-    {
-        if ($this->propertyRents->removeElement($propertyRent)) {
-            // set the owning side to null (unless already changed)
-            if ($propertyRent->getTenant() === $this) {
-                $propertyRent->setTenant(null);
-            }
-        }
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, FinancialEntry>
      */
@@ -232,6 +153,18 @@ class Tenant
                 $financialEntry->setTenant(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getLease(): ?Lease
+    {
+        return $this->lease;
+    }
+
+    public function setLease(?Lease $lease): static
+    {
+        $this->lease = $lease;
 
         return $this;
     }
