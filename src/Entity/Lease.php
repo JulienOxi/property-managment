@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: LeaseRepository::class)]
 class Lease
@@ -22,7 +24,8 @@ class Lease
     /**
      * @var Collection<int, Tenant>
      */
-    #[ORM\OneToMany(targetEntity: Tenant::class, mappedBy: 'lease')]
+    #[Assert\Valid]
+    #[ORM\OneToMany(targetEntity: Tenant::class, mappedBy: 'lease', cascade:["persist", "remove"])]
     private Collection $tenants;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]

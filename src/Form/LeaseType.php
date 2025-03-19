@@ -40,12 +40,13 @@ class LeaseType extends AbstractType
             ->add('tenants', CollectionType::class, [
                 'entry_type' => TenantType::class,
                 'allow_add' => true,
+                'allow_delete' => true,
                 'by_reference' => false,
                 'entry_options' => [
                     'label' => false,
                 ],
                 'attr' => [
-                    'data-controller' => 'form_collection',
+                    'data-controller' => 'form-collection',
                 ]
             ])
         ;

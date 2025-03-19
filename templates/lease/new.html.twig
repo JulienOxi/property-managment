@@ -25,6 +25,7 @@
 
         </div>
     </div>
+    
 {% endblock %}
 
 {% block javascripts %}
@@ -32,6 +33,11 @@
 <script>
 window.addEventListener("load", () => {
     document.getElementById("menu_btn_lease").classList.add("menu-btn-active");
+
+    addOneYearToInput(document.getElementById("lease_fromAt"), document.getElementById("lease_toAt"));
+
 })
+
+
 </script>
 {% endblock %}
