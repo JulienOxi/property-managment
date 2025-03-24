@@ -2,11 +2,17 @@ import { Controller } from '@hotwired/stimulus';
 
 /* stimulusFetch: 'lazy' */
 export default class extends Controller {
+
+    static values = {
+        btnadd: String
+    }
+
     connect() {
+        console.log(this.btnaddValue);
         this.index = this.element.childElementCount;
         const btn = document.createElement('button');
         btn.setAttribute('class', 'bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600');
-        btn.textContent = 'Ajouter un locataire';
+        btn.textContent = this.btnaddValue ? this.btnaddValue : 'Ajouter un locataire';
         btn.setAttribute('type', 'button');
         btn.addEventListener('click', this.addelement);
         this.element.childNodes.forEach(this.addDeleteButton);

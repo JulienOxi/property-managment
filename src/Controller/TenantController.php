@@ -28,20 +28,24 @@ final class TenantController extends AbstractController
     }
     
     #[Route(name: 'app_tenant_index', methods: ['GET'])]
-    public function index(PropertyRepository $propertyRepository, UploadFileRepository $uploadFileRepository): Response
+    public function index(PropertyRepository $propertyRepository, UploadFileRepository $uploadFileRepository, EntityManagerInterface $entityManager): Response
     {
         $properties = $propertyRepository->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]);
 
         //on récupère les locataires liés aux propriétés
-        $tenants = [];
-        foreach ($properties as $property) {
-            $tenants = [...$tenants, ...$property->getTenants()];
-        }
+        $tenants = $entityManager->createQuery("
+            SELECT t FROM App\Entity\Tenant t
+            JOIN t.lease l
+            JOIN l.property p
+            WHERE p IN (:properties)
+        ")
+        ->setParameter('properties', $properties)
+        ->getResult();
 
         //on cherche l'image liée à la propriété pour afficher dans le card header
         $images = [];
         foreach ($tenants as $tenant) {
-            $property = $tenant->getProperty();
+            $property = $tenant->getLease()->getProperty();
             $uploadsImages = $uploadFileRepository->findOneBy(['property' => $property->getId(), 'type' => 'image']);
                 if (!empty($uploadsImages)) { //on récupère la première immage
                     $images[$tenant->getId()] = $uploadsImages;

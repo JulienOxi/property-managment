@@ -111,7 +111,7 @@ class Property
     )]
     private ?string $EGID = null;
 
-    private ?Tenant $actualTenant = null;
+    private ?Lease $actualLease= null;
 
     /**
      * @var Collection<int, FinancialEntry>
@@ -153,6 +153,12 @@ class Property
      */
     #[ORM\OneToMany(targetEntity: Folder::class, mappedBy: 'property')]
     private Collection $folders;
+
+    /**
+     * @var Collection<int, Lease>
+     */
+    #[ORM\OneToMany(targetEntity: Lease::class, mappedBy: 'property', cascade:["persist", "remove"])]
+    private Collection $leases;
 
 
     public function __construct()
@@ -378,14 +384,14 @@ class Property
         return $this;
     }
 
-    public function getActualTenant(): ?Tenant
+    public function getActualLease(): ?Lease
     {
-        return $this->actualTenant;
+        return $this->actualLease;
     }
 
-    public function setActualTenant(?Tenant $actualTenant): static
+    public function setActualLease(?Lease $actualLease): static
     {
-        $this->actualTenant = $actualTenant;
+        $this->actualLease = $actualLease;
 
         return $this;
     }
@@ -604,6 +610,36 @@ class Property
             // set the owning side to null (unless already changed)
             if ($folder->getProperty() === $this) {
                 $folder->setProperty(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Lease>
+     */
+    public function getLeases(): Collection
+    {
+        return $this->leases;
+    }
+
+    public function addLease(Lease $lease): static
+    {
+        if (!$this->leases->contains($lease)) {
+            $this->leases->add($lease);
+            $lease->setProperty($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLease(Lease $lease): static
+    {
+        if ($this->leases->removeElement($lease)) {
+            // set the owning side to null (unless already changed)
+            if ($lease->getProperty() === $this) {
+                $lease->setProperty(null);
             }
         }
 

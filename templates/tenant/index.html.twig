@@ -15,7 +15,7 @@
                 <div class="bg-white shadow-md rounded-lg overflow-hidden border-4 border-white hover:shadow-xl">
 
             {% if images[tenant.id] is defined %}
-                {% set path = asset('uploads/' ~ tenant.property.id ~ '/' ~ images[tenant.id].fileName) %}
+                {% set path = asset('uploads/' ~ tenant.lease.property.id ~ '/' ~ images[tenant.id].fileName) %}
             {% else %}
                 {% set path = asset('media/app_default.JPE') %}
             {% endif %}
@@ -25,7 +25,7 @@
                         <!-- Nom et prénom -->
                         {% set color = 'gray' %}
                         {# si les dates de bail sont passées, on met la couleur rouge (les locataires n'ont plus de bails actif) #}
-                        {% if tenant.rentalEndDate|date("U") <= "now"|date("U") %}{% set color = 'red' %}{% endif %}
+                        {% if tenant.lease.toAt|date("U") <= "now"|date("U") %}{% set color = 'red' %}{% endif %}
                         
                         <h2 class="text-white text-xl font-semibold bg-{{color}}-900 px-4 py-2 w-fit">
                             {{ tenant.firstname }} {{ tenant.lastname }}
@@ -41,15 +41,15 @@
                     <div class="bg-white p-4">
                         <ul>
                             <li><strong>Numéro de téléphone:</strong> {{ tenant.phonenumber }}</li>
-                            <li><strong>Date d'entrée:</strong> {{ tenant.rentalStartDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") }}</li>
-                            <li><strong>Fin de bail:</strong> {{ tenant.rentalEndDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") }}</li>
+                            <li><strong>Date d'entrée:</strong> {{ tenant.lease.fromAt|format_datetime(locale='fr',pattern="dd MMMM YYYY") }}</li>
+                            <li><strong>Fin de bail:</strong> {{ tenant.lease.toAt|format_datetime(locale='fr',pattern="dd MMMM YYYY") }}</li>
                         </ul>
                     </div>
                     <hr class="m-2">
 
                     <div class="p-4 flex justify-center bg-white gap-4">
                         <a href="{{ path('app_tenant_show', {'id': tenant.id}) }}" class="inline-flex items-center border-[1px] border-blue-500 text-blue-500 font-semibold py-1 px-4 rounded hover:bg-blue-300 transition-colors"><span class="material-symbols-outlined text-sm">visibility</span>&nbsp;Voir</a>
-                        {% if tenant.rentalEndDate|date("U") <= "now"|date("U") %}                        
+                        {% if tenant.lease.toAt|date("U") <= "now"|date("U") %}                        
                             <a href="{{ path('app_tenant_lease_renew', {'id': tenant.id}) }}" class="inline-flex items-center border-[1px] border-orange-500 text-orange-500 font-semibold py-1 px-4 rounded hover:bg-orange-300 transition-colors">Renouveller le bail</a>
                         {% endif %}
                         <a href="{{ path('app_tenant_edit', {'id': tenant.id}) }}" class="inline-flex items-center border-[1px] border-lime-500 text-lime-500 font-semibold py-1 px-4 rounded hover:bg-lime-300 transition-colors"><span class="material-symbols-outlined text-sm">edit</span>&nbsp;Modifier</a>

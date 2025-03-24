@@ -37,8 +37,11 @@ class Lease
     /**
      * @var Collection<int, PropertyRent>
      */
-    #[ORM\OneToMany(targetEntity: PropertyRent::class, mappedBy: 'lease')]
-    private Collection $propertyRent;
+    #[ORM\OneToMany(targetEntity: PropertyRent::class, mappedBy: 'lease', cascade:["persist", "remove"])]
+    private Collection $propertyRents;
+
+    #[ORM\ManyToOne(inversedBy: 'leases')]
+    private ?User $createdBy = null;
 
     public function __construct()
     {
@@ -120,15 +123,15 @@ class Lease
     /**
      * @return Collection<int, PropertyRent>
      */
-    public function getPropertyRent(): Collection
+    public function getPropertyRents(): Collection
     {
-        return $this->propertyRent;
+        return $this->propertyRents;
     }
 
     public function addPropertyRent(PropertyRent $propertyRent): static
     {
-        if (!$this->propertyRent->contains($propertyRent)) {
-            $this->propertyRent->add($propertyRent);
+        if (!$this->propertyRents->contains($propertyRent)) {
+            $this->propertyRents->add($propertyRent);
             $propertyRent->setLease($this);
         }
 
@@ -137,12 +140,24 @@ class Lease
 
     public function removePropertyRent(PropertyRent $propertyRent): static
     {
-        if ($this->propertyRent->removeElement($propertyRent)) {
+        if ($this->propertyRents->removeElement($propertyRent)) {
             // set the owning side to null (unless already changed)
             if ($propertyRent->getLease() === $this) {
                 $propertyRent->setLease(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }

@@ -16,7 +16,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-class PropertyRentType extends AbstractType
+class PropertyRentTypeCopy extends AbstractType
 {
     private Security $security;
     private EntityManagerInterface $entityManager;
@@ -38,6 +38,18 @@ class PropertyRentType extends AbstractType
                 )
             ])
             ->add('monthlyPrice')
+            ->add('tenant', EntityType::class, [
+                'class' => Tenant::class,
+                'query_builder' => function (TenantRepository $tenantRepository) {
+                    return $tenantRepository->createQueryBuilder('t')
+                        ->innerJoin('t.property', 'p')
+                        ->where('p IN (:properties)')
+                        ->setParameter('properties', $this->entityManager->getRepository(Property::class)->findAccessibleProperties($this->security->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]));
+                },
+                'choice_label' => function (Tenant $tenant) {
+                    return $tenant->getFullName() . ' - ' . $tenant->getProperty()->getName();
+                },
+            ])
         ;
     }
 

@@ -18,12 +18,27 @@ class PropertyService{
     public function getActualTenant($property, $startDate = null){
         $startDate === null ? $date = new \DateTime() : $date = $startDate;
         $actualTenant = null;
-        foreach($property->getTenants() as $tenant){
-            if($tenant->getRentalStartDate() <= $date && $tenant->getRentalEndDate() >= $date){
-                $actualTenant = $tenant;
+        foreach($property->getLeases() as $lease){
+            if($lease->getFromAt() <= $date && $lease->getToAt() >= $date){
+                $actualTenant = $lease->getTenant();
             }
         }
         return $actualTenant;
+    }
+
+    /**
+     * Retourne le bail actuel d'un bien immobilier
+     * @param mixed $property
+     */
+    public function getActualLease($property, $startDate = null){
+        $startDate === null ? $date = new \DateTime() : $date = $startDate;
+        $actuallease= null;
+        foreach($property->getLeases() as $lease){
+            if($lease->getFromAt() <= $date && $lease->getToAt() >= $date){
+                $actuallease = $lease;
+            }
+        }
+        return $actuallease;
     }
 
     /**
@@ -33,15 +48,15 @@ class PropertyService{
      * @param mixed $endDate
      * @return bool
      */
-    public function haveTenantBetweenTwoDates($property, \DateTimeImmutable|\datetime $startDate, \DateTimeImmutable|\datetime $endDate): bool{
+    public function haveLeaseBetweenTwoDates($property, \DateTimeImmutable|\datetime $startDate, \DateTimeImmutable|\datetime $endDate): bool{
 
         $startDate = $this->dateService->getDateTimeImmutable($startDate);
         $endDate = $this->dateService->getDateTimeImmutable($endDate);
         
-        //on récupère les locatires actuel
-        if($tenant = $this->getActualTenant($property)){
+        //on récupère le bail actuel
+        if($lease = $this->getActualLease($property)){
             //on compare les dates
-            if($this->datesCollide($tenant->getRentalStartDate(), $tenant->getRentalEndDate(), $startDate, $endDate)){
+            if($this->datesCollide($lease->getfromAt(), $lease->getToAt(), $startDate, $endDate)){
                 return true;
             }
         };
@@ -50,10 +65,10 @@ class PropertyService{
 
     /**
      * Controle si deux dates ce chevauches
-     * @param \DateTime $start1
-     * @param \DateTime $end1
-     * @param \DateTime $start2
-     * @param \DateTime $end2
+     * @param \DateTime|\DateTimeImmutable $start1
+     * @param \DateTime|\DateTimeImmutable $end1
+     * @param \DateTime|\DateTimeImmutable $start2
+     * @param \DateTime|\DateTimeImmutable $end2
      * @return bool
      */
     public function datesCollide(\DateTimeImmutable|\datetime $start1, \DateTimeImmutable|\datetime $end1, \DateTimeImmutable|\datetime $start2, \DateTimeImmutable|\datetime $end2): bool {

@@ -46,16 +46,6 @@ class PropertyRent
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'propertyRents')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $createdBy = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $endedAt = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $fromAt = null;
-
-    #[ORM\ManyToOne(inversedBy: 'propertyRent')]
     private ?Lease $lease = null;
 
     public function __construct(){
@@ -123,30 +113,6 @@ class PropertyRent
     public function setCreatedBy(?User $createdBy): static
     {
         $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    public function getEndedAt(): ?\DateTimeImmutable
-    {
-        return $this->endedAt;
-    }
-
-    public function setEndedAt(\DateTimeImmutable $endedAt): static
-    {
-        $this->endedAt = $endedAt;
-
-        return $this;
-    }
-
-    public function getFromAt(): ?\DateTimeImmutable
-    {
-        return $this->fromAt;
-    }
-
-    public function setFromAt(\DateTimeImmutable $fromAt): static
-    {
-        $this->fromAt = $fromAt;
 
         return $this;
     }

@@ -13,8 +13,15 @@
         <div class="flex-grow border-t border-gray-400"></div>
     </div>
 </div>
-    {{ form_row(form.tenants, {'label': 'Locataire(s)', 'attr': {'class': 'md:grid md:grid-cols-4 md:gap-4'}}) }}   
-
+    {{ form_row(form.tenants, {'attr': {'class': 'md:grid md:grid-cols-4 md:gap-4'}}) }}   
+<div class="md:grid md:grid-cols-4 md:gap-4">
+    <div class="relative flex py-5 items-center col-span-4">
+        <div class="flex-grow border-t border-gray-400"></div>
+        <span class="flex-shrink mx-4 text-gray-400">Loyer</span>
+        <div class="flex-grow border-t border-gray-400"></div>
+    </div>
+</div>
+    {{ form_row(form.propertyRents, {'attr': {'class': 'md:grid md:grid-cols-4 md:gap-4'}}) }}   
 
 
 <div>

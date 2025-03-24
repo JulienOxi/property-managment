@@ -52,12 +52,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     private Collection $accessControls;
 
     /**
-     * @var Collection<int, PropertyRent>
-     */
-    #[ORM\OneToMany(targetEntity: PropertyRent::class, mappedBy: 'createdBy', orphanRemoval: true)]
-    private Collection $propertyRents;
-
-    /**
      * @var Collection<int, UploadFile>
      */
     #[ORM\OneToMany(targetEntity: UploadFile::class, mappedBy: 'updatedBy')]
@@ -72,12 +66,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'user')]
     private Collection $notifications;
 
+    /**
+     * @var Collection<int, Lease>
+     */
+    #[ORM\OneToMany(targetEntity: Lease::class, mappedBy: 'createdBy')]
+    private Collection $leases;
+
     public function __construct()
     {
         $this->accessControls = new ArrayCollection();
         $this->propertyRents = new ArrayCollection();
         $this->uploadFiles = new ArrayCollection();
         $this->notifications = new ArrayCollection();
+        $this->leases = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -198,36 +199,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     }
 
     /**
-     * @return Collection<int, PropertyRent>
-     */
-    public function getPropertyRents(): Collection
-    {
-        return $this->propertyRents;
-    }
-
-    public function addPropertyRent(PropertyRent $propertyRent): static
-    {
-        if (!$this->propertyRents->contains($propertyRent)) {
-            $this->propertyRents->add($propertyRent);
-            $propertyRent->setCreatedBy($this);
-        }
-
-        return $this;
-    }
-
-    public function removePropertyRent(PropertyRent $propertyRent): static
-    {
-        if ($this->propertyRents->removeElement($propertyRent)) {
-            // set the owning side to null (unless already changed)
-            if ($propertyRent->getCreatedBy() === $this) {
-                $propertyRent->setCreatedBy(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, UploadFile>
      */
     public function getUploadFiles(): Collection
@@ -330,6 +301,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             // set the owning side to null (unless already changed)
             if ($notification->getUser() === $this) {
                 $notification->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Lease>
+     */
+    public function getLeases(): Collection
+    {
+        return $this->leases;
+    }
+
+    public function addLease(Lease $lease): static
+    {
+        if (!$this->leases->contains($lease)) {
+            $this->leases->add($lease);
+            $lease->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLease(Lease $lease): static
+    {
+        if ($this->leases->removeElement($lease)) {
+            // set the owning side to null (unless already changed)
+            if ($lease->getCreatedBy() === $this) {
+                $lease->setCreatedBy(null);
             }
         }
 

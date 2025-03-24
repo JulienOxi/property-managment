@@ -23,7 +23,7 @@
                             <div class="relative">
                                 <img src="{{ path }}" class="w-full h-48 object-cover opacity-50">
                             <div class="absolute inset-0 flex items-start justify-end">
-                                {% if property.actualTenant is null %}
+                                {% if property.actualLease is null %}
                                     <span class="inline-block bg-orange-200 text-orange-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded mt-2 z-10">
                                         Disponible
                                     </span>
@@ -41,7 +41,7 @@
             <div class="bg-white p-4">
                 <ul>
                     <li>
-                    {% if property.actualTenant is empty %}
+                    {% if property.actualLease is empty %}
                         <span class="inline-block bg-orange-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
                             Disponible
                         </span>
@@ -50,17 +50,21 @@
                             Loué
                         </span>
                     {% endif %}
-                    </li>                    
-                    {% if property.actualTenant is not null %}
-                        <li><strong>Locataire:</strong> {{ property.actualTenant.firstname }} {{ property.actualTenant.lastname }}</li>
+                    </li>
+                    {% if property.actualLease is not null and property.actualLease.tenants is not null %}
+                        {% for tenant in property.actualLease.tenants %}
+                            <li><strong>Locataire:</strong> {{ tenant.firstname }} {{ tenant.lastname }}</li>
+                        {% endfor %}
                     {% endif %}
                     {% set rentTotal = 0 %}
-                    {% for property_rent in property.propertyRents %}
-                        {% if property_rent.type.name != 'CHARGES_DEPOSIT' %}
-                            {% set rentTotal = rentTotal + property_rent.monthlyPrice %}
-                        {% endif %}
-                    {% endfor %}
-                    
+                    {% if property.actualLease is not null and property.actualLease.propertyRents is not null %}
+                        {% for property_rent in property.actualLease.propertyRents %}
+                            {% if property_rent.type.name != 'CHARGES_DEPOSIT' %}
+                                {% set rentTotal = rentTotal + property_rent.monthlyPrice %}
+                            {% endif %}
+                        {% endfor %}
+                    <li><hr class="m-2"></li>
+                    {% endif %}
                     <li><strong>Loyer mensuel:</strong> {{ rentTotal }} CHF</li>
                     <li><hr class="m-2"></li>
                     

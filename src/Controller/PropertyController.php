@@ -53,7 +53,7 @@ final class PropertyController extends AbstractController
             if (!empty($uploadsImages)) { //on récupère la première immage
                 $images[$property->getId()] = array_values($uploadsImages)[0];
             }
-            $property->setActualTenant($propertyService->getActualTenant($property));
+            $property->setActualLease($propertyService->getActualLease($property));
         }
 
 
@@ -114,7 +114,7 @@ final class PropertyController extends AbstractController
         }
 
         //on ajout le locataire actuel
-        $property->setActualTenant($propertyService->getActualTenant($property));
+        $property->setActualLease($propertyService->getActualLease($property));
 
         $year = $request->get('year') ?? date('Y');
         $financialEntrys = $financialEntryRepository->findEntryByPropertyAndYear($property, $year); //selection des loyers (entrées financières)
