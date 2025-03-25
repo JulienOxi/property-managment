@@ -48,15 +48,15 @@ class PropertyService{
      * @param mixed $endDate
      * @return bool
      */
-    public function haveLeaseBetweenTwoDates($property, \DateTimeImmutable|\datetime $startDate, \DateTimeImmutable|\datetime $endDate): bool{
+    public function haveLeaseBetweenTwoDates($property, \DateTimeImmutable|\datetime $startDate, \DateTimeImmutable|\datetime $endDate, $lease = []): bool{
 
         $startDate = $this->dateService->getDateTimeImmutable($startDate);
         $endDate = $this->dateService->getDateTimeImmutable($endDate);
         
-        //on récupère le bail actuel
-        if($lease = $this->getActualLease($property)){
+        //on récupère le bail actuel puis on le compare avec le bail donné
+        if(($actualLease = $this->getActualLease($property)) && $actualLease != $lease){
             //on compare les dates
-            if($this->datesCollide($lease->getfromAt(), $lease->getToAt(), $startDate, $endDate)){
+            if($this->datesCollide($actualLease->getfromAt(), $actualLease->getToAt(), $startDate, $endDate)){
                 return true;
             }
         };

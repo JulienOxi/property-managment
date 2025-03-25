@@ -13,11 +13,19 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/lease')]
 final class LeaseController extends AbstractController
 {
+    private PropertyService $propertyService;
+
+    public function __construct(PropertyService $propertyService)
+    {
+        $this->propertyService = $propertyService;
+    }
     #[Route(name: 'app_lease_index', methods: ['GET'])]
     public function index(PropertyRepository $propertyRepository, UploadFileRepository $uploadFileRepository, PropertyService $propertyService): Response
     {
@@ -47,7 +55,7 @@ final class LeaseController extends AbstractController
     }
 
     #[Route('/new', name: 'app_lease_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, PropertyService $propertyService): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, PropertyService $propertyService, SluggerInterface $slugger): Response
     {
         $lease = new Lease();
         $form = $this->createForm(LeaseType::class, $lease);
@@ -55,14 +63,14 @@ final class LeaseController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            //check que la date d'entrée ne correspond pas à une date déjà louée
-            if($propertyService->haveLeaseBetweenTwoDates($lease->getProperty(), $lease->getFromAt(), $lease->getToAt()))
-            {
-                $this->addFlash('warning', 'Date de location ce chevauche avec un bail en cours. Veuillez choisir une autre date de location.');
+            //check sur les dates
+            if (!$this->dateCheck($lease)) {
                 return $this->redirectToRoute('app_lease_new', [$lease], Response::HTTP_SEE_OTHER);
             }
 
-            $lease->setCreatedBy($this->getUser());
+            $lease
+                ->setCreatedBy($this->getUser())
+                ->setSlug(strtolower($slugger->slug($lease->getProperty()->getName())->toString()));
             $entityManager->persist($lease);
             $entityManager->flush();
 
@@ -75,7 +83,7 @@ final class LeaseController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_lease_show', methods: ['GET'])]
+    #[Route('/{id}-{slug}', name: 'app_lease_show', methods: ['GET'], requirements: ['id' => Requirement::POSITIVE_INT, 'slug' => Requirement::ASCII_SLUG])]
     public function show(Lease $lease): Response
     {
         return $this->render('lease/show.html.twig', [
@@ -83,21 +91,23 @@ final class LeaseController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_lease_edit', methods: ['GET', 'POST'])]
+    #[Route('/edit/{id}-{slug}', name: 'app_lease_edit', methods: ['GET', 'POST'], requirements: ['id' => Requirement::POSITIVE_INT, 'slug' => Requirement::ASCII_SLUG])]
     public function edit(Request $request, Lease $lease, EntityManagerInterface $entityManager, PropertyService $propertyService): Response
     {
         $form = $this->createForm(LeaseType::class, $lease);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            //check que la date d'entrée ne correspond pas à une date déjà louée
-            if($propertyService->haveLeaseBetweenTwoDates($lease->getProperty(), $lease->getFromAt(), $lease->getToAt()))
-            {
-                $this->addFlash('warning', 'Date de location ce chevauche avec un bail en cours. Veuillez choisir une autre date de location.');
-                return $this->redirectToRoute('app_lease_edit', ['id' => $lease->getId(), $lease], Response::HTTP_SEE_OTHER);
+
+            //check sur les dates
+            if (!$this->dateCheck($lease)) {
+                return $this->redirectToRoute('app_lease_edit', ['id' => $lease->getId(), 'slug' => $lease->getSlug()], Response::HTTP_SEE_OTHER);
             }
+
+
             $entityManager->flush();
 
+            $this->addFlash('success','Modification effectuée');
             return $this->redirectToRoute('app_lease_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -113,9 +123,38 @@ final class LeaseController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$lease->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($lease);
             $entityManager->flush();
-            $this->addFlash('success', 'Bail bien supprimer.');
+            $this->addFlash('success', 'Le bail à été supprimer.');
         }
 
         return $this->redirectToRoute('app_lease_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+
+    /**
+     * check que la date d'entrée ne correspond pas à une date déjà louée et que la date de sortie est plus grande que la date d'entrée
+     * @param \App\Entity\Lease $lease
+     * @return bool
+     */
+    private function dateCheck(Lease $lease)    
+    {
+
+        // Détecter si c'est une création (ID null) ou une édition
+        $isNew = $lease->getId() === null;
+
+            //check que la date d'entrée ne correspond pas à une date déjà louée
+            if($this->propertyService->haveLeaseBetweenTwoDates($lease->getProperty(), $lease->getFromAt(), $lease->getToAt(), $isNew ? [] : $lease))
+            {
+                $this->addFlash('warning', 'Date de location ce chevauche avec un bail en cours. Veuillez choisir une autre date de location.');
+                return false;
+            }
+
+            //check que la date de sortie est plus grande que la date d'entrée
+            if($lease->getToAt() < $lease->getFromAt())
+            {
+                $this->addFlash('warning', 'La date de fin de bail doit être plus grande que la date de début.');
+                return false;
+            }
+        
+        return true;
     }
 }

@@ -11,7 +11,7 @@ export default class extends Controller {
         console.log(this.btnaddValue);
         this.index = this.element.childElementCount;
         const btn = document.createElement('button');
-        btn.setAttribute('class', 'bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600');
+        btn.setAttribute('class', 'bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600');
         btn.textContent = this.btnaddValue ? this.btnaddValue : 'Ajouter un locataire';
         btn.setAttribute('type', 'button');
         btn.addEventListener('click', this.addelement);
@@ -63,8 +63,8 @@ export default class extends Controller {
      */
     addDeleteButton = (item) => {
         const btn = document.createElement('button');
-        btn.setAttribute('class', 'mt-4 bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600');
-        btn.textContent = 'Supprimer';
+        btn.setAttribute('class', 'mt-4 bg-white text-red-600 border-[1px] border-red-600 px-2 pt-1 rounded shadow hover:bg-red-600 hover:text-white');
+        btn.innerHTML = '<span class="material-symbols-outlined">delete</span>';
         btn.setAttribute('type', 'button');
         item.append(btn);
         btn.addEventListener('click', e => {

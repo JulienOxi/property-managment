@@ -13,7 +13,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {% for lease in leases %}
             <div class="flex flex-col">
-                <a href="{{ path('app_lease_show', {'id': lease.id}) }}" class="">
+                <a href="{{ path('app_lease_show', {'id': lease.id, 'slug': lease.property.slug}) }}" class="">
                     <div class="flex flex-col bg-white shadow-md rounded-lg overflow-hidden border-4 border-white hover:shadow-xl">
                         {% if images[lease.property.id] is defined %}
                             {% set path = asset('uploads/' ~ lease.property.id ~ '/' ~ images[lease.property.id].fileName) %}
@@ -41,13 +41,17 @@
             <div class="bg-white p-4">
                 <ul>
                     <li>
-                    {% if lease.tenants is empty %}
+                    {% if lease.fromAt|date("U") >= "now"|date("U") %}
                         <span class="inline-block bg-orange-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
-                            Disponible
+                            Location prochaine
+                        </span>
+                    {% elseif lease.toAt|date("U") <= "now"|date("U") %}
+                        <span class="inline-block bg-red-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
+                            Bail terminé
                         </span>
                     {% else %}
                         <span class="inline-block bg-green-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
-                            Loué
+                            Actuellement loué 
                         </span>
                     {% endif %}
                     </li>                    
@@ -56,7 +60,7 @@
                     {% endif %}
                     {% set rentTotal = 0 %}
                     {% for property_rent in lease.propertyRents %}
-                        {% if property_rent.type.name != 'CHARGES_DEPOSIT' %}
+                        {% if property_rent.type.name != 'CHARGES_DEPOSIT_OWNER' %}
                             {% set rentTotal = rentTotal + property_rent.monthlyPrice %}
                         {% endif %}
                     {% endfor %}
@@ -66,7 +70,8 @@
                     <li><strong>Fin de bail:</strong> {{ lease.toAt|format_datetime(locale='fr',pattern="dd MMMM YYYY") }}</li>
                     <div class="relative flex py-5 items-center col-span-4">
                         <div class="flex-grow border-t border-gray-400"></div>
-                        <span class="flex-shrink mx-4 text-gray-400">Locataire(s)</span>
+                        <span class="flex-shrink mx-4 text-gray-400">Locataire{% if lease.tenants|length > 1 %}s{% endif %}
+                        </span>
                         <div class="flex-grow border-t border-gray-400"></div>
                     </div>
                     {% for tenant in lease.tenants %}
@@ -83,15 +88,6 @@
                                 Aucun locataire.
                             </div>
                         </div>
-                    {% endif %}
-                    
-                    
-
-                    {% if lease.property.mortgageType2 is not null %}
-                    <li class="mt-2 text-gray-500 text-sm text-center">Deuxième hypothèque</li>
-                    <li><strong>Taux hypothécaire:</strong> {{ lease.property.mortgageRate2 }}%</li>
-                    <li><strong>Type d'hypothèque:</strong> {{ lease.property.mortgageType2.value }}</li>
-                    <li><strong>Fin de l'hypothèque:</strong> {{ lease.property.mortgageEndDate2 ? lease.property.mortgageEndDate2|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</li>
                     {% endif %}
                 </ul>
             </div>

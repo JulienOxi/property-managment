@@ -43,10 +43,13 @@ class Lease
     #[ORM\ManyToOne(inversedBy: 'leases')]
     private ?User $createdBy = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $slug = null;
+
     public function __construct()
     {
         $this->tenants = new ArrayCollection();
-        $this->propertyRent = new ArrayCollection();
+        $this->propertyRents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -158,6 +161,18 @@ class Lease
     public function setCreatedBy(?User $createdBy): static
     {
         $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(?string $slug): static
+    {
+        $this->slug = $slug;
 
         return $this;
     }
