@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/lease')]
@@ -27,8 +28,11 @@ final class LeaseController extends AbstractController
         $this->propertyService = $propertyService;
     }
     #[Route(name: 'app_lease_index', methods: ['GET'])]
-    public function index(PropertyRepository $propertyRepository, UploadFileRepository $uploadFileRepository, PropertyService $propertyService): Response
+    public function index(PropertyRepository $propertyRepository, UploadFileRepository $uploadFileRepository, PropertyService $propertyService, CsrfTokenManagerInterface $csrfTokenManager): Response
     {
+
+        // Générer un token pour la génération des entrée financière
+        $csrfToken = $csrfTokenManager->getToken('generate_from_property_rent_form')->getValue();
 
         $properties = $propertyRepository->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]);
         //on cherche les images liées aux propriétés pour afficher dans le card header
@@ -51,6 +55,7 @@ final class LeaseController extends AbstractController
         return $this->render('lease/index.html.twig', [
             'leases' => $leases,
             'images' => $images,
+            'csrfToken' => $csrfToken
         ]);
     }
 

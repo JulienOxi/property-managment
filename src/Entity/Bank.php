@@ -58,6 +58,9 @@ class Bank
     #[Assert\NotBlank(
         message: 'Le IBAN ne peut pas être vide',
     )]
+    #[Assert\Iban(
+        message: "Le IBAN {{ value }} n'est pas valide."
+    )]
     private ?string $iban = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
