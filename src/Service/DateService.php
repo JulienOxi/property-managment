@@ -70,10 +70,10 @@ function returnDatesBetweenTwo($date1, $date2, $format = 'd-m-Y', $week_end = tr
     $dates = array();
     
     //on formate les dates
-    if($date1 instanceof \DateTimeImmutable){
+    if($date1 instanceof \DateTimeImmutable || $date1 instanceof DateTime){
         $date1 = $date1->format('Y-m-d');
     }
-    if($date2 instanceof \DateTimeImmutable){
+    if($date2 instanceof \DateTimeImmutable || $date2 instanceof DateTime){
         $date2 = $date2->format('Y-m-d');
     }
     $current = strtotime($date1);
@@ -95,13 +95,16 @@ function returnDatesBetweenTwo($date1, $date2, $format = 'd-m-Y', $week_end = tr
 
     /**
      * Compte le nombre de mois complets entre deux dates
-     * @param \DateTimeImmutable $startDate
-     * @param \DateTimeImmutable $endDate
+     * @param \DateTimeImmutable || DateTime $startDate
+     * @param \DateTimeImmutable || DateTime $endDate
      * @throws \InvalidArgumentException
      * @return array months -> [mois][année]
      */
-    function countFullMonthsBetweenDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    function countFullMonthsBetweenDates($startDate, $endDate): array
     {
+        $startDate = $this->getDateTimeImmutable($startDate);
+        $endDate = $this->getDateTimeImmutable($endDate);
+
         // Vérifiez que la date de début est antérieure ou égale à la date de fin
         if ($startDate > $endDate) {
             throw new \InvalidArgumentException('La date de début doit être antérieure ou égale à la date de fin.');

@@ -60,11 +60,11 @@ class FinancialEntry
     private ?\DateTimeImmutable $paidAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'financialEntries')]
-    private ?tenant $tenant = null;
-
-    #[ORM\ManyToOne(inversedBy: 'financialEntries')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Bank $bank = null;
+
+    #[ORM\ManyToOne(inversedBy: 'financialEntries')]
+    private ?Lease $lease = null;
 
     public function __construct(){
         $this->createdAt = new \DateTimeImmutable();
@@ -182,18 +182,6 @@ class FinancialEntry
         return $this;
     }
 
-    public function getTenant(): ?tenant
-    {
-        return $this->tenant;
-    }
-
-    public function setTenant(?tenant $tenant): static
-    {
-        $this->tenant = $tenant;
-
-        return $this;
-    }
-
     public function getBank(): ?Bank
     {
         return $this->bank;
@@ -202,6 +190,18 @@ class FinancialEntry
     public function setBank(?Bank $bank): static
     {
         $this->bank = $bank;
+
+        return $this;
+    }
+
+    public function getLease(): ?Lease
+    {
+        return $this->lease;
+    }
+
+    public function setLease(?Lease $lease): static
+    {
+        $this->lease = $lease;
 
         return $this;
     }

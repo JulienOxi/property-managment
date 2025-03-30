@@ -2,8 +2,6 @@
 
 namespace App\Service;
 
-use DateTime;
-use App\Enum\PropertyRentEnum;
 use App\Enum\FinancialCategoryEnum;
 
 class EnumService{
@@ -12,8 +10,10 @@ class EnumService{
         return match($propertyRentType) { 
             'RENT' => FinancialCategoryEnum::RENT, 
             'PARKING' => FinancialCategoryEnum::PARKING, 
-            'CHARGES' => FinancialCategoryEnum::CHARGES, 
             'CHARGES_DEPOSIT' => FinancialCategoryEnum::CHARGES_DEPOSIT, 
+            'FLAT_FEE' => FinancialCategoryEnum::FLAT_FEE,
+
+            'CHARGES_DEPOSIT_OWNER' => FinancialCategoryEnum::CHARGES_DEPOSIT_OWNER, 
         };
     }
 }

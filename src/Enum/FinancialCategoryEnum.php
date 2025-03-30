@@ -6,11 +6,12 @@ enum FinancialCategoryEnum: string {
     // Entrées financières
     case RENT = 'Loyer';
     case PARKING = 'Place de parc';
-    case CHARGES = 'Charges';
+    case CHARGES_DEPOSIT = 'Charges (Acompte)';
+    case FLAT_FEE = 'Charges (Forfait)';
     case MISCELLANEOUS_INCOME = 'Revenu divers';
 
     // Sorties financières
-    case CHARGES_DEPOSIT = 'Acompte de charges'; 
+    case CHARGES_DEPOSIT_OWNER = 'Acompte de charges (Propriétaire)'; 
     case WATER = 'Eau';
     case HEATER = 'Chauffage';
     case ELECTRICITY = 'Electricité';
@@ -32,8 +33,8 @@ enum FinancialCategoryEnum: string {
      */
     public static function getByType(string|int $value): string|array {
         $mapping = [
-            'INCOME' => [self::RENT, self::PARKING, self::CHARGES, self::MISCELLANEOUS_INCOME],
-            'EXPENSE' => [self::CHARGES_DEPOSIT, self::WATER, self::HEATER, self::ELECTRICITY, 
+            'INCOME' => [self::RENT, self::PARKING, self::CHARGES_DEPOSIT, self::FLAT_FEE, self::MISCELLANEOUS_INCOME],
+            'EXPENSE' => [self::CHARGES_DEPOSIT_OWNER, self::WATER, self::HEATER, self::ELECTRICITY, 
                           self::WORKS, self::MORTGAGE, self::TAXES, self::MAINTENANCE, 
                           self::INSURANCE, self::BANK_FEE, self::BANK_TRANSFER, 
                           self::MISCELLANEOUS_EXPENSE, self::BANK_TRANSFER]

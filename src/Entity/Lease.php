@@ -18,7 +18,7 @@ class Lease
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'leases')]
     private ?Property $property = null;
 
     /**
@@ -50,6 +50,7 @@ class Lease
     {
         $this->tenants = new ArrayCollection();
         $this->propertyRents = new ArrayCollection();
+        $this->financialEntries = new ArrayCollection();
     }
 
     public function getId(): ?int

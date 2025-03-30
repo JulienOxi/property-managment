@@ -13,94 +13,106 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {% for lease in leases %}
             <div class="flex flex-col">
-                <a href="{{ path('app_lease_show', {'id': lease.id, 'slug': lease.property.slug}) }}" class="">
-                    <div class="flex flex-col bg-white shadow-md rounded-lg overflow-hidden border-4 border-white hover:shadow-xl">
+                <div class="flex flex-col bg-white shadow-md rounded-lg overflow-hidden border-4 border-white hover:shadow-xl">
+
                         {% if images[lease.property.id] is defined %}
                             {% set path = asset('uploads/' ~ lease.property.id ~ '/' ~ images[lease.property.id].fileName) %}
                         {% else %}
                             {% set path = asset('media/app_default.JPE') %}
                         {% endif %}
-                        <div class="relative">
-                            <img src="{{ path }}" class="w-full h-48 object-cover opacity-50"></img>
-                            <div class="absolute inset-0 flex items-start justify-end">
-                                {% if lease.tenants is null %}
-                                    <span class="inline-block bg-orange-200 text-orange-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded mt-2 z-10">
-                                        Disponible
-                                    </span>
-                                {% endif %}
+                        <div class="relative" data-controller="menu">
+                            <img src="{{ path }}" class="w-full h-48 object-cover opacity-50">
+
+                            <div class="absolute inset-0 flex items-start justify-between">
+                                <!-- Bouton Menu -->
+                                <span class="inline-block bg-gray-200 text-black text-sm font-semibold ml-2 px-2.5 pt-1 rounded mt-2 z-10 hover:bg-gray-400 cursor-pointer"
+                                    data-action="click->menu#toggle">
+                                    <span class="material-symbols-outlined">menu</span>
+                                </span>
+
+                                <!-- Tag Type -->
                                 <span class="inline-block bg-blue-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded mt-2 z-10">
                                     {{ lease.property.type.value }}
                                 </span>
                             </div>
+
                             <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                <h2 class="text-white text-xl font-semibold text-center px-4 py-2 bg-gray-900 w-full">{{ lease.property.name }}</h2>
+                                <h2 class="text-white text-xl font-semibold text-center px-4 py-2 bg-gray-900 w-full">
+                                    {{ lease.property.name }}
+                                </h2>
+                            </div>
+
+                            <!-- Menu déroulant -->
+                            <div data-menu-target="menu" class="hidden absolute top-10 left-2 bg-white shadow-md rounded-lg border border-black py-2 w-40 z-20">
+                                <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Modifier</a>
+                                <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Supprimer</a>
+                                <a href="{{ path('app_lease_show', {'id': lease.id, 'slug': lease.property.slug}) }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Détails</a>
                             </div>
                         </div>
 
-                        <div class="bg-white p-4">
-                            <ul>
-                                <li>
-                                {% if lease.fromAt|date("U") >= "now"|date("U") %}
-                                    <span class="inline-block bg-orange-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
-                                        Location prochaine
-                                    </span>
-                                {% elseif lease.toAt|date("U") <= "now"|date("U") %}
-                                    <span class="inline-block bg-red-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
-                                        Bail terminé
-                                    </span>
-                                {% else %}
-                                    <span class="inline-block bg-green-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
-                                        Actuellement loué 
-                                    </span>
+                    <div class="bg-white p-4">
+                        <ul>
+                            <li>
+                            {% if lease.fromAt|date("U") >= "now"|date("U") %}
+                                <span class="inline-block bg-orange-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
+                                    Location prochaine
+                                </span>
+                            {% elseif lease.toAt|date("U") <= "now"|date("U") %}
+                                <span class="inline-block bg-red-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
+                                    Bail terminé
+                                </span>
+                            {% else %}
+                                <span class="inline-block bg-green-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
+                                    Actuellement loué 
+                                </span>
+                            {% endif %}
+                            </li>                    
+                            {% if lease.tenants is not null %}
+                                {# <li><strong>Locataire:</strong> {{ lease.actualTenant.firstname }} {{ lease.actualTenant.lastname }}</li> #}
+                            {% endif %}
+                            {% set rentTotal = 0 %}
+                            {% for property_rent in lease.propertyRents %}
+                                {% if property_rent.type.name != 'CHARGES_DEPOSIT_OWNER' %}
+                                    {% set rentTotal = rentTotal + property_rent.monthlyPrice %}
                                 {% endif %}
-                                </li>                    
-                                {% if lease.tenants is not null %}
-                                    {# <li><strong>Locataire:</strong> {{ lease.actualTenant.firstname }} {{ lease.actualTenant.lastname }}</li> #}
-                                {% endif %}
-                                {% set rentTotal = 0 %}
-                                {% for property_rent in lease.propertyRents %}
-                                    {% if property_rent.type.name != 'CHARGES_DEPOSIT_OWNER' %}
-                                        {% set rentTotal = rentTotal + property_rent.monthlyPrice %}
-                                    {% endif %}
-                                {% endfor %}
-                                
-                                <li><strong>Loyer mensuel:</strong> {{ rentTotal }} CHF</li>
-                                <li><strong>Début de bail:</strong> {{ lease.fromAt|format_datetime(locale='fr',pattern="dd MMMM YYYY") }}</li>
-                                <li><strong>Fin de bail:</strong> {{ lease.toAt|format_datetime(locale='fr',pattern="dd MMMM YYYY") }}</li>
-                                <div class="relative flex py-5 items-center col-span-4">
-                                    <div class="flex-grow border-t border-gray-400"></div>
-                                    <span class="flex-shrink mx-4 text-gray-400">Locataire{% if lease.tenants|length > 1 %}s{% endif %}
-                                    </span>
-                                    <div class="flex-grow border-t border-gray-400"></div>
-                                </div>
-                                {% for tenant in lease.tenants %}
-                                    {% if loop.index > 1 %}
-                                        <hr class="m-2">
-                                    {% endif %}
-                                    <li><strong>Nom complet:</strong> {{ tenant.fullname }}</li>
-                                    <li><strong>Email:</strong> {{ tenant.email }}</li>
-                                    <li><strong>Téléphone:</strong> {{ tenant.phonenumber }}</li>
-                                {% endfor %}
-                                {% if lease.tenants is empty %}
-                                    <div class="col-span-full text-center text-gray-600">
-                                        <div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
-                                            Aucun locataire.
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </ul>
-
+                            {% endfor %}
+                            
+                            <li><strong>Loyer mensuel:</strong> {{ rentTotal }} CHF</li>
+                            <li><strong>Début de bail:</strong> {{ lease.fromAt|format_datetime(locale='fr',pattern="dd MMMM YYYY") }}</li>
+                            <li><strong>Fin de bail:</strong> {{ lease.toAt|format_datetime(locale='fr',pattern="dd MMMM YYYY") }}</li>
                             <div class="relative flex py-5 items-center col-span-4">
                                 <div class="flex-grow border-t border-gray-400"></div>
+                                <span class="flex-shrink mx-4 text-gray-400">Locataire{% if lease.tenants|length > 1 %}s{% endif %}
+                                </span>
                                 <div class="flex-grow border-t border-gray-400"></div>
                             </div>
-                            <form method="POST" action="{{ path('app_financial_entry_generate_from_property_rent', {'property_id': lease.id}) }}">
-                                <input type="hidden" name="_csrf_token" value="{{ csrfToken }}">
-                                <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded shadow hover:bg-amber-600">Générer les loyers</button>
-                            </form>
+                            {% for tenant in lease.tenants %}
+                                {% if loop.index > 1 %}
+                                    <hr class="m-2">
+                                {% endif %}
+                                <li><strong>Nom complet:</strong> {{ tenant.fullname }}</li>
+                                <li><strong>Email:</strong> {{ tenant.email }}</li>
+                                <li><strong>Téléphone:</strong> {{ tenant.phonenumber }}</li>
+                            {% endfor %}
+                            {% if lease.tenants is empty %}
+                                <div class="col-span-full text-center text-gray-600">
+                                    <div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
+                                        Aucun locataire.
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </ul>
+
+                        <div class="relative flex py-5 items-center col-span-4">
+                            <div class="flex-grow border-t border-gray-400"></div>
+                            <div class="flex-grow border-t border-gray-400"></div>
                         </div>
+                        <form method="POST" action="{{ path('app_financial_entry_generate_property_rent_from_lease', {'lease': lease.id}) }}">
+                            <input type="hidden" name="_csrf_token" value="{{ csrfToken }}">
+                            <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded shadow hover:bg-amber-600">Générer les loyers</button>
+                        </form>
                     </div>
-                </a>
+                </div>
             </div>
             {% else %}
                 <div class="col-span-full text-center text-gray-600">

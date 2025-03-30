@@ -70,7 +70,7 @@ class FinancialEntryRepository extends ServiceEntityRepository
                     ->andWhere('f.type = :type')
                     ->andWhere('f.category = :category')
                     ->setParameter('type', TransactionEnum::EXPENSE)
-                    ->setParameter('category', FinancialCategoryEnum::CHARGES_DEPOSIT);
+                    ->setParameter('category', FinancialCategoryEnum::CHARGES_DEPOSIT_OWNER);
             }else{
                 $queryBuilder
                     ->andWhere('f.type = :type')
