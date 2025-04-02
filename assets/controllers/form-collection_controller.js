@@ -7,17 +7,25 @@ export default class extends Controller {
         btnadd: String
     }
 
-    connect() {
-        console.log(this.btnaddValue);
-        this.index = this.element.childElementCount;
-        const btn = document.createElement('button');
-        btn.setAttribute('class', 'bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600');
-        btn.textContent = this.btnaddValue ? this.btnaddValue : 'Ajouter un locataire';
-        btn.setAttribute('type', 'button');
-        btn.addEventListener('click', this.addelement);
-        this.element.childNodes.forEach(this.addDeleteButton);
-        this.element.insertAdjacentElement('afterend', btn);
-    }
+connect() {
+    console.log(this.btnaddValue);
+    this.index = this.element.childElementCount;
+    const btn = document.createElement('button');
+    btn.setAttribute('class', 'bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600');
+    btn.textContent = this.btnaddValue ? this.btnaddValue : 'Ajouter un locataire';
+    btn.setAttribute('type', 'button');
+    btn.addEventListener('click', this.addelement);
+
+    // Appliquer les styles aux éléments déjà présents lors du chargement (édition)
+    this.element.childNodes.forEach(item => {
+        if (item.nodeType === 1) { // Vérifie que c'est bien un élément HTML
+            this.applyFieldStyles(item);
+            this.addDeleteButton(item);
+        }
+    });
+
+    this.element.insertAdjacentElement('afterend', btn);
+}
 
     /**
      * Ajoute un nouvel élément au formulaire imbriqué

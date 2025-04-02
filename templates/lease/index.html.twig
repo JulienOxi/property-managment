@@ -44,9 +44,9 @@
 
                             <!-- Menu déroulant -->
                             <div data-menu-target="menu" class="hidden absolute top-10 left-2 bg-white shadow-md rounded-lg border border-black py-2 w-40 z-20">
-                                <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Modifier</a>
+                                <a href="{{ path('app_lease_edit', {'id': lease.id, 'slug': lease.property.slug}) }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Modifier</a>
                                 <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Supprimer</a>
-                                <a href="{{ path('app_lease_show', {'id': lease.id, 'slug': lease.property.slug}) }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Détails</a>
+                                {# <a href="{{ path('app_lease_show', {'id': lease.id, 'slug': lease.property.slug}) }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Détails</a> #}
                             </div>
                         </div>
 
@@ -106,7 +106,7 @@
                             <div class="flex-grow border-t border-gray-400"></div>
                             <div class="flex-grow border-t border-gray-400"></div>
                         </div>
-                        <form method="POST" action="{{ path('app_financial_entry_generate_property_rent_from_lease', {'lease': lease.id}) }}">
+                        <form method="POST" action="{{ path('app_rent_generate_from_lease', {'lease': lease.id}) }}">
                             <input type="hidden" name="_csrf_token" value="{{ csrfToken }}">
                             <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded shadow hover:bg-amber-600">Générer les loyers</button>
                         </form>

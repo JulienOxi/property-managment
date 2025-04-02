@@ -21,6 +21,12 @@ window.validateInput = function(inputId, regex, capitalize = true) {
 
     const elem = document.getElementById(inputId);
 
+    
+    if(regex === null){
+        elem.classList.add("focus:border-green-700");
+        return;
+    }
+
     if (!elem) return; // Vérifie si l'élément existe
 
     // Vérifie si la valeur actuelle est valide au chargement
@@ -36,6 +42,7 @@ window.validateInput = function(inputId, regex, capitalize = true) {
 
     // Ajoute un écouteur d'événements sur l'input
     elem.addEventListener("input", () => {
+
         const isValid = regex.test(elem.value);
 
         if (capitalize) {
@@ -93,16 +100,22 @@ window.validateInput = function(inputId, regex, capitalize = true) {
 
 /**
  * Ajoute une année à une input depuis une date d'un autre input
- * @param {*} input1  Date input default
- * @param {*} input2  date input à ajouter
+ * @param {HTMLInputElement} input1  Date input de départ
+ * @param {HTMLInputElement} input2  Date input où ajouter un an
+ * @param {boolean} getToday  Si true, initialise input1 au premier jour du mois suivant
  */
-window.addOneYearToInput =  function (input1, input2) {
+window.addOneYearToInput = function (input1, input2, getToday = true) {
     let startDateInput = input1;
     let endDateInput = input2;
 
     function getFirstDayOfNextMonth() {
-        let today = new Date();
-        return new Date(today.getFullYear(), today.getMonth() + 1, 2);
+        let today;
+        if (getToday) {
+            today = new Date();
+        } else {
+            today = startDateInput.value ? new Date(startDateInput.value) : new Date();
+        }
+        return new Date(today.getFullYear(), today.getMonth() + 1, 1);
     }
 
     function updateEndDate() {
@@ -114,13 +127,16 @@ window.addOneYearToInput =  function (input1, input2) {
         }
     }
 
-    // Définir automatiquement la date de début au premier jour du mois suivant
-    let firstDayNextMonth = getFirstDayOfNextMonth();
-    startDateInput.value = firstDayNextMonth.toISOString().split('T')[0];
+    // Définir automatiquement la date de début si getToday est true
+    if (getToday) {
+        let firstDayNextMonth = getFirstDayOfNextMonth();
+        startDateInput.value = firstDayNextMonth.toISOString().split('T')[0];
+    }
 
     // Mettre à jour la date de fin automatiquement
     updateEndDate();
 
+    // Ajouter un listener pour mettre à jour la date de fin en cas de changement de la date de début
     startDateInput.addEventListener("change", updateEndDate);
 };
 

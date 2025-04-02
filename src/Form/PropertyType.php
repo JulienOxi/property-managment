@@ -85,6 +85,9 @@ class PropertyType extends AbstractType
                 'choice_label' => 'name',
                 'required' => true
             ])
+            ->add('ownerChargesDepositAmount', null, [
+                'required' => false,
+            ])
         ;
     }
 

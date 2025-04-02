@@ -53,8 +53,12 @@ class LeaseType extends AbstractType
                     'data-form-collection-btnadd-value' => 'Ajouter un locataire',
                 ]
             ])
-            ->add('rentAmount')
-            ->add('feeAmount')
+            ->add('rentAmount', null, [
+                'required' => true
+            ])
+            ->add('feeAmount', null, [
+                'required' => true
+            ])
             ->add('feeType', ChoiceType::class, [
                 'choices' => RentalFeeEnum::cases(), // Liste des enums
                 'choice_label' => fn(RentalFeeEnum $type) => $type->value, // Affichage du label

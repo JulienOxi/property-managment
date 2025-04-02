@@ -12,6 +12,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 
 class TenantType extends AbstractType
 {
@@ -25,10 +27,21 @@ class TenantType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('firstname')
-            ->add('lastname')
-            ->add('email')
-            ->add('phoneNumber')
+            ->add('firstname', TextType::class, [
+                'label' => 'Prénom'
+            ])
+            ->add('lastname', TextType::class, [
+                'label' => 'Nom'
+            ])
+            ->add('email', EmailType::class, [
+                'label' => 'Adresse email',
+                'required' => false
+            ])
+            ->add('phoneNumber', TextType::class, [
+                'label' => 'Téléphone',
+                'required' => false
+
+            ])
         ;
     }
 

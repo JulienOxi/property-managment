@@ -160,6 +160,9 @@ class Property
     #[ORM\OneToMany(targetEntity: Lease::class, mappedBy: 'property', cascade:["persist", "remove"])]
     private Collection $leases;
 
+    #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2, nullable: true)]
+    private ?string $ownerChargesDepositAmount = null;
+
 
     public function __construct()
     {
@@ -642,6 +645,18 @@ class Property
                 $lease->setProperty(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getOwnerChargesDepositAmount(): ?string
+    {
+        return $this->ownerChargesDepositAmount;
+    }
+
+    public function setOwnerChargesDepositAmount(?string $ownerChargesDepositAmount): static
+    {
+        $this->ownerChargesDepositAmount = $ownerChargesDepositAmount;
 
         return $this;
     }
