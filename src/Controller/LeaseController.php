@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Lease;
+use App\Enum\PropertyRentEnum;
 use App\Form\LeaseType;
+use App\Entity\PropertyRent;
 use App\Enum\AccessRoleEnum;
 use App\Service\PropertyService;
 use App\Repository\LeaseRepository;

@@ -21,7 +21,99 @@
         <div class="flex-grow border-t border-gray-400"></div>
     </div>
 </div>
-    {{ form_row(form.propertyRents, {'attr': {'class': 'md:grid md:grid-cols-4 md:gap-4'}}) }}   
+<div class="space-y-4" data-controller="table-total">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 bg-gray-100 p-3 rounded-lg shadow">
+        <div></div>
+        <div class="text-sm font-bold">Montant 1 mois</div>
+        <div class="text-sm font-bold md:block hidden">Montant 3 mois</div>
+        <div class="text-sm font-bold md:block hidden">Montant 1 année</div>
+    </div>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 p-3 border rounded-lg">
+        <div>Loyer</div>
+        <div>
+            {{ form_widget(form.rentAmount, { 'attr': {'class': 'input-base', 'data-id': 'rentAmount', 'data-table-total-target': 'input', 'data-action': 'input->table-total#updateValues' } }) }}
+        </div>
+        <div class="md:block hidden">
+            <input type="text" class="input-base" data-id="rentAmount3months" readonly disabled>
+        </div>
+        <div class="md:block hidden">
+            <input type="text" class="input-base" data-id="rentAmount12months" readonly disabled>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 p-3 border rounded-lg">
+        <div>{{ form_widget(form.feeType, { 'attr': {'class': 'w-full bg-white border rounded-md p-2'} }) }}</div>
+        <div>
+            {{ form_widget(form.feeAmount, { 'attr': {'class': 'input-base', 'data-id': 'feeAmount', 'data-table-total-target': 'input', 'data-action': 'input->table-total#updateValues' } }) }}
+        </div>
+        <div class="md:block hidden">
+            <input type="text" class="input-base" data-id="feeAmount3months" readonly disabled>
+        </div>
+        <div class="md:block hidden">
+            <input type="text" class="input-base" data-id="feeAmount12months" readonly disabled>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 p-3 border rounded-lg">
+        <div>Parking</div>
+        <div>
+            {{ form_widget(form.parkingAmount, { 'attr': {'class': 'input-base', 'data-id': 'parkingAmount', 'data-table-total-target': 'input', 'data-action': 'input->table-total#updateValues' } }) }}
+        </div>
+        <div class="md:block hidden">
+            <input type="text" class="input-base" data-id="parkingAmount3months" readonly disabled>
+        </div>
+        <div class="md:block hidden">
+            <input type="text" class="input-base" data-id="parkingAmount12months" readonly disabled>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 p-3 border rounded-lg">
+        <div>Autre</div>
+        <div>
+            {{ form_widget(form.variousAmount, { 'attr': {'class': 'input-base', 'data-id': 'variousAmount', 'data-table-total-target': 'input', 'data-action': 'input->table-total#updateValues' } }) }}
+        </div>
+        <div class="md:block hidden">
+            <input type="text" class="input-base" data-id="variousAmount3months" readonly disabled>
+        </div>
+        <div class="md:block hidden">
+            <input type="text" class="input-base" data-id="variousAmount12months" readonly disabled>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 p-3 border bg-gray-500 text-white rounded-lg">
+        <div>Total</div>
+        <div><div id="total-1-month">0.00</div></div>
+        <div class="md:block hidden"><div id="total-3-month">0.00</div></div>
+        <div class="md:block hidden"><div id="total-12-month">0.00</div></div>
+    </div>
+</div>
+
+
+        {# <!-- Version mobile sous forme de cartes -->
+        <div class="md:hidden space-y-4">
+            {% for propertyRent in form.propertyRents %}
+                <div class="border border-gray-300 shadow-md rounded-lg p-4 bg-white">
+                    <div class="mb-2">
+                        <label class="text-gray-700 font-semibold">Type</label>
+                        {{ form_widget(propertyRent.type, { 'attr': {'class': 'w-full bg-white border rounded-md p-2'} }) }}
+                    </div>
+                    <div class="mb-2">
+                        <label class="text-gray-700 font-semibold">Montant 1 mois</label>
+                        {{ form_widget(propertyRent.monthlyPrice, { 'attr': {'class': 'monthly-price w-full bg-white border rounded-md p-2', 'data-id': loop.index } }) }}
+                    </div>
+                    <div class="mb-2">
+                        <label class="text-gray-700 font-semibold">Montant 3 mois</label>
+                        <input type="text" class="quarterly-price w-full bg-gray-100 border rounded-md p-2" data-id="{{ loop.index }}" readonly>
+                    </div>
+                    <div>
+                        <label class="text-gray-700 font-semibold">Montant 1 année</label>
+                        <input type="text" class="yearly-price w-full bg-gray-100 border rounded-md p-2" data-id="{{ loop.index }}" readonly>
+                    </div>
+                </div>
+            {% endfor %}
+        </div> #}
+
 
 <hr>
 <div>

@@ -42,24 +42,29 @@ class PropertyService{
     }
 
     /**
-     * Check si il existe un locataire entre 2 dates données pour une propriétée donnée
+     * Check si il existe un bail entre 2 dates données pour une propriétée donnée
      * @param mixed $property
      * @param mixed $startDate
      * @param mixed $endDate
      * @return bool
      */
-    public function haveLeaseBetweenTwoDates($property, \DateTimeImmutable|\datetime $startDate, \DateTimeImmutable|\datetime $endDate, $lease = []): bool{
+    public function haveLeaseBetweenTwoDates($property, \DateTimeImmutable|\datetime $startDate, \DateTimeImmutable|\datetime $endDate, $givenLease = []): bool{
 
         $startDate = $this->dateService->getDateTimeImmutable($startDate);
         $endDate = $this->dateService->getDateTimeImmutable($endDate);
-        
-        //on récupère le bail actuel puis on le compare avec le bail donné
-        if(($actualLease = $this->getActualLease($property)) && $actualLease != $lease){
-            //on compare les dates
-            if($this->datesCollide($actualLease->getfromAt(), $actualLease->getToAt(), $startDate, $endDate)){
-                return true;
-            }
-        };
+
+        //récupère tous les baux liés au bien
+        $leases = $property->getLeases();
+
+        foreach ($leases as $lease) {
+            //on récupère le bail actuel puis on le compare avec le bail donné
+            if($lease != $givenLease){
+                //on compare les dates
+                if($this->datesCollide($lease->getfromAt(), $lease->getToAt(), $startDate, $endDate)){
+                    return true;
+                }
+            };
+        }
         return false;
     }
 

@@ -57,14 +57,12 @@
                         {% endfor %}
                     {% endif %}
                     {% set rentTotal = 0 %}
-                    {% if property.actualLease is not null and property.actualLease.propertyRents is not null %}
-                        {% for property_rent in property.actualLease.propertyRents %}
-                            {% if property_rent.type.name != 'CHARGES_DEPOSIT' %}
-                                {% set rentTotal = rentTotal + property_rent.monthlyPrice %}
-                            {% endif %}
-                        {% endfor %}
-                    <li><hr class="m-2"></li>
-                    {% endif %}
+                    {% if property.actualLease is not null %}
+                        {% set rentTotal = rentTotal + property.actualLease.rentAmount %}
+                        {% set rentTotal = rentTotal + property.actualLease.parkingAmount %}
+                        {% set rentTotal = rentTotal + property.actualLease.feeAmount %}
+                        {% set rentTotal = rentTotal + property.actualLease.variousAmount %}
+                    {% endif %}                        
                     <li><strong>Loyer mensuel:</strong> {{ rentTotal }} CHF</li>
                     <li><hr class="m-2"></li>
                     

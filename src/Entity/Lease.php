@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\LeaseRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Enum\RentalFeeEnum;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\LeaseRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
@@ -34,17 +35,26 @@ class Lease
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $toAt = null;
 
-    /**
-     * @var Collection<int, PropertyRent>
-     */
-    #[ORM\OneToMany(targetEntity: PropertyRent::class, mappedBy: 'lease', cascade:["persist", "remove"])]
-    private Collection $propertyRents;
-
     #[ORM\ManyToOne(inversedBy: 'leases')]
     private ?User $createdBy = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $slug = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2, nullable: true)]
+    private ?string $rentAmount = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2, nullable: true)]
+    private ?string $parkingAmount = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2, nullable: true)]
+    private ?string $feeAmount = null;
+
+    #[ORM\Column(enumType: RentalFeeEnum::class)]
+    private ?RentalFeeEnum $feeType = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2, nullable: true)]
+    private ?string $variousAmount = null;
 
     public function __construct()
     {
@@ -124,36 +134,6 @@ class Lease
         return $this;
     }
 
-    /**
-     * @return Collection<int, PropertyRent>
-     */
-    public function getPropertyRents(): Collection
-    {
-        return $this->propertyRents;
-    }
-
-    public function addPropertyRent(PropertyRent $propertyRent): static
-    {
-        if (!$this->propertyRents->contains($propertyRent)) {
-            $this->propertyRents->add($propertyRent);
-            $propertyRent->setLease($this);
-        }
-
-        return $this;
-    }
-
-    public function removePropertyRent(PropertyRent $propertyRent): static
-    {
-        if ($this->propertyRents->removeElement($propertyRent)) {
-            // set the owning side to null (unless already changed)
-            if ($propertyRent->getLease() === $this) {
-                $propertyRent->setLease(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getCreatedBy(): ?User
     {
         return $this->createdBy;
@@ -174,6 +154,66 @@ class Lease
     public function setSlug(?string $slug): static
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getRentAmount(): ?string
+    {
+        return $this->rentAmount;
+    }
+
+    public function setRentAmount(?string $rentAmount): static
+    {
+        $this->rentAmount = $rentAmount;
+
+        return $this;
+    }
+
+    public function getParkingAmount(): ?string
+    {
+        return $this->parkingAmount;
+    }
+
+    public function setParkingAmount(?string $parkingAmount): static
+    {
+        $this->parkingAmount = $parkingAmount;
+
+        return $this;
+    }
+
+    public function getFeeAmount(): ?string
+    {
+        return $this->feeAmount;
+    }
+
+    public function setFeeAmount(?string $feeAmount): static
+    {
+        $this->feeAmount = $feeAmount;
+
+        return $this;
+    }
+
+    public function getFeeType(): ?RentalFeeEnum
+    {
+        return $this->feeType;
+    }
+
+    public function setFeeType(?RentalFeeEnum $feeType): static
+    {
+        $this->feeType = $feeType;
+
+        return $this;
+    }
+
+    public function getVariousAmount(): ?string
+    {
+        return $this->variousAmount;
+    }
+
+    public function setVariousAmount(?string $variousAmount): static
+    {
+        $this->variousAmount = $variousAmount;
 
         return $this;
     }

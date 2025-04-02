@@ -132,17 +132,17 @@
         </div>
       
     {% for message in app.flashes('success') %}
-      <div class="w-full flex justify-center bg-lime-500 px-5 mt-2 rounded-lg" id="alert">
+      <div class="w-full flex justify-center bg-lime-500 px-5 mt-2 mb-2 rounded-lg" id="alert">
         <div class="py-2 font-bold text-gray-900">{{ message }}</div>
       </div>
     {% endfor %}
     {% for message in app.flashes('warning') %}
-      <div class="w-full flex justify-center bg-amber-500 px-5 mt-2 rounded-lg" id="alert">
+      <div class="w-full flex justify-center bg-amber-500 px-5 mt-2 mb-2 rounded-lg" id="alert">
         <div class="py-2 font-bold text-gray-900">{{ message }}</div>
       </div>
     {% endfor %}
     {% for message in app.flashes('error') %}
-      <div class="w-full flex justify-center bg-red-500 px-5 mt-2 rounded-lg" id="alert">
+      <div class="w-full flex justify-center bg-red-500 px-5 mt-2 mb-2 rounded-lg" id="alert">
         <div class="py-2 font-bold text-gray-50">{{ message }}</div>
       </div>
     {% endfor %}
