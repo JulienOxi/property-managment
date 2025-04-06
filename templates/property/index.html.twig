@@ -47,7 +47,7 @@
                         </span>
                     {% else %}
                         <span class="inline-block bg-green-200 text-blue-800 text-sm font-semibold mb-3 p-1 rounded">
-                            Loué
+                            Actuellement loué
                         </span>
                     {% endif %}
                     </li>
@@ -66,7 +66,7 @@
                     <li><strong>Loyer mensuel:</strong> {{ rentTotal }} CHF</li>
                     <li><hr class="m-2"></li>
                     
-                    <li><strong>Taux hypothécaire:</strong> {{ property.mortgageRate }}%</li>
+                    {# <li><strong>Taux hypothécaire:</strong> {{ property.mortgageRate }}%</li>
                     <li><strong>Type d'hypothèque:</strong> {{ property.mortgageType.value }}</li>
                     <li><strong>Fin de l'hypothèque:</strong> {{ property.mortgageEndDate ? property.mortgageEndDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</li>
 
@@ -75,7 +75,7 @@
                     <li><strong>Taux hypothécaire:</strong> {{ property.mortgageRate2 }}%</li>
                     <li><strong>Type d'hypothèque:</strong> {{ property.mortgageType2.value }}</li>
                     <li><strong>Fin de l'hypothèque:</strong> {{ property.mortgageEndDate2 ? property.mortgageEndDate2|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</li>
-                    {% endif %}
+                    {% endif %} #}
                 </ul>
             </div>
         </a>

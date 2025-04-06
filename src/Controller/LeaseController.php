@@ -11,6 +11,7 @@ use App\Service\EnumService;
 use App\Enum\TransactionEnum;
 use App\Entity\FinancialEntry;
 use App\Enum\PropertyRentEnum;
+use App\Service\LeaseService;
 use App\Service\PropertyService;
 use App\Enum\FinancialCategoryEnum;
 use App\Repository\LeaseRepository;
@@ -38,7 +39,7 @@ final class LeaseController extends AbstractController
         $this->propertyService = $propertyService;
     }
     #[Route(name: 'app_lease_index', methods: ['GET'])]
-    public function index(PropertyRepository $propertyRepository, UploadFileRepository $uploadFileRepository, PropertyService $propertyService, CsrfTokenManagerInterface $csrfTokenManager): Response
+    public function index(PropertyRepository $propertyRepository, UploadFileRepository $uploadFileRepository, PropertyService $propertyService, LeaseService $leaseService, CsrfTokenManagerInterface $csrfTokenManager): Response
     {
 
         // Générer un token pour la génération des entrée financière
@@ -47,8 +48,10 @@ final class LeaseController extends AbstractController
         $properties = $propertyRepository->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]);
         //on cherche les images liées aux propriétés pour afficher dans le card header
         $images = [];
+        $leases = [];
 
         foreach ($properties as $property) {
+        $leases = [...$leases, ...$property->getLeases()]; //on récupère les baux liés aux propriétés
         $uploadsImages = $uploadFileRepository->findBy(['property' => $property->getId(), 'type' => 'image']);
             if (!empty($uploadsImages)) { //on récupère la première immage
                 $images[$property->getId()] = array_values($uploadsImages)[0];
@@ -56,10 +59,10 @@ final class LeaseController extends AbstractController
             $property->setActualLease($propertyService->getActualLease($property));
         }
 
-        //on récupère les baux liés aux propriétés
-        $leases = [];
-        foreach ($properties as $property) {
-            $leases = [...$leases, ...$property->getLeases()];
+
+        // On ajoute un status à chaque lease
+        foreach ($leases as $lease) {
+            $lease->setInfos($leaseService->getInfos($lease));
         }
 
         return $this->render('lease/index.html.twig', [
@@ -89,6 +92,7 @@ final class LeaseController extends AbstractController
             $entityManager->persist($lease);
             $entityManager->flush();
 
+            $this->addFlash('success', 'Le bail à été créé avec succès.');
             return $this->redirectToRoute('app_lease_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -220,14 +224,20 @@ final class LeaseController extends AbstractController
         if (in_array($today, $dates)) {
             $actualRent['RENT'] = $lease->getRentAmount();
             $fullMonth['RENT'] = $dateService->countFullMonthsBetweenDates($lease->getFromAt(), $oneMonthLater);
-            $actualRent['PARKING'] = $lease->getParkingAmount();
-            $fullMonth['PARKING'] = $dateService->countFullMonthsBetweenDates($lease->getFromAt(), $oneMonthLater);
             $actualRent[$lease->getFeeType()->name] = $lease->getFeeAmount();
             $fullMonth[$lease->getFeeType()->name] = $dateService->countFullMonthsBetweenDates($lease->getFromAt(), $oneMonthLater);
-            $actualRent['MISCELLANEOUS_INCOME'] = $lease->getVariousAmount();
-            $fullMonth['MISCELLANEOUS_INCOME'] = $dateService->countFullMonthsBetweenDates($lease->getFromAt(), $oneMonthLater);
+            if($lease->getParkingAmount() != null && (float) $lease->getParkingAmount() > 0.04)
+            {
+                $actualRent['PARKING'] = $lease->getParkingAmount();
+                $fullMonth['PARKING'] = $dateService->countFullMonthsBetweenDates($lease->getFromAt(), $oneMonthLater);
+            }
+            if($lease->getVariousAmount() != null && (float) $lease->getVariousAmount() > 0.04)
+            {
+                $actualRent['MISCELLANEOUS_INCOME'] = $lease->getVariousAmount();
+                $fullMonth['MISCELLANEOUS_INCOME'] = $dateService->countFullMonthsBetweenDates($lease->getFromAt(), $oneMonthLater);
+            }
             //charges propriétaire si renseignée
-            if($lease->getProperty()->getOwnerChargesDepositAmount() != null && $lease->getProperty()->getOwnerChargesDepositAmount() != 0)
+            if($lease->getProperty()->getOwnerChargesDepositAmount() != null && (float) $lease->getProperty()->getOwnerChargesDepositAmount() > 0.04)
             {
                 $actualRent['CHARGES_DEPOSIT_OWNER'] = $lease->getProperty()->getOwnerChargesDepositAmount();
                 $fullMonth['CHARGES_DEPOSIT_OWNER'] = $dateService->countFullMonthsBetweenDates($lease->getProperty()->getPurchaseDate(), $oneMonthLater);
@@ -262,7 +272,7 @@ final class LeaseController extends AbstractController
                             ->setCreatedBy($this->getUser())
                             ->setIsPaid(true)
                             ->setLease($lease)
-                            ->setBank($property->getBank());
+                            ->setBank($lease->getBank() ? $lease->getBank() : null);
                         
                         $em->persist($financialEntry);
                         $createdEntry++;
@@ -280,7 +290,7 @@ final class LeaseController extends AbstractController
                             ->setCreatedBy($this->getUser())
                             ->setIsPaid(true)
                             ->setLease($lease)
-                            ->setBank($property->getBank());
+                            ->setBank($lease->getBank() ? $lease->getBank() : null);
                         
                         $em->persist($financialDeposit);
                         $createdDeposit++;

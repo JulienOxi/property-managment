@@ -7,6 +7,7 @@ use App\Entity\UploadFile;
 use App\Enum\AccessRoleEnum;
 use App\Service\DateService;
 use App\Service\EnumService;
+use BadRequestHttpException;
 use App\Enum\TransactionEnum;
 use App\Entity\FinancialEntry;
 use App\Enum\FinancialCategoryEnum;
@@ -101,9 +102,32 @@ final class FinancialEntryController extends AbstractController
     {
         $financialEntry = new FinancialEntry();
 
+        //validation de la description
+        $description = $request->query->get('description') ? $request->query->get('description') : null;
+        if($description){
+            if (!preg_match('/^[\p{L}\p{N}\s.,!?\-()\'"]+$/u', $description)) {
+                $this->addFlash('danger', 'La description contient des caractères non autorisés.');
+                return $this->redirectToRoute('app_financial_entry_index', [], Response::HTTP_SEE_OTHER);
+            }
+        }
+
+        $paidAt = $request->query->get('paidAt') ? $request->query->get('paidAt') : null;
+        if($paidAt){
+            $paidAt = \DateTimeImmutable::createFromFormat('Y-m-d', $paidAt);
+
+            if ($paidAt === false) {
+                $this->addFlash('danger', 'La date n\'est pas valide.');
+                return $this->redirectToRoute('app_financial_entry_index', [], Response::HTTP_SEE_OTHER);
+            }
+        }
+
+
         // On Set le type si il est renseigné dans la route
         $request->query->get('type') ? $financialEntry->setType(TransactionEnum::fromName($request->query->get('type'))) : null;
         $request->query->get('property') ? $financialEntry->setProperty($entityManager->getRepository(Property::class)->find($request->query->get('property'))) : null;
+        $request->query->get('category') ? $financialEntry->setCategory(FinancialCategoryEnum::fromName($request->query->get('category'))) : null;
+        $description ? $financialEntry->setDescription($description) : null;
+        $paidAt ? $financialEntry->setPaidAt($paidAt) : null;
 
         $form = $this->createForm(FinancialEntryNewType::class, $financialEntry);
         $form->handleRequest($request);
@@ -190,103 +214,4 @@ final class FinancialEntryController extends AbstractController
         return $this->redirectToRoute('app_financial_entry_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    
-    #[Route('/generate/from_property_rent/{property_id}', name: 'app_financial_entry_generate_from_property_rent', methods: ['POST'], requirements: ['property_id' => Requirement::POSITIVE_INT])]
-    public function gernerateFromPropertyRent(FinancialEntryRepository $financialEntryRepository, Request $request, CsrfTokenManagerInterface $csrfTokenManager, EntityManagerInterface $em, DateService $dateService, EnumService $enumService, int $property_id = 0): Response
-    {
-        $token = $request->request->get('_csrf_token');
-
-        // Vérifier si le token est valide
-        if (!$csrfTokenManager->isTokenValid(new \Symfony\Component\Security\Csrf\CsrfToken('generate_from_property_rent_form', $token))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token');
-        }        
-
-        $property = $em->getRepository(Property::class)->find($property_id);
-        if (!$property && $property_id != 0) {
-            throw $this->createNotFoundException('Property not found');
-        }
-        
-        // Résumé logique
-        
-        //     Récupère tous les contrats de location pour une propriété.
-        //     Identifie ceux qui sont actuellement actifs en fonction des dates.
-        //     Calcule le nombre de mois pleins pour chaque contrat actif jusque à aujourd'hui.
-        //     Recherche un paiements financiers effectués entre 2 dates avec les type et catégories appropriées.
-        //     Vérifie si les paiements sont corrects (en temps voulu et pour des catégories spécifiques).
-        //     Créer eventuellement un loyer.
-
-                $actualRent = []; //contrat de Loyer qui sont d'actualité (entre 2 dates)
-                $fullMonth = []; //nombre de mois dans l'intérval
-                foreach ($property->getPropertyRents() as $key => $rent) {
-                    $dates = $dateService->returnDatesBetweenTwo($rent->getFromAt(), $rent->getEndedAt(), 'Y-m-d');
-                    if(in_array(date('Y-m-d'), $dates)){ //on check si l'entrée est d'actualité
-                        $actualRent[$rent->getType()->name] =  $rent;
-                        $fullMonth[$rent->getType()->name] = $dateService->countFullMonthsBetweenDates($rent->getFromAt(), new \DateTimeImmutable('+1 month'));
-                    }
-                }
-
-
-                $createdEntry = 0;
-                $createdDeposit = 0;
-                //on récupère les entrée dejà payé/validée
-                foreach ($actualRent as $key => $rent) {
-                    foreach ($fullMonth[$key] as $monthsAndYear) {//récupère le type de loyer $key::RENT|PARKING|CHARGE et tous les mois
-                        foreach($monthsAndYear as $monthAndYear){ //récupère tous les mois de l'intervalle
-                            //defini la periode de recherche (entre le 25 du mois d'avant et le 5 du mois en cours)
-                            $withinRentPaymentDates = $dateService->withinRentPaymentPeriod($monthAndYear['month'], $monthAndYear['year']);
-                            //on regarde si on trouve une entrée dans le laps de temps dans la même catégory et le même type
-                            $financialEntry = $financialEntryRepository->findBetweenTwoDates($rent->getproperty(), $withinRentPaymentDates['start'], $withinRentPaymentDates['end'], TransactionEnum::INCOME, $enumService->mapPropertyRentToFinancialCategory($key));
-                            $financialDeposit = $financialEntryRepository->findBetweenTwoDates($rent->getproperty(),$withinRentPaymentDates['start'], $withinRentPaymentDates['end'], TransactionEnum::EXPENSE, FinancialCategoryEnum::CHARGES_DEPOSIT);
-
-
-                            //si il n'y a pas de loyer on le créer
-                            if(count($financialDeposit) == 0 && !$financialEntry && $enumService->mapPropertyRentToFinancialCategory($key) != FinancialCategoryEnum::CHARGES_DEPOSIT){
-                                $financialEntry = new FinancialEntry();
-                                $financialEntry->setType(TransactionEnum::INCOME);
-                                $financialEntry->setPaidAt(new \DateTimeImmutable('01.'.$monthAndYear['month'].'.'.$monthAndYear['year']));
-                                $financialEntry->setCategory($enumService->mapPropertyRentToFinancialCategory($key));
-                                $financialEntry->setAmount($rent->getMonthlyPrice());
-                                $financialEntry->setDescription($rent->getType()->value.' '.$monthAndYear['month'].' '.$monthAndYear['year']);
-                                $financialEntry->setProperty($rent->getProperty());
-                                $financialEntry->setCreatedBy($this->getUser());
-                                $financialEntry->setIsPaid(true);
-                                $financialEntry->setTenant($rent->getTenant());
-                                $financialEntry->setBank($rent->getProperty()->getBank());
-
-                                $em->persist($financialEntry);
-                                $createdEntry++;
-                            }
-                            //si il n'y a pas de charges on les crée
-                            if(count($financialDeposit) == 0 && !count($financialEntry) && $enumService->mapPropertyRentToFinancialCategory($key) == FinancialCategoryEnum::CHARGES_DEPOSIT){
-                                $financialDeposit = new FinancialEntry();
-                                $financialDeposit->setType(TransactionEnum::EXPENSE);
-                                $financialDeposit->setPaidAt(new \DateTimeImmutable('01.'.$monthAndYear['month'].'.'.$monthAndYear['year']));
-                                $financialDeposit->setCategory(FinancialCategoryEnum::CHARGES_DEPOSIT);
-                                $financialDeposit->setAmount($rent->getMonthlyPrice());
-                                $financialDeposit->setDescription($rent->getType()->value.' '.$monthAndYear['month'].' '.$monthAndYear['year']);
-                                $financialDeposit->setProperty($rent->getProperty());
-                                $financialDeposit->setCreatedBy($this->getUser());
-                                $financialDeposit->setIsPaid(true);
-                                $financialDeposit->setTenant($rent->getTenant());
-                                $financialDeposit->setBank($rent->getProperty()->getBank());
-
-                                $em->persist($financialDeposit);
-                                $createdDeposit++;
-                            }
-                        }
-                    }
-                }
-
-                //si il y a des loyer à créer on flush
-                if($createdEntry > 0 || $createdDeposit > 0){
-                    $em->flush();
-                    $this->addFlash('success', $createdEntry.' loyers on correctement été générer !');
-                    $this->addFlash('success', $createdDeposit.' acomptes de charges on correctement été générer !');
-                }else{
-                    $this->addFlash('warning', 'Aucun loyer à genérer !');
-                }
-        $route = $request->headers->get('referer');
-
-        return $this->redirect($route);
-    }
 }

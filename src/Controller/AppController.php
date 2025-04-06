@@ -37,8 +37,8 @@ class AppController extends AbstractController
         $totalPropertyWithoutActiveLease = 0;
         $deadlines = []; //array type => bank ou loyer / name => (nom banque ou locataire) / preoperty => property.name
         foreach ($properties as $key => $property) {
-            $rent = $entityManager->getRepository(FinancialEntry::class)->findSumAmountBetweenTwoDates($property->getBank(), date('Y-01-01'), date('Y-12-31'), TransactionEnum::INCOME, $property);
-            $expenses = $entityManager->getRepository(FinancialEntry::class)->findSumAmountBetweenTwoDates($property->getBank(), date('Y-01-01'), date('Y-12-31'), TransactionEnum::EXPENSE, $property);
+            $rent = $entityManager->getRepository(FinancialEntry::class)->findSumAmountBetweenTwoDates( date('Y-01-01'), date('Y-12-31'), TransactionEnum::INCOME, null, $property);
+            $expenses = $entityManager->getRepository(FinancialEntry::class)->findSumAmountBetweenTwoDates(date('Y-01-01'), date('Y-12-31'), TransactionEnum::EXPENSE, null, $property);
             $unpaidRents = $entityManager->getRepository(FinancialEntry::class)->getUnpaidRents($property);
 
             $property->setTotalRents($rent ? $rent : 0);//ajoute le total des loyers
@@ -57,12 +57,11 @@ class AppController extends AbstractController
             }
 
             //ajoute toutes les hypotèques à la liste
-            array_push($deadlines,['type' => 'Bancaire', 'name' => $property->getBank()->getName(), 'date' => $property->getMortgageEndDate(), 'property' => $property->getName()]);
+            foreach ($property->getMortgages() as $mortgage) {
+                array_push($deadlines,['type' => 'Hypotèque', 'name' => $mortgage->getBank()->getName(), 'date' => $mortgage->getToAt(), 'property' => $mortgage->getProperty()->getName()]);
+            }
             if($property->getActualLease() != null){
                 array_push($deadlines,['type' => 'Bail à loyer', 'name' => '', 'date' => $property->getActualLease()->getToAt(), 'property' => $property->getName()]);
-            }
-            if($property->getMortgageEndDate2() != null){
-                array_push($deadlines,['type' => 'Bancaire', 'name' => $property->getBank()->getName(), 'date' => $property->getMortgageEndDate2(), 'property' => $property->getName()]);
             }
             // Fonction de comparaison pour trier par date décroissante
             usort($deadlines, function($a, $b) {

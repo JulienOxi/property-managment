@@ -1,0 +1,60 @@
+
+<table class="table-auto w-full">
+    <thead>
+        <tr>
+            <th class="text-sm bg-orange-200">Période</th>
+            <th class="text-sm bg-orange-200">Montant</th>
+            {% if hypo2 %}                                
+                <th class="text-sm bg-orange-200">Montant 2</th>
+            {% endif %}
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr>
+        {# type=EXPENSE&property=1&category=MORTGAGE&description=hello&paidAt=2024-12-31 #}
+            <td class="text-sm">1er Janvier au 31 Mars</td>
+            <td class="text-center text-sm">
+                {{ mortgages['03-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
+            </td>
+            {% if hypo2 %}
+                <td class="text-center text-sm">
+                    {{ mortgages['03-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
+                </td>  
+            {% endif %}            
+        </tr>
+        <tr>
+            <td class="text-sm">1er Avril au 30 Juin</td>
+            <td class="text-center text-sm">
+                {{ mortgages['06-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
+            </td>
+            {% if hypo2 %}
+                <td class="text-center text-sm">
+                    {{ mortgages['06-MORTGAGE2'].amount|default('')|number_format(2, '.', '\'') }}
+                </td>    
+            {% endif %}                     
+        </tr>
+        <tr>
+            <td class="text-sm">1er Juillet au 30 Septembre</td>
+            <td class="text-center text-sm">
+                {{ mortgages['09-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
+            </td>
+            {% if hypo2 %}
+                <td class="text-center text-sm">
+                    {{ mortgages['09-MORTGAGE2'].amount|default('')|number_format(2, '.', '\'') }}
+                </td>     
+            {% endif %}
+        </tr>
+        <tr>
+            <td class="text-sm">1er Octobre au 31 Décembre</td>
+            <td class="text-center text-sm">
+                {{ mortgages['12-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
+            </td>
+            {% if hypo2 %}
+                <td class="text-center text-sm">
+                    {{ mortgages['12-MORTGAGE2'].amount|default('')|number_format(2, '.', '\'') }}
+                </td>  
+            {% endif %}  
+        </tr>
+    </tbody>
+</table>

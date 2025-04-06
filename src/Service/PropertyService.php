@@ -42,6 +42,20 @@ class PropertyService{
     }
 
     /**
+    * Retourne toutes les hypotèque actuelles
+    */
+    public function getActualMortgages($property){
+        $actualMortgages = [];
+        $now = new \DateTime();
+        foreach($property->getMortgages() as $mortgage){
+            if($mortgage->getToAt() >= $now && $mortgage->getFromAt() <= $now){
+                $actualMortgages[] = $mortgage;
+            }
+        }
+        return $actualMortgages;
+    }
+
+    /**
      * Check si il existe un bail entre 2 dates données pour une propriétée donnée
      * @param mixed $property
      * @param mixed $startDate

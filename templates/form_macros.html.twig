@@ -1,6 +1,6 @@
 {% macro field(field, label, divClass) %}
-    <div class="{{divClass}}">
-        {{ form_label(field, label, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}        
+    <div class="{{divClass}}">     
+        {{ form_label(field, label, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}       
         {% if field.vars.errors|length > 0 %}
         <div class="flex">
             <div class="text-white text-xs px-2 py-1 bg-red-500 rounded-lg mr-2">Erreur</div>

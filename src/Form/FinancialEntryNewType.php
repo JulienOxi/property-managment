@@ -53,11 +53,22 @@ class FinancialEntryNewType extends AbstractType
                     'Oui' => true,
                     'Non' => false
                 ],
-            ])
-            ->add('paidAt', DateType::class, [
-                'widget' => 'single_text',
-                'attr' => ['value' => Date('Y-m-d')],
-            ])
+            ]);
+
+            if($options['data']->getPaidAt() === null){
+                $builder
+                    ->add('paidAt', DateType::class, [
+                        'widget' => 'single_text',
+                        'attr' => ['value' => Date('Y-m-d')],
+                    ]);
+            }else{
+                $builder
+                    ->add('paidAt', DateType::class, [
+                        'widget' => 'single_text',
+                        ]); 
+            }
+
+            $builder
             ->add('property', EntityType::class, [
                 'class' => Property::class,
                 'query_builder' => function (PropertyRepository $propertyRepository) {

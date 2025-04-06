@@ -39,12 +39,6 @@
             } 
         %}
 
-		{# on regarde si il existe une deuxième hypothèque, si oui on met la variable hypo2 a true #}
-		{% set hypo2 = false %}
-		{% if property.mortgageType2 is not null %}
-			{% set hypo2 = true %}
-		{% endif %}
-
 		<div class="container mx-auto px-4 p-6">
 			<h1 class="text-2xl font-bold mb-6 text-center md:hidden">
 				{{pageName}}
@@ -255,63 +249,7 @@
 									</table>
 								</div>
 								<div class="flex overflow-x-auto gap-4 mt-4">
-									<table class="table-auto w-full">
-										<thead>
-											<tr>
-												<th class="text-sm bg-orange-200">Période</th>
-												<th class="text-sm bg-orange-200">Montant</th>
-												{% if hypo2 %}                                
-													<th class="text-sm bg-orange-200">Montant 2</th>
-												{% endif %}
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td class="text-sm">1er Janvier au 31 Mars</td>
-												<td class="text-center text-sm">
-													{{ mortgages['03-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
-												</td>
-												{% if hypo2 %}
-													<td class="text-center text-sm">
-														{{ mortgages['03-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
-													</td>  
-												{% endif %}            
-											</tr>
-											<tr>
-												<td class="text-sm">1er Avril au 30 Juin</td>
-												<td class="text-center text-sm">
-													{{ mortgages['06-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
-												</td>
-												{% if hypo2 %}
-													<td class="text-center text-sm">
-														{{ mortgages['06-MORTGAGE2'].amount|default('')|number_format(2, '.', '\'') }}
-													</td>    
-												{% endif %}                     
-											</tr>
-											<tr>
-												<td class="text-sm">1er Juillet au 30 Septembre</td>
-												<td class="text-center text-sm">
-													{{ mortgages['09-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
-												</td>
-												{% if hypo2 %}
-													<td class="text-center text-sm">
-														{{ mortgages['09-MORTGAGE2'].amount|default('')|number_format(2, '.', '\'') }}
-													</td>     
-												{% endif %}
-											</tr>
-											<tr>
-												<td class="text-sm">1er Octobre au 31 Décembre</td>
-												<td class="text-center text-sm">
-													{{ mortgages['12-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
-												</td>
-												{% if hypo2 %}
-													<td class="text-center text-sm">
-														{{ mortgages['12-MORTGAGE2'].amount|default('')|number_format(2, '.', '\'') }}
-													</td>  
-												{% endif %}  
-											</tr>
-										</tbody>
-									</table>
+									{# {% include "templates/property/_mortgage_table.html.twig" %} #}
 								</div>
 							</div>
 						</div> {# fin card loyer #}
@@ -377,8 +315,16 @@
 							<h2 class="text-xl p-2 font-semibold text-gray-700 mb-2">Details financier</h2>
 							<div class="md:grid md:grid-cols-2">
 								<div class="col-span-2 bg-cyan-900">
-									<p class="ml-4 text-white font-medium">Banque</p>
-									<p class="ml-8 text-white font-thin">{{ property.bank.name }}</p>
+									{% if property.mortgages|length == 0 %}
+										<p class="ml-4 text-white font-medium">Aucune hypothèque</p>
+									{% else %}
+										<p class="ml-4 text-white font-medium">Hypotèque{% if property.mortgages|length > 1 %}s{% endif %}</p>
+										{% for mortgage in property.mortgages %}
+											<p class="ml-8 text-white font-thin">{{ mortgage.bank.name }} - {{ mortgage.mortgageType.value }} ({{ mortgage.rate }}%)</p>
+											<p class="ml-8 text-white font-thin">Ce termine le {{ mortgage.toAt ? mortgage.toAt|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
+										{% endfor %}
+									{% endif %}
+									
 								</div>  
 							</div>
 							<div class="md:grid md:grid-cols-2">          
@@ -386,71 +332,6 @@
 									<p class="text-neutral-900 font-semibold">Achat</p>
 									<p class="ml-4 font-thin"><b>{{ property.purchasePrice|format_currency('CHF') }}</b> le {{ property.purchaseDate ? property.purchaseDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
 								</div>
-
-								<div class="pl-2 bg-cyan-900 text-white mx-0 font-medium  md:col-span-2">	
-									{{ property.mortgageType2 ? 'Hypothèques' : 'Hypothèque' }}
-									
-								</div>
-								<div class="ml-4">
-									<p class="text-neutral-900 font-semibold">
-										Type de taux
-									</p>
-									<p class="ml-4 font-thin">
-										{{ property.mortgageType.value }}
-									</p>
-								</div>
-											{% if property.mortgageType2 is not null %}
-											<div class="ml-4">
-												<p class="text-neutral-900 font-semibold">
-													Type de taux
-												</p>
-												<p class="ml-4 font-thin">
-													{{ property.mortgageType2.value }}
-												</p>
-											</div>
-											{% else %}
-												<div></div>
-											{% endif %}
-								<div class="ml-4">
-									<p class="text-neutral-900 font-semibold">
-										Taux hypothécaire
-									</p>
-									<p class="ml-4 font-thin">
-										{{ property.mortgageRate }}
-									</p>
-								</div>
-										{% if property.mortgageRate2 is not null %}
-										<div class="ml-4">
-											<p class="text-neutral-900 font-semibold">
-												Taux hypothécaire
-											</p>
-											<p class="ml-4 font-thin">
-												{{ property.mortgageRate2 }}
-											</p>
-										</div>
-										{% else %}
-											<div></div>
-										{% endif %}
-								<div class="ml-4">
-									<p class="text-neutral-900 font-semibold">
-										Fin de l'hypotèque
-									</p>
-									<p class="ml-4 font-thin">
-										{{ property.mortgageEndDate ? property.mortgageEndDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}
-									</p>
-								</div>
-										{% if property.mortgageEndDate2 is not null %}
-										<div class="ml-4">
-											<p class="text-neutral-900 font-semibold">
-												Fin de l'hypotèque
-											</p>
-											<p class="ml-4 font-thin">
-												{{ property.mortgageEndDate2 ? property.mortgageEndDate2|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}
-											</p>
-										</div>
-										{% else %}
-											<div></div>
-										{% endif %}
 							</div>
 						</div>
 					</div>

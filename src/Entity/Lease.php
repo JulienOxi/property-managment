@@ -42,19 +42,38 @@ class Lease
     private ?string $slug = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2, nullable: true)]
+    #[Assert\GreaterThanOrEqual(0)]
+    #[Assert\Regex(pattern: "/^\d+(?:[\.,]\d{0,2})?$/", message: "Le montant peut avoir au maximum 2 décimales.")]
     private ?string $rentAmount = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2, nullable: true)]
+    #[Assert\GreaterThanOrEqual(0)]
+    #[Assert\Regex(pattern: "/^\d+(?:[\.,]\d{0,2})?$/", message: "Le montant peut avoir au maximum 2 décimales.")]
     private ?string $parkingAmount = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2, nullable: true)]
+    #[Assert\GreaterThanOrEqual(0)]
+    #[Assert\Regex(pattern: "/^\d+(?:[\.,]\d{0,2})?$/", message: "Le montant peut avoir au maximum 2 décimales.")]    
     private ?string $feeAmount = null;
 
     #[ORM\Column(enumType: RentalFeeEnum::class)]
     private ?RentalFeeEnum $feeType = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2, nullable: true)]
+    #[Assert\GreaterThanOrEqual(0)]
+    #[Assert\Regex(pattern: "/^\d+(?:[\.,]\d{0,2})?$/", message: "Le montant peut avoir au maximum 2 décimales.")]    
     private ?string $variousAmount = null;
+
+    /**
+     * @var Collection<int, FinancialEntry>
+     */
+    #[ORM\OneToMany(targetEntity: FinancialEntry::class, mappedBy: 'lease')]
+    private Collection $financialEntries;
+
+    private ?array $infos = [];
+
+    #[ORM\ManyToOne]
+    private ?Bank $bank = null;
 
     public function __construct()
     {
@@ -214,6 +233,59 @@ class Lease
     public function setVariousAmount(?string $variousAmount): static
     {
         $this->variousAmount = $variousAmount;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FinancialEntry>
+     */
+    public function getFinancialEntries(): Collection
+    {
+        return $this->financialEntries;
+    }
+
+    public function addFinancialEntry(FinancialEntry $financialEntry): static
+    {
+        if (!$this->financialEntries->contains($financialEntry)) {
+            $this->financialEntries->add($financialEntry);
+            $financialEntry->setLease($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFinancialEntry(FinancialEntry $financialEntry): static
+    {
+        if ($this->financialEntries->removeElement($financialEntry)) {
+            // set the owning side to null (unless already changed)
+            if ($financialEntry->getLease() === $this) {
+                $financialEntry->setLease(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getinfos(): ?array
+    {
+        return $this->infos;
+    }
+    public function setInfos(array $infos): static
+    {
+        $this->infos = $infos;
+
+        return $this;
+    }
+
+    public function getBank(): ?Bank
+    {
+        return $this->bank;
+    }
+
+    public function setBank(?Bank $bank): static
+    {
+        $this->bank = $bank;
 
         return $this;
     }

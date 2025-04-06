@@ -8,6 +8,7 @@ use App\Entity\Property;
 use App\Form\PropertyType;
 use App\Enum\AccessRoleEnum;
 use App\Entity\AccessControl;
+use App\Service\LeaseService;
 use App\Form\PropertyShareType;
 use App\Service\PropertyService;
 use Symfony\Component\Mime\Address;
@@ -41,7 +42,7 @@ final class PropertyController extends AbstractController
 
     
     #[Route(name: 'app_property_index', methods: ['GET'])]
-    public function index(PropertyRepository $propertyRepository, UploadFileRepository $uploadFileRepository, PropertyService $propertyService): Response
+    public function index(PropertyRepository $propertyRepository, UploadFileRepository $uploadFileRepository, PropertyService $propertyService, LeaseService $leaseService): Response
     {
 
         $properties = $propertyRepository->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]);
@@ -54,6 +55,12 @@ final class PropertyController extends AbstractController
                 $images[$property->getId()] = array_values($uploadsImages)[0];
             }
             $property->setActualLease($propertyService->getActualLease($property));
+
+            //on récupère les hypothèques actuelles et on les ajoutes à la proprieté
+            $mortagages = $propertyService->getActualMortgages($property);
+            foreach ($mortagages as $mortagage) {
+                $property->addMortgage($mortagage);
+            }
         }
 
 

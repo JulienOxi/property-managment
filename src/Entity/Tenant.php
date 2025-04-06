@@ -54,12 +54,6 @@ class Tenant
     )]
     private ?string $phoneNumber = null;
 
-    /**
-     * @var Collection<int, FinancialEntry>
-     */
-    #[ORM\OneToMany(targetEntity: FinancialEntry::class, mappedBy: 'tenant')]
-    private Collection $financialEntries;
-
     #[ORM\ManyToOne(inversedBy: 'tenants')]
     private ?Lease $lease = null;
 
@@ -123,36 +117,6 @@ class Tenant
     public function setPhoneNumber(?string $phoneNumber): static
     {
         $this->phoneNumber = $phoneNumber;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, FinancialEntry>
-     */
-    public function getFinancialEntries(): Collection
-    {
-        return $this->financialEntries;
-    }
-
-    public function addFinancialEntry(FinancialEntry $financialEntry): static
-    {
-        if (!$this->financialEntries->contains($financialEntry)) {
-            $this->financialEntries->add($financialEntry);
-            $financialEntry->setTenant($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFinancialEntry(FinancialEntry $financialEntry): static
-    {
-        if ($this->financialEntries->removeElement($financialEntry)) {
-            // set the owning side to null (unless already changed)
-            if ($financialEntry->getTenant() === $this) {
-                $financialEntry->setTenant(null);
-            }
-        }
 
         return $this;
     }

@@ -1,5 +1,7 @@
 {% import 'form_macros.html.twig' as macros %}
 {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+{# afficher les erreurs #}
+{{ form_errors(form) }}
 
 <div class="md:grid md:grid-cols-4 md:gap-4">
 
@@ -23,6 +25,8 @@
         <div class="flex-grow border-t border-gray-400"></div>
     </div>
 </div>
+    {{ macros.field(form.bank, 'Banque pour le loyer', 'md:col-span-2') }}
+
 <div class="space-y-4" data-controller="table-total">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-2 bg-gray-100 p-3 rounded-lg shadow">
         <div></div>

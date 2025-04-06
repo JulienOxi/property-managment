@@ -53,14 +53,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     validateInput('property_mortgageRate', tauxHypoRegex, false)
     validateInput('property_purchasePrice', purchasePriceRegex, false)
+    validateInput('property_purchaseDate', null)
 
     validateInput('property_address_street', streetRegex)
     validateInput('property_address_streetNumber', streetNumberRegex, false)
     validateInput('property_address_zipCode', zipCodeRegex, false)
     validateInput('property_address_city', cityRegex)
 
-    //ajoute un an à la date de fin de location
-    addOneYearToInput(document.getElementById("property_purchaseDate"), document.getElementById("property_mortgageEndDate"));
+    
+    document.addEventListener('focus', function(e) {
+        // Vérifie si l'élément qui a déclenché l'événement est un champ à valider
+        if (e.target.matches('[id^="property_mortgages"]')) {
+            let regex = null;
+            const id = e.target.id;        
+            // Valider le champ
+            validateInput(e.target.id, regex, null)
+        }
+    }, true);
 
 });
 </script>

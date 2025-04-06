@@ -1,7 +1,7 @@
 <?php
 namespace App\Enum;
 
-enum MortgageEnum: string {
+enum MortgageTypeEnum: string {
     case FIXE = 'Fixe';
     case SARON = 'Saron';
 }

@@ -2,10 +2,14 @@
 
 namespace App\Form;
 
+use App\Entity\Bank;
 use App\Entity\Lease;
 use App\Entity\Property;
-use App\Enum\AccessRoleEnum;
+use App\Form\TenantType;
 use App\Enum\RentalFeeEnum;
+use App\Enum\AccessRoleEnum;
+use Doctrine\ORM\QueryBuilder;
+use App\Repository\BankRepository;
 use App\Repository\PropertyRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -66,6 +70,17 @@ class LeaseType extends AbstractType
             ])
             ->add('parkingAmount')
             ->add('variousAmount')
+            ->add('bank', EntityType::class, [
+                'query_builder' => function (BankRepository $bankRepository):QueryBuilder {
+                    return $bankRepository->createQueryBuilder('b')
+                        ->where('b.createdBy = :createdBy')
+                        ->setParameter('createdBy', $this->security->getUser());
+                },
+                'class' => Bank::class,
+                'choice_label' => 'name',
+                'required' => true,
+                'label' => 'Banque pour le paiement',
+            ])
             ;
 
     }

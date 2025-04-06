@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Enum\MortgageEnum;
 use App\Enum\PropertyEnum;
 use App\Enum\AccessRoleEnum;
 use Doctrine\DBAL\Types\Types;
@@ -65,33 +64,8 @@ class Property
     private ?string $purchasePrice = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotNull]
     private ?\DateTimeInterface $purchaseDate = null;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    #[Assert\Regex(
-        pattern: "/^(10(?:[.,]0{1,2})?|[0-9](?:[.,][0-9]{1,2})?)$/",
-        message: 'Le taux hypothécaire doit contenir uniquement des chiffres et des virgules',
-    )]
-    private ?string $mortgageRate = null;
-
-    #[ORM\Column(enumType: MortgageEnum::class, nullable: true)]
-    private ?MortgageEnum $mortgageType = null;
-
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $mortgageEndDate = null;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    #[Assert\Regex(
-        pattern: "/^(10(?:[.,]0{1,2})?|[0-9](?:[.,][0-9]{1,2})?)$/",
-        message: 'Le taux hypothécaire doit contenir uniquement des chiffres et des virgules',
-    )]
-    private ?string $mortgageRate2 = null;
-
-    #[ORM\Column(enumType: MortgageEnum::class, nullable: true)]
-    private ?MortgageEnum $mortgageType2 = null;
-
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $mortgageEndDate2 = null;
 
     /**
      * @var Collection<int, AccessControl>
@@ -111,22 +85,24 @@ class Property
     )]
     private ?string $EGID = null;
 
-    private ?Lease $actualLease= null;
-
     /**
      * @var Collection<int, FinancialEntry>
      */
     #[ORM\OneToMany(targetEntity: FinancialEntry::class, mappedBy: 'property')]
     private Collection $financialEntries;
 
-    #[ORM\ManyToOne]
-    private ?Bank $bank = null;
-
     private float $totalRents = 0;
 
     private float $totalExpenses = 0;
 
     private float $unpaidRents = 0;
+
+    private ?Lease $actualLease= null;
+
+    /**
+     * @var Collection<int, Mortgage>
+     */
+     private Collection $actualMortgages;
 
     #[ORM\ManyToOne]
     private ?User $createdBy = null;
@@ -163,6 +139,12 @@ class Property
     #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2, nullable: true)]
     private ?string $ownerChargesDepositAmount = null;
 
+    /**
+     * @var Collection<int, Mortgage>
+     */
+    #[ORM\OneToMany(targetEntity: Mortgage::class, mappedBy: 'property', cascade:["persist", "remove"])]
+    private Collection $mortgages;
+
 
     public function __construct()
     {
@@ -173,6 +155,7 @@ class Property
         $this->updatedAt = new \DateTimeImmutable();
         $this->uploadFiles = new ArrayCollection();
         $this->folders = new ArrayCollection();
+        $this->mortgages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -251,86 +234,7 @@ class Property
 
         return $this;
     }
-
-    public function getMortgageRate(): ?string
-    {
-        return $this->mortgageRate;
-    }
-
-    public function setMortgageRate(?string $mortgageRate): static
-    {
-        $this->mortgageRate = $mortgageRate;
-
-        return $this;
-    }
-
-    /**
-     * @return MortgageEnum[]|null
-     */
-    public function getMortgageType(): ?MortgageEnum
-    {
-        return $this->mortgageType;
-    }
-
-    public function setMortgageType(?MortgageEnum $mortgageType): static
-    {
-        $this->mortgageType = $mortgageType;
-
-        return $this;
-    }
-
-    public function getMortgageEndDate(): ?\DateTimeInterface
-    {
-        return $this->mortgageEndDate;
-    }
-
-    public function setMortgageEndDate(?\DateTimeInterface $mortgageEndDate): static
-    {
-        $this->mortgageEndDate = $mortgageEndDate;
-
-        return $this;
-    }
-
-
-    public function getMortgageRate2(): ?string
-    {
-        return $this->mortgageRate2;
-    }
-
-    public function setMortgageRate2(?string $mortgageRate2): static
-    {
-        $this->mortgageRate2 = $mortgageRate2;
-
-        return $this;
-    }
-
-    /**
-     * @return MortgageEnum[]|null
-     */
-    public function getMortgageType2(): ?MortgageEnum
-    {
-        return $this->mortgageType2;
-    }
-
-    public function setMortgageType2(?MortgageEnum $mortgageType2): static
-    {
-        $this->mortgageType2 = $mortgageType2;
-
-        return $this;
-    }
-
-    public function getMortgageEndDate2(): ?\DateTimeInterface
-    {
-        return $this->mortgageEndDate2;
-    }
-
-    public function setMortgageEndDate2(?\DateTimeInterface $mortgageEndDate2): static
-    {
-        $this->mortgageEndDate2 = $mortgageEndDate2;
-
-        return $this;
-    }
-
+    
     /**
      * @return Collection<int, AccessControl>
      */
@@ -399,6 +303,23 @@ class Property
         return $this;
     }
 
+    public function addActualMoartgage(Mortgage $mortgage): static
+    {
+        if (!$this->actualMortgages->contains($mortgage)) {
+            $this->actualMortgages->add($mortgage);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Mortgage>
+     */
+    public function getActualMortgages(): Collection
+    {
+        return $this->actualMortgages;
+    }
+
     public function removeTenant(Tenant $tenant): static
     {
         if ($this->tenants->removeElement($tenant)) {
@@ -437,18 +358,6 @@ class Property
                 $financialEntry->setProperty(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getBank(): ?Bank
-    {
-        return $this->bank;
-    }
-
-    public function setBank(?Bank $bank): static
-    {
-        $this->bank = $bank;
 
         return $this;
     }
@@ -657,6 +566,36 @@ class Property
     public function setOwnerChargesDepositAmount(?string $ownerChargesDepositAmount): static
     {
         $this->ownerChargesDepositAmount = $ownerChargesDepositAmount;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Mortgage>
+     */
+    public function getMortgages(): Collection
+    {
+        return $this->mortgages;
+    }
+
+    public function addMortgage(Mortgage $mortgage): static
+    {
+        if (!$this->mortgages->contains($mortgage)) {
+            $this->mortgages->add($mortgage);
+            $mortgage->setProperty($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMortgage(Mortgage $mortgage): static
+    {
+        if ($this->mortgages->removeElement($mortgage)) {
+            // set the owning side to null (unless already changed)
+            if ($mortgage->getProperty() === $this) {
+                $mortgage->setProperty(null);
+            }
+        }
 
         return $this;
     }

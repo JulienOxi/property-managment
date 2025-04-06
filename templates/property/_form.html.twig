@@ -31,31 +31,18 @@
 
     {{ macros.field(form.purchasePrice, 'Prix d\'achat', '') }}
     {{ macros.field(form.purchaseDate, 'Date d\'achat', '') }}
-    {{ macros.field(form.bank, 'Banque', '') }}
     {{ macros.field(form.ownerChargesDepositAmount, 'Charges mensuelles', '') }}
 
 
     <div class="relative flex py-5 items-center col-span-3">
     <div class="flex-grow border-t border-gray-400"></div>
-    <span class="flex-shrink mx-4 text-gray-400">Première hypothèque</span>
+    <span class="flex-shrink mx-4 text-gray-400">Hypothèque</span>
     <div class="flex-grow border-t border-gray-400"></div>
     </div>
-
-    {{ macros.field(form.mortgageType, 'Type d\'hypothèque', '') }}
-    {{ macros.field(form.mortgageRate, 'Taux hypothécaire', '') }}
-    {{ macros.field(form.mortgageEndDate, 'Fin de l\'hypothèque', '') }}
-
-    <div class="relative flex py-5 items-center col-span-3">
-    <div class="flex-grow border-t border-gray-400"></div>
-    <span class="flex-shrink mx-4 text-gray-400">Seconde hypothèque</span>
-    <div class="flex-grow border-t border-gray-400"></div>
-    </div>
-
-    {{ macros.field(form.mortgageType2, 'Type d\'hypothèque', '') }}
-    {{ macros.field(form.mortgageRate2, 'Taux hypothécaire', '') }}
-    {{ macros.field(form.mortgageEndDate2, 'Fin de l\'hypothèque', '') }}
-
 </div>
+    {{ form_row(form.mortgages, {'attr': {'class': 'col-span-3 grid grid-cols-4 gap-2'}}) }}   
+
+
 
 <div>
     <button class="mt-4 py-2 px-4 bg-blue-600 text-white font-bold rounded hover:bg-blue-700">
