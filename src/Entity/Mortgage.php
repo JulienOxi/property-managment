@@ -6,6 +6,7 @@ use App\Enum\MortgageBillingPeriodEnum;
 use App\Enum\MortgageTypeEnum;
 use App\Repository\MortgageRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -44,9 +45,19 @@ class Mortgage
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 3)]
     private ?string $rate = null;
 
+    /**
+     * @var Collection<int, FinancialEntry>
+     */
+    #[ORM\OneToMany(targetEntity: FinancialEntry::class, mappedBy: 'mortgage')]
+    private Collection $financialEntries;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $amount = null;
+
     public function __construct()
     {
         $this->mortgagePayments = new ArrayCollection();
+        $this->financialEntries = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -134,6 +145,48 @@ class Mortgage
     public function setRate(string $rate): static
     {
         $this->rate = $rate;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FinancialEntry>
+     */
+    public function getFinancialEntries(): Collection
+    {
+        return $this->financialEntries;
+    }
+
+    public function addFinancialEntry(FinancialEntry $financialEntry): static
+    {
+        if (!$this->financialEntries->contains($financialEntry)) {
+            $this->financialEntries->add($financialEntry);
+            $financialEntry->setMortgage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFinancialEntry(FinancialEntry $financialEntry): static
+    {
+        if ($this->financialEntries->removeElement($financialEntry)) {
+            // set the owning side to null (unless already changed)
+            if ($financialEntry->getMortgage() === $this) {
+                $financialEntry->setMortgage(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAmount(): ?string
+    {
+        return $this->amount;
+    }
+
+    public function setAmount(?string $amount): static
+    {
+        $this->amount = $amount;
 
         return $this;
     }

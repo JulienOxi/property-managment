@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use Dom\Entity;
+use App\Entity\Mortgage;
 use App\Entity\Property;
 use App\Entity\UploadFile;
 use App\Enum\AccessRoleEnum;
@@ -11,7 +12,6 @@ use App\Entity\FinancialEntry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityRepository;
 use App\Enum\FinancialCategoryEnum;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormEvent;
 use App\Repository\PropertyRepository;
 use Symfony\Component\Form\FormEvents;
@@ -24,6 +24,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class FinancialEntryEditType extends AbstractType
 {
@@ -57,6 +58,12 @@ class FinancialEntryEditType extends AbstractType
                 $form = $event->getForm();                
                 $this->updateUploadFile($form, $data);
             })
+            //Ajout du chant mortgage
+            ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {  
+                $data = $event->getData();
+                $form = $event->getForm();                
+                $this->updateMortgage($form, $data);
+            })
         ;
     }
 
@@ -83,9 +90,35 @@ class FinancialEntryEditType extends AbstractType
             'mapped' => false
             ]);
         }
+    }
 
-       
-
+    /**
+     * Met à jour du champ "mortgage" en fonction de la catégorie sélectionnée.
+     *
+     * @param FormInterface $form Le formulaire.
+     * @param string|null   $type Le type de transaction.
+     */
+    private function updateMortgage($form, $data): void
+    {
+        if ($data->getCategory() !== null && $data->getCategory() === FinancialCategoryEnum::MORTGAGE) {
+            $form->add('mortgage', EntityType::class, [
+                'class' => Mortgage::class,
+                'query_builder' => function (EntityRepository $entityRepository) use ($data) {
+                    return $entityRepository->createQueryBuilder('e')
+                        ->where('e.property = :property')
+                        ->setParameter('property', $data->getProperty());
+                },
+                'placeholder' => 'Sélectionnez une hypothèque',
+                'choice_label' => function (Mortgage $mortgage) {
+                    return $mortgage->getBank()->getName() . ' - ' . $mortgage->getMortgageType()->value . ' ' . $mortgage->getRate() . '%';
+                },
+                'required' => false,
+            ]);
+        }else{
+            $form->add('mortgage', HiddenType::class, [
+                'mapped' => false,
+            ]);
+        }
     }
     
 

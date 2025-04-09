@@ -1,91 +1,109 @@
 {% extends 'base.html.twig' %}
 
 {% set pageName = "Banque" %}
-{% block title %}{{pageName}}{% endblock %}
-{% block pageName %}{{pageName}}{% endblock %}
+{% block title %}{{ pageName }}{% endblock %}
+{% block pageName %}{{ pageName }}{% endblock %}
 
 {% block body %}
-    <div class="container mx-auto p-4">
-        <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
-        <div class="my-4 flex justify-center">
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{ pageName }}</h1>
+
+    <div class="flex justify-center mb-6">
         <turbo-frame id="new_bank">
-            <a href="{{ path('app_bank_new') }}" class="inline-block btn-blue-to-emrald">Ajouter une banque</a>
+            <a href="{{ path('app_bank_new') }}" class="btn-blue-to-emrald">Ajouter une banque</a>
         </turbo-frame>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 flex items-start lg:grid-cols-3 gap-6">
-            {% for bank in banks %}
-                <div class="bg-white shadow-md rounded-lg overflow-hidden border-4 border-white hover:shadow-xl">
-                    <div class="p-4">
-                        <h2 class="text-xl font-semibold">{{ bank.name }}</h2>
-                        <hr class="m-2">
-                        <div class="m-3">
-                            {% if bank.email is not null %}                            
-                                <p><span class="bg-blue-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ bank.email }}</span></p>
-                            {% endif %}
-                            {% if bank.website is not null %}   
-                                <p class="mt-2"><span class="bg-emerald-200 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">{{ bank.website }}</span></p>
-                            {% endif %}
-                        </div>
-                        <hr class="m-2">
-                    </div>
-                    <div class="bg-white p-4">
-                        <ul>
-                            <li><strong>BIC:</strong> {{ bank.bic }}</li>
-                            <li><strong>IBAN:</strong> {{ bank.iban }} <a href="#" onclick="setClipboard('{{ bank.iban }}')"><span class="material-symbols-outlined text-sm">content_copy</span></a><span class="material-symbols-outlined text-xs text-green-500 hidden" id="iban-copied-success">check</span></li>
-                            {% if bank.ClearingNumber is not null %}
-                                <li><strong>Numéro de clearing:</strong> {{ bank.ClearingNumber }}</li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                    <hr class="m-2">
-                    <div class="p-4 flex justify-center bg-white gap-4">
-                        <a href="{{ path('app_bank_show', {'id': bank.id}) }}" class="inline-flex items-center border-[1px] border-blue-500 text-blue-500 font-semibold py-1 px-4 rounded hover:bg-blue-300 transition-colors">
-                            <span class="material-symbols-outlined text-sm mr-2">visibility</span>
-                            Voir
-                        </a>
-                        <a href="{{ path('app_bank_edit', {'id': bank.id}) }}" class="inline-flex items-center border-[1px] border-lime-500 text-lime-500 font-semibold py-1 px-4 rounded hover:bg-lime-300 transition-colors">
-                            <span class="material-symbols-outlined text-sm mr-2">edit</span>
-                            Modifier
-                        </a>
-                    </div>
-                </div>
-            {% else %}
-                <div class="col-span-full text-center text-gray-600">
-                    <div class="col-span-full text-center text-gray-600">
-                        <div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
-                            Aucune banque actuellement.
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
     </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for bank in banks %}
+            <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all border border-gray-100 relative">
+
+                <!-- Menu en haut de la carte -->
+                        <div class="relative" data-controller="menu">
+                        <img src="{{asset('media/user-background.jpg')}}" class="w-full h-48 object-cover opacity-50">
+                            <div class="absolute inset-0 flex items-start justify-between">
+                                <!-- Bouton Menu -->
+                                <span class="inline-block bg-gray-200 text-black text-sm font-semibold ml-2 px-2.5 pt-1 rounded mt-2 z-10 hover:bg-gray-400 cursor-pointer"
+                                    data-action="click->menu#toggle">
+                                    <span class="material-symbols-outlined">menu</span>
+                                </span>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <h2 class="text-white text-xl font-semibold text-center px-4 py-2 bg-gray-800/50 w-full">
+                                    {{ bank.name }}
+                                </h2>
+                            </div>
+
+                            <!-- Menu déroulant -->
+                            <div data-menu-target="menu" class="hidden absolute top-10 left-2 bg-white shadow-md rounded-lg border border-black py-2 w-40 z-20">
+                                <a href="{{ path('app_bank_edit', {'id': bank.id}) }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <span class="material-symbols-outlined text-sm">edit</span> Modifier
+                                </a>
+                                <a href="{{ path('app_bank_show', {'id': bank.id}) }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <span class="material-symbols-outlined text-sm">visibility</span> Voir
+                                </a>
+                            </div>
+                        </div>
+
+                <!-- Contenu principal de la carte -->
+                <div class="p-6 pt-4">
+                    {% if bank.email %}
+                        <p class="text-sm text-gray-600">
+                            <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                                {{ bank.email }}
+                            </span>
+                        </p>
+                    {% endif %}
+
+                    {% if bank.website %}
+                        <p class="text-sm text-gray-600 mt-2">
+                            <span class="inline-block bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full text-xs font-medium">
+                                {{ bank.website }}
+                            </span>
+                        </p>
+                    {% endif %}
+
+                    <div class="mt-4 text-sm text-gray-700 space-y-1">
+                        <p><strong>BIC :</strong> {{ bank.bic }}</p>
+                        <p>
+                            <strong>IBAN :</strong> {{ bank.iban }}
+                            <button onclick="setClipboard('{{ bank.iban }}')" class="ml-2 text-blue-500 hover:text-blue-700">
+                                <span class="material-symbols-outlined text-base align-middle">content_copy</span>
+                            </button>
+                            <span class="material-symbols-outlined text-sm text-green-500 hidden" id="iban-copied-success">check</span>
+                        </p>
+                        {% if bank.ClearingNumber %}
+                            <p><strong>Numéro de clearing :</strong> {{ bank.ClearingNumber }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-span-full text-center">
+                <div class="bg-yellow-100 text-yellow-800 font-medium px-4 py-2 rounded-lg">
+                    Aucune banque actuellement.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
 
 {% block javascripts %}
 <script>
 function setClipboard(text) {
-  const ibanCopiedSuccess = document.getElementById('iban-copied-success');
-
-  navigator.clipboard.writeText(text).then(
-    function () {
-      ibanCopiedSuccess.classList.remove('hidden');
-      setTimeout(() => {
-        ibanCopiedSuccess.classList.add('hidden');
-      }, 2000);
-    },
-    function (e) {
-      alert("Erreur lors de la copie dans le presse-papier :"+e);
-    },
-  );
+    const ibanCopiedSuccess = document.getElementById('iban-copied-success');
+    navigator.clipboard.writeText(text).then(() => {
+        ibanCopiedSuccess.classList.remove('hidden');
+        setTimeout(() => ibanCopiedSuccess.classList.add('hidden'), 2000);
+    }).catch((e) => {
+        alert("Erreur lors de la copie : " + e);
+    });
 }
 
-</script>
-
-<script>
 window.addEventListener("load", () => {
-    document.getElementById("menu_btn_bank").classList.add("menu-btn-active");
-})
+    const menuBtn = document.getElementById("menu_btn_bank");
+    if (menuBtn) menuBtn.classList.add("menu-btn-active");
+});
 </script>
 {% endblock %}
-

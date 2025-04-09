@@ -66,6 +66,9 @@ class FinancialEntry
     #[ORM\ManyToOne(inversedBy: 'financialEntries')]
     private ?Lease $lease = null;
 
+    #[ORM\ManyToOne(inversedBy: 'financialEntries')]
+    private ?Mortgage $mortgage = null;
+
     public function __construct(){
         $this->createdAt = new \DateTimeImmutable();
     }
@@ -202,6 +205,18 @@ class FinancialEntry
     public function setLease(?Lease $lease): static
     {
         $this->lease = $lease;
+
+        return $this;
+    }
+
+    public function getMortgage(): ?Mortgage
+    {
+        return $this->mortgage;
+    }
+
+    public function setMortgage(?Mortgage $mortgage): static
+    {
+        $this->mortgage = $mortgage;
 
         return $this;
     }

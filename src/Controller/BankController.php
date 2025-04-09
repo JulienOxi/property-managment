@@ -85,8 +85,8 @@ final class BankController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $dateFrom = $form->get('dateFrom')->getData();
             $dateTo = $form->get('dateTo')->getData();
-            $sortAmountIncome = $financialEntryRepository->findSumAmountBetweenTwoDates($bank, $dateFrom, $dateTo, TransactionEnum::INCOME);
-            $sortAmountExpense = $financialEntryRepository->findSumAmountBetweenTwoDates($bank, $dateFrom, $dateTo, TransactionEnum::EXPENSE);            
+            $sortAmountIncome = $financialEntryRepository->findSumAmountBetweenTwoDates( $dateFrom, $dateTo, TransactionEnum::INCOME, $bank);
+            $sortAmountExpense = $financialEntryRepository->findSumAmountBetweenTwoDates($dateFrom, $dateTo, TransactionEnum::EXPENSE, $bank);            
             $sortTotalAmount = $sortAmountIncome - $sortAmountExpense;
 
             //création du graphique
@@ -122,8 +122,8 @@ final class BankController extends AbstractController
             $dateTo = new \DateTime('last day of this month');
         }
         
-        $totalAmountIncome = $financialEntryRepository->findSumAmountBetweenTwoDates($bank, new \DateTime('2000-01-01'), new \DateTime('+1 year'), TransactionEnum::INCOME);
-        $totalAmountExpense = $financialEntryRepository->findSumAmountBetweenTwoDates($bank, new \DateTime('2000-01-01'), new \DateTime('+1 year'), TransactionEnum::EXPENSE);
+        $totalAmountIncome = $financialEntryRepository->findSumAmountBetweenTwoDates( new \DateTime('2000-01-01'), new \DateTime('+1 year'), TransactionEnum::INCOME, $bank);
+        $totalAmountExpense = $financialEntryRepository->findSumAmountBetweenTwoDates(new \DateTime('2000-01-01'), new \DateTime('+1 year'), TransactionEnum::EXPENSE, $bank);
         $totalAmount = $totalAmountIncome - $totalAmountExpense;
 
         return $this->render('bank/show.html.twig', [

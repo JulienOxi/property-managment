@@ -98,7 +98,9 @@
                             </div>
                             <form method="POST" action="{{ path('app_rent_generate_from_lease', {'lease': lease.id}) }}">
                                 <input type="hidden" name="_csrf_token" value="{{ csrfToken }}">
-                                <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded shadow hover:bg-amber-600">Générer les loyers</button>
+                                <button type="submit" class="inline-flex items-center gap-1 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 font-medium px-3 py-1.5 rounded-xl transition">
+                                    <span class="material-symbols-outlined text-sm">autorenew</span> Générer les loyers
+                                </button>
                             </form>
                         {% endif %}
                     </div>

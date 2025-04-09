@@ -149,6 +149,7 @@ final class PropertyController extends AbstractController
             }
         }
 
+
         //selection des fichiers
         $uploadsFiles = $uploadFileRepository->findFilesWithoutEntity($property->getId(), 'document');
 
@@ -167,7 +168,8 @@ final class PropertyController extends AbstractController
             'uploads' => null,
             'financialEntrys' => $shortFinancialEntrys,
             'financialDeposit' => $shortFinancialDeposit,
-            'mortgages' => $shortMortgages,
+            'shortMortgages' => $shortMortgages,
+            'mortgages' => $propertyService->getActualMortgages($property, new \DateTime($year.'-12-31')), //selection des hypothèques actuelles pour chaque année au 31.12
             'uploadsFiles' => $uploadsFiles,
             'uploadsImages' => $uploadsImages
         ]);

@@ -8,6 +8,20 @@
     {{ macros.field(form.paidAt, 'Payé le', '') }} 
     {{ macros.field(form.isPaid, 'Montant payé', '') }} 
 
+    {# affichage du chant hypotèque #}
+        {% if form.mortgage.vars.choices is defined and form.mortgage.vars.choices is not empty %}
+            <div class="relative flex py-5 items-center col-span-3">
+                <div class="flex-grow border-t border-gray-400"></div>
+                <span class="flex-shrink mx-4 text-gray-400">hypotèque</span>
+                <div class="flex-grow border-t border-gray-400"></div>
+            </div>
+            {{ macros.field(form.mortgage, 'Selectionner une hypotèque', 'col-span-3') }} 
+        {% else %}
+            <div class="hidden">
+            {{ macros.field(form.mortgage, '', '') }} 
+            </div>
+        {% endif %}
+
     {# //uniquement pour la mise à jour d'une transaction, on control si il existe déjà un fichier joint avec cette dernière #}
     {% if uploaded_file is defined and uploaded_file is not empty %}
         <div class="relative flex py-5 items-center col-span-3">

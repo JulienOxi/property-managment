@@ -40,32 +40,37 @@ document.addEventListener("DOMContentLoaded", () => {
 <script>
 //permet de generer l'url pour le tri des catégories et afficher uniquement les catégories en foncitron des "entrées" ou "sorties"
 document.addEventListener("DOMContentLoaded", function () {
+    const baseUrl = '{{ path("app_financial_entry_new") }}'; // Twig injecte l'URL
     const urlParams = new URLSearchParams(window.location.search);
-    const typeFields = document.querySelectorAll('select[name="financial_entry_new[type]"]');
-    let baseUrl = '{{ path("app_financial_entry_new") }}'; // Twig génère l'URL en tant que string JS
 
-    typeFields.forEach(field => {
-        field.addEventListener("change", function () {
-            if (urlParams.has('property')) {
-                window.location.href = baseUrl + '?property=' + urlParams.get('property') + '&type=' + encodeURIComponent(this.value);
-            }else{
-                window.location.href = baseUrl + '?type=' + encodeURIComponent(this.value);
-            } 
+    const fieldSelectors = {
+        property: 'select[name="financial_entry_new[property]"]',
+        type: 'select[name="financial_entry_new[type]"]',
+        category: 'select[name="financial_entry_new[category]"]',
+    };
+
+    function updateURL(updatedKey, updatedValue) {
+        const params = new URLSearchParams();
+
+        // Conserve les anciennes valeurs s’il y en a
+        Object.keys(fieldSelectors).forEach(key => {
+            const field = document.querySelector(fieldSelectors[key]);
+            if (field && (key === updatedKey || field.value)) {
+                params.set(key, key === updatedKey ? updatedValue : field.value);
+            }
+        });
+
+        window.location.href = baseUrl + '?' + params.toString();
+    }
+
+    Object.entries(fieldSelectors).forEach(([key, selector]) => {
+        const fields = document.querySelectorAll(selector);
+        fields.forEach(field => {
+            field.addEventListener("change", function () {
+                updateURL(key, this.value);
+            });
         });
     });
-
-
-    const propertyFields = document.querySelectorAll('select[name="financial_entry_new[property]"]');
-
-    propertyFields.forEach(field => {
-        field.addEventListener("change", function () {
-            if (urlParams.has('type')) {
-                window.location.href = baseUrl + '?type=' + urlParams.get('type') + '&property=' + encodeURIComponent(this.value);
-            }else{
-                window.location.href = baseUrl + '?property=' + encodeURIComponent(this.value);
-            }        
-        });
-    })
 });
 </script>
 

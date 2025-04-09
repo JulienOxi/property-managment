@@ -7,6 +7,7 @@ use App\Entity\UploadFile;
 use App\Enum\AccessRoleEnum;
 use App\Service\DateService;
 use App\Service\EnumService;
+use App\Service\PropertyService;
 use BadRequestHttpException;
 use App\Enum\TransactionEnum;
 use App\Entity\FinancialEntry;
@@ -98,7 +99,7 @@ final class FinancialEntryController extends AbstractController
     }
 
     #[Route('/new', name: 'app_financial_entry_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, PropertyService $propertyService): Response
     {
         $financialEntry = new FinancialEntry();
 
@@ -135,7 +136,7 @@ final class FinancialEntryController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $financialEntry->setCreatedBy($this->getUser())
-                ->setBank($financialEntry->getProperty()->getBank());
+                ->setBank($propertyService->getActualMortgages($financialEntry->getProperty())[0]->getBank());
             $entityManager->persist($financialEntry);
             $entityManager->flush();
 

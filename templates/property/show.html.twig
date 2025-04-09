@@ -176,7 +176,16 @@
 													{% if rentKey in financialEntrys|keys %}
 														{% set selectedEntry = financialEntrys[rentKey] %}
 														<td class="text-xs hidden lg:table-cell">
-															{# {{ selectedEntry.tenant ? selectedEntry.tenant.fullname : 'NULL' }} #}NULL
+															{% if selectedEntry.lease is not null and selectedEntry.lease.tenants is not empty %}
+																{% set nb_of_tenants = selectedEntry.lease.tenants|length %}
+																{% if nb_of_tenants == 1 %}
+																	{{ selectedEntry.lease.tenants[0].fullname }}
+																{% else %}
+																	{% for tenant in selectedEntry.lease.tenants %}
+																		<p>{{tenant.firstname|first}}. {{tenant.lastname}}</p>
+																	{% endfor %}
+																{% endif %}
+															{% endif %}
 														</td>
 													{% else %}
 														<td class="text-xs hidden lg:table-cell"></td>
@@ -248,9 +257,8 @@
 										</tbody>
 									</table>
 								</div>
-								<div class="flex overflow-x-auto gap-4 mt-4">
-									{# {% include "templates/property/_mortgage_table.html.twig" %} #}
-								</div>
+	
+									{% include "property/_mortgage_table.html.twig" %}
 							</div>
 						</div> {# fin card loyer #}
 						{# Locataire #}

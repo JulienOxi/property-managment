@@ -249,14 +249,14 @@ final class LeaseController extends AbstractController
 
 
         // Vérification et création des entrées financières
-        foreach ($actualRent as $name => $amount) { //actualRent = $type => amount
+        foreach ($actualRent as $name => $amount) { //actualRent = $type => amount (exemple : RENT => 1000)
             foreach ($fullMonth[$name] as $monthsAndYear) {
-                foreach ($monthsAndYear as $monthAndYear) {
+                foreach ($monthsAndYear as $monthAndYear) { 
                     $paymentPeriod = $dateService->withinRentPaymentPeriod($monthAndYear['month'], $monthAndYear['year']);
                     $property = $lease->getProperty();
                     $category = $enumService->mapStringToFinancialCategory($name);
 
-                    // Vérifier si un paiement existe déjà
+                    // Vérifier si un paiement existe déjà dans la période de paiement par default entre le 25 du mois précédent et le 5 du mois en cours
                     $existingEntry = $financialEntryRepository->findBetweenTwoDates($property, $paymentPeriod['start'], $paymentPeriod['end'], TransactionEnum::INCOME, $category);
                     $existingDeposit = $financialEntryRepository->findBetweenTwoDates($property, $paymentPeriod['start'], $paymentPeriod['end'], TransactionEnum::EXPENSE, FinancialCategoryEnum::CHARGES_DEPOSIT_OWNER);
 

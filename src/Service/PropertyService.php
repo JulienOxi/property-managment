@@ -44,9 +44,8 @@ class PropertyService{
     /**
     * Retourne toutes les hypotèque actuelles
     */
-    public function getActualMortgages($property){
+    public function getActualMortgages($property, \DateTimeImmutable|\datetime $now = new \DateTime()){
         $actualMortgages = [];
-        $now = new \DateTime();
         foreach($property->getMortgages() as $mortgage){
             if($mortgage->getToAt() >= $now && $mortgage->getFromAt() <= $now){
                 $actualMortgages[] = $mortgage;
