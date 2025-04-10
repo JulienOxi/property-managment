@@ -173,6 +173,7 @@ class FinancialEntryNewType extends AbstractType
         if ($data->getCategory() !== null && $data->getCategory() === FinancialCategoryEnum::MORTGAGE) {
             $form->add('mortgage', EntityType::class, [
                 'class' => Mortgage::class,
+                'required' => true,
                 'query_builder' => function (EntityRepository $entityRepository) use ($data) {
                     return $entityRepository->createQueryBuilder('e')
                         ->where('e.property = :property')
@@ -182,7 +183,6 @@ class FinancialEntryNewType extends AbstractType
                 'choice_label' => function (Mortgage $mortgage) {
                     return $mortgage->getBank()->getName() . ' - ' . $mortgage->getMortgageType()->value . ' ' . $mortgage->getRate() . '%';
                 },
-                'required' => false,
             ]);
         }else{
             $form->add('mortgage', HiddenType::class, [

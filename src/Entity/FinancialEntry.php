@@ -60,7 +60,7 @@ class FinancialEntry
     private ?\DateTimeImmutable $paidAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'financialEntries')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Bank $bank = null;
 
     #[ORM\ManyToOne(inversedBy: 'financialEntries')]

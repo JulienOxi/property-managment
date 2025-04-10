@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use Dom\Entity;
+use App\Entity\Bank;
 use App\Entity\Mortgage;
 use App\Entity\Property;
 use App\Entity\UploadFile;
@@ -10,6 +11,7 @@ use App\Enum\AccessRoleEnum;
 use App\Enum\TransactionEnum;
 use App\Entity\FinancialEntry;
 use Doctrine\ORM\QueryBuilder;
+use App\Repository\BankRepository;
 use Doctrine\ORM\EntityRepository;
 use App\Enum\FinancialCategoryEnum;
 use Symfony\Component\Form\FormEvent;
@@ -52,6 +54,18 @@ class FinancialEntryEditType extends AbstractType
             ->add('paidAt', DateType::class, [
                 'widget' => 'single_text',
             ])
+            ->add('bank', EntityType::class, [
+                'query_builder' => function (BankRepository $bankRepository):QueryBuilder {
+                    return $bankRepository->createQueryBuilder('b')
+                        ->where('b.createdBy = :createdBy')
+                        ->setParameter('createdBy', $this->security->getUser());
+                },
+                'class' => Bank::class,
+                'choice_label' => 'name',
+                'required' => true,
+                'label' => 'Etablissement bancaire',
+                'placeholder' => 'Sélectionnez un établissement bancaire',
+            ])            
             //Ajout du chant UploadFile
             ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {  
                 $data = $event->getData();
@@ -112,7 +126,7 @@ class FinancialEntryEditType extends AbstractType
                 'choice_label' => function (Mortgage $mortgage) {
                     return $mortgage->getBank()->getName() . ' - ' . $mortgage->getMortgageType()->value . ' ' . $mortgage->getRate() . '%';
                 },
-                'required' => false,
+                'required' => true,
             ]);
         }else{
             $form->add('mortgage', HiddenType::class, [

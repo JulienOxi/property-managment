@@ -5,7 +5,6 @@
 {% block title %}{{pageName}}{% endblock %}
 {% block pageName %}{{pageName}}{% endblock %}
 
-
 {% block body %}
 <div class="container mx-auto px-4 py-6">
     <h1 class="text-2xl font-bold mb-6 text-center md:hidden">{{pageName}}</h1>
@@ -19,14 +18,13 @@
         <div class="flex-grow border-t border-gray-400"></div>
     </div>
 
-{% if properties is not empty %}
-    
-    {# formulaire de recherche #}
-    <div class="my-2 flex justify-center">
-        {{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
-            <div class="space-y-4">
-                <div data-controller='update-financial-url' data-update-financial-url-base-url-value="{{ path('app_financial_entry_index') }}">
-                    <!-- Propriétés -->
+    {% if properties is not empty %}
+        <!-- Accordéon pour filtres -->
+        <details class="mb-4 bg-white p-4 rounded shadow" open>
+            <summary class="text-sm font-semibold cursor-pointer">Filtres de recherche</summary>
+            <div class="mt-4">
+                {{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
+                <div class="space-y-4" data-controller='update-financial-url' data-update-financial-url-base-url-value="{{ path('app_financial_entry_index') }}">
                     <div>
                         <h3 class="text-sm font-medium text-gray-900 mb-2">Propriétés</h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -38,8 +36,6 @@
                             {% endfor %}
                         </div>
                     </div>
-
-                    <!-- Type -->
                     <div>
                         <h3 class="text-sm font-medium text-gray-900 mb-2">Types de Transaction</h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -51,58 +47,42 @@
                             {% endfor %}
                         </div>
                     </div>
-                </div>
-
-                <!-- Catégorie -->
-                {% if form.category is empty %}
-                    <div class="hidden">
-                    {# on affiche quand même la catégories mais cachée #}
-                        {{ form_row(form.category) }} 
-                    </div>
-                {% else %}
-                    <div data-controller="checkbox-selector">
-                        <h3 class="text-sm font-medium text-gray-900 mb-2">Catégories</h3>
-
-                        <!-- Checkbox "Tout sélectionner" -->
-                        <label class="flex items-center p-2 border rounded-lg shadow-sm bg-white text-sm">
-                            <input 
-                                type="checkbox" 
-                                data-action="change->checkbox-selector#toggleSelection"
-                                data-checkbox-selector-target="selectAll"
-                            >
-                            <span class="ml-2 font-semibold text-gray-900">Tout sélectionner</span>
-                        </label>
-
-                        <!-- Liste des catégories -->
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2" data-checkbox-selector-target="checkboxes">
-                            {% for child in form.category %}
-                                <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
-                                    {{ form_widget(child, {'attr': {'data-checkbox-selector-target': 'checkbox'}}) }}
-                                    <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
-                                </label>
-                            {% endfor %}
+                    {% if form.category is empty %}
+                        <div class="hidden">
+                            {{ form_row(form.category) }}
                         </div>
+                    {% else %}
+                        <div data-controller="checkbox-selector">
+                            <h3 class="text-sm font-medium text-gray-900 mb-2">Catégories</h3>
+                            <label class="flex items-center p-2 mb-2 border rounded-lg shadow-sm bg-white text-sm">
+                                <input type="checkbox" data-action="change->checkbox-selector#toggleSelection" data-checkbox-selector-target="selectAll">
+                                <span class="ml-2 font-semibold text-gray-900">Tout sélectionner</span>
+                            </label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2" data-checkbox-selector-target="checkboxes">
+                                {% for child in form.category %}
+                                    <label class="flex items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer bg-white text-sm">
+                                        {{ form_widget(child, {'attr': {'data-checkbox-selector-target': 'checkbox'}}) }}
+                                        <span class="ml-2 text-gray-700">{{ child.vars.label }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="flex justify-center">
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">Filtrer</button>
                     </div>
-                {% endif %}
-
-                <div class="flex justify-center">
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">Filtrer</button>
                 </div>
+                {{ form_end(form) }}
             </div>
-        {{ form_end(form) }}
-    </div>
+        </details>
+    {% else %}
+        <div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
+            Vous devez ajoutez une Propriété avant de pouvoir effectuer une recherche et ajouter une transaction financière.
+        </div>
+    {% endif %}
 
-{% else %}
-
-<div class="my-2 flex justify-center bg-amber-500 px-5 my-4 rounded-lg">
-    Vous devez ajoutez une Propriété avant de pouvoir effectuer une recherche et ajouter une transaction financière.
-</div>
-{% endif %}
-
-
-{# fin du formulaire de recherche #}
-    
-    <div class="overflow-x-auto">
+    <!-- Table desktop -->
+    <div class="hidden lg:block overflow-x-auto">
         <table class="min-w-full bg-white shadow-md rounded-lg">
             <thead class="bg-gray-800 text-white">
                 <tr>
@@ -118,7 +98,12 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
                 {% for financial_entry in financial_entries %}
-                    <tr>
+                    {% if financial_entry.bank is null %}
+                        <tr class="bg-red-100">
+                    {% else %}
+                        <tr>
+                    {% endif %}
+                    
                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">{{ financial_entry.type.value }}</td>
                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.category.value }}</td>
                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.amount }} CHF</td>
@@ -127,7 +112,7 @@
                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ financial_entry.isPaid ? '<p class="text-green-500">Oui</p>' : '<p class="text-red-500">Non</p>' }}</td>
                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">{{ financial_entry.paidAt ? financial_entry.paidAt|date('d-m-Y') : 'N/A' }}</td>
                         <td class="px-2 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="{{ path('app_financial_entry_edit', {'id': financial_entry.id}) }}" class="hidden border-[1px] border-lime-500 text-lime-500 font-semibold pt-1 pb-0 px-1 rounded hover:bg-lime-200 md:inline-block">
+                            <a href="{{ path('app_financial_entry_edit', {'id': financial_entry.id}) }}" class="border-[1px] border-lime-500 text-lime-500 font-semibold pt-1 pb-0 px-1 rounded hover:bg-lime-200">
                                <span class="material-symbols-outlined text-sm">edit</span> 
                             </a>
                         </td>
@@ -139,60 +124,51 @@
                 {% endfor %}
             </tbody>
         </table>
-{# Pagination #}
-<div class="navigation flex justify-center my-4">
-    <ul class="pagination flex list-none">
-        {% if financial_entries.currentPageNumber > 1 %}
-            <li class="page-item">
-                <a class="hidden page-link px-3 py-1 border border-gray-300 rounded-l-lg hover:bg-gray-100 md:inline" 
-                   href="{{ path('app_financial_entry_index', queryParams|merge({ page: financial_entries.currentPageNumber - 1 })) }}">
-                    Précédent
-                </a>
-                <a class="page-link px-3 py-1 border border-gray-300 rounded-l-lg hover:bg-gray-100 md:hidden" 
-                   href="{{ path('app_financial_entry_index', queryParams|merge({ page: financial_entries.currentPageNumber - 1 })) }}">
-                    <
-                </a>
-            </li>
-        {% endif %}
+    </div>
 
-        {% for page in 1..financial_entries.pageCount %}
-            {% if page == financial_entries.currentPageNumber %}
-                <li class="page-item">
-                    <span class="page-link px-3 py-1 border border-gray-300 bg-gray-200">{{ page }}</span>
-                </li>
-            {% else %}
-                <li class="page-item">
-                    <a class="page-link px-3 py-1 border border-gray-300 hover:bg-gray-100" 
-                       href="{{ path('app_financial_entry_index', queryParams|merge({ page: page })) }}">
-                        {{ page }}
+    <!-- Vue mobile -->
+    <div class="space-y-4 lg:hidden">
+        {% for financial_entry in financial_entries %}
+            <div class="bg-white p-4 shadow rounded-md border">
+                <div class="flex justify-between">
+                    <span class="text-xs font-bold text-gray-50 bg-stone-400 rounded-md px-2">{{ financial_entry.category.value }}</span>
+                    <span class="text-sm font-semibold text-gray-800">{{ financial_entry.amount }} CHF</span>
+                </div>
+                <div class="text-sm text-gray-500 mt-1">
+                    <p><strong>Type :</strong> {{ financial_entry.type.value }}</p>
+                    <p><strong>Payé :</strong> {% if financial_entry.isPaid %}<span class="text-green-600">Oui</span>{% else %}<span class="text-red-600">Non</span>{% endif %}</p>
+                    {% if financial_entry.paidAt %}<p><strong>Payé le :</strong> {{ financial_entry.paidAt|date('d-m-Y') }}</p>{% endif %}
+                </div>
+                <div class="mt-2 text-right">
+                    <a href="{{ path('app_financial_entry_edit', {'id': financial_entry.id}) }}" class="border-[1px] border-lime-500 text-lime-500 font-semibold pt-1 pb-0 px-1 rounded hover:bg-lime-200">
+                        <span class="material-symbols-outlined text-sm">edit</span> 
                     </a>
-                </li>
-            {% endif %}
+                </div>
+            </div>
         {% endfor %}
+    </div>
 
-        {% if financial_entries.currentPageNumber < financial_entries.pageCount %}
-            <li class="page-item">
-                <a class="hidden page-link px-3 py-1 border border-gray-300 rounded-r-lg hover:bg-gray-100 md:inline" 
-                   href="{{ path('app_financial_entry_index', queryParams|merge({ page: financial_entries.currentPageNumber + 1 })) }}">
-                    Suivant
-                </a>
-                <a class="page-link px-3 py-1 border border-gray-300 rounded-r-lg hover:bg-gray-100 md:hidden" 
-                   href="{{ path('app_financial_entry_index', queryParams|merge({ page: financial_entries.currentPageNumber + 1 })) }}">
-                    >
-                </a>
-            </li>
-        {% endif %}
-    </ul>
-</div>
-{# endpagination #}
-
+    <div class="navigation flex justify-center my-4">
+        <ul class="pagination flex list-none gap-1">
+            {% if financial_entries.currentPageNumber > 1 %}
+                <li><a class="inline-block bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-sm font-semibold" href="{{ path('app_financial_entry_index', queryParams|merge({ page: financial_entries.currentPageNumber - 1 })) }}">&lt;</a></li>
+            {% endif %}
+            {% for page in 1..financial_entries.pageCount %}
+                {% if page == financial_entries.currentPageNumber %}
+                    <li><span class="inline-block px-3 py-1 bg-gray-300 rounded text-sm">{{ page }}</span></li>
+                {% else %}
+                    <li><a class="inline-block bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded text-sm" href="{{ path('app_financial_entry_index', queryParams|merge({ page: page })) }}">{{ page }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if financial_entries.currentPageNumber < financial_entries.pageCount %}
+                <li><a class="inline-block bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-sm font-semibold" href="{{ path('app_financial_entry_index', queryParams|merge({ page: financial_entries.currentPageNumber + 1 })) }}">&gt;</a></li>
+            {% endif %}
+        </ul>
     </div>
 </div>
-
 {% endblock %}
 
 {% block javascripts %}
-
 <script>
 window.addEventListener("load", () => {
     document.getElementById("menu_btn_finance").classList.add("menu-btn-active");

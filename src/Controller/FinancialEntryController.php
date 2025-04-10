@@ -135,8 +135,10 @@ final class FinancialEntryController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            $mortgage = $propertyService->getActualMortgages($financialEntry->getProperty())[0] ?? null; //on récupère la première hypothèque si elle existe
+
             $financialEntry->setCreatedBy($this->getUser())
-                ->setBank($propertyService->getActualMortgages($financialEntry->getProperty())[0]->getBank());
+                ->setBank($mortgage->getBank() ?? null);
             $entityManager->persist($financialEntry);
             $entityManager->flush();
 

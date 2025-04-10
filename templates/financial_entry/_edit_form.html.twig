@@ -7,6 +7,7 @@
     {{ macros.field(form.amount, 'Montant', '') }} 
     {{ macros.field(form.paidAt, 'Payé le', '') }} 
     {{ macros.field(form.isPaid, 'Montant payé', '') }} 
+    {{ macros.field(form.bank, 'Etablissement bancaire', 'md:col-span-3') }} 
 
     {# affichage du chant hypotèque #}
         {% if form.mortgage.vars.choices is defined and form.mortgage.vars.choices is not empty %}
