@@ -10,6 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 use App\Repository\BankRepository;
 use App\Enum\MortgageBillingPeriodEnum;
 use Symfony\Component\Form\AbstractType;
+use App\Enum\MortgageAmortizationTypeEnum;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -56,6 +57,27 @@ class MortgageType extends AbstractType
                 'label' => 'Taux (%)',
                 'attr' => [
                     'placeholder' => 'Taux en pourcent',
+                ],
+            ])
+            ->add('amount', null, [
+                'label' => 'Montant de l\'hypothèque',
+                'required' => true,
+            ])
+            ->add('amortizationType', ChoiceType::class, [
+                'choices' => MortgageAmortizationTypeEnum::cases(),
+                'choice_label' => fn(MortgageAmortizationTypeEnum $type) => $type->value,
+                'choice_value' => fn(?MortgageAmortizationTypeEnum $type) => $type?->name,
+                'label' => 'Type d\'amortissement',
+                'attr' => [
+                    'class' => 'js-amortization-type', // pour le JS
+                ]
+            ])
+            ->add('amortization', null, [
+                'label' => 'Amortissement (%)',
+                'required' => false,
+                'attr' => [
+                    'class' => 'js-amortization-field transition-all duration-300 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed',
+                    'disabled' => true,
                 ],
             ])
             ->add('bank', EntityType::class, [

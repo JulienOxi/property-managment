@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Sortie': [
                     { value: 'WATER', label: 'Eau' },
                     { value: 'HEATER', label: 'Chauffage' },
-                    { value: 'MORTAGE', label: 'Hypotèque' },
+                    { value: 'MORTAGE', label: 'Hypothèque' },
                     { value: 'TAXES', label: 'Impôts' },
                     { value: 'MAINTENANCE', label: 'Maintenance' },
                     { value: 'INSURANCE', label: 'Assurance' },

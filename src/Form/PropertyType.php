@@ -57,7 +57,7 @@ class PropertyType extends AbstractType
                 ],
                 'attr' => [
                     'data-controller' => 'form-collection',
-                    'data-form-collection-btnadd-value' => 'Ajouter une hypotèque',
+                    'data-form-collection-btnadd-value' => 'Ajouter une hypothèque',
                 ]
             ])
             ->add('EWID')

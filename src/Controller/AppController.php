@@ -56,10 +56,10 @@ class AppController extends AbstractController
                 $totalPropertyWithoutActiveLease++;
             }
 
-            //ajoute toutes les hypotèques à la liste
+            //ajoute toutes les hypothques à la liste
             foreach ($property->getMortgages() as $mortgage) {
                 if($mortgage->getToAt() >= new \DateTime()){
-                    array_push($deadlines,['type' => 'Hypotèque', 'name' => $mortgage->getBank()->getName(), 'date' => $mortgage->getToAt(), 'property' => $mortgage->getProperty()->getName()]);
+                    array_push($deadlines,['type' => 'Hypothèque', 'name' => $mortgage->getBank()->getName(), 'date' => $mortgage->getToAt(), 'property' => $mortgage->getProperty()->getName()]);
                 }
             }
             if($property->getActualLease() != null){

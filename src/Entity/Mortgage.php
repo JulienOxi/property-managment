@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\MortgageAmortizationTypeEnum;
 use App\Enum\MortgageBillingPeriodEnum;
 use App\Enum\MortgageTypeEnum;
 use App\Repository\MortgageRepository;
@@ -53,6 +54,12 @@ class Mortgage
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $amount = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, nullable: true)]
+    private ?string $amortization = null;
+
+    #[ORM\Column(nullable: true, enumType: MortgageAmortizationTypeEnum::class)]
+    private ?MortgageAmortizationTypeEnum $amortizationType = null;
 
     public function __construct()
     {
@@ -187,6 +194,30 @@ class Mortgage
     public function setAmount(?string $amount): static
     {
         $this->amount = $amount;
+
+        return $this;
+    }
+
+    public function getAmortization(): ?string
+    {
+        return $this->amortization;
+    }
+
+    public function setAmortization(?string $amortization): static
+    {
+        $this->amortization = $amortization;
+
+        return $this;
+    }
+
+    public function getAmortizationType(): ?MortgageAmortizationTypeEnum
+    {
+        return $this->amortizationType;
+    }
+
+    public function setAmortizationType(?MortgageAmortizationTypeEnum $amortizationType): static
+    {
+        $this->amortizationType = $amortizationType;
 
         return $this;
     }

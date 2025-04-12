@@ -4,4 +4,5 @@ namespace App\Enum;
 enum MortgageTypeEnum: string {
     case FIXE = 'Fixe';
     case SARON = 'Saron';
+    case VARIABLE_RATE = 'Taux variable';
 }

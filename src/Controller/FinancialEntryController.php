@@ -7,14 +7,16 @@ use App\Entity\UploadFile;
 use App\Enum\AccessRoleEnum;
 use App\Service\DateService;
 use App\Service\EnumService;
-use App\Service\PropertyService;
 use BadRequestHttpException;
 use App\Enum\TransactionEnum;
 use App\Entity\FinancialEntry;
+use App\Service\MortgageService;
+use App\Service\PropertyService;
 use App\Enum\FinancialCategoryEnum;
 use App\Form\FinancialEntryNewType;
 use App\Form\TransactionFilterType;
 use App\Form\FinancialEntryEditType;
+use Symfony\Component\Form\FormError;
 use App\Repository\PropertyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -99,7 +101,7 @@ final class FinancialEntryController extends AbstractController
     }
 
     #[Route('/new', name: 'app_financial_entry_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, PropertyService $propertyService): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, PropertyService $propertyService, MortgageService $mortgageService): Response
     {
         $financialEntry = new FinancialEntry();
 
@@ -135,6 +137,16 @@ final class FinancialEntryController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            if($financialEntry->getCategory()->name === 'MORTGAGE' && $mortgageService->isPaiementDateValid($financialEntry) === false){
+                // Si la date de paiement n'est pas valide pour une hypothèque, on affiche un message d'erreur
+                 $form->get('paidAt')->addError(new FormError('La date de paiement ne correspond pas à une échéance pour l\'hypothèque séléctionnée.'));
+                return $this->render('financial_entry/new.html.twig', [
+                    'financial_entry' => $financialEntry,
+                    'form' => $form,
+                    'properties' => $entityManager->getRepository(Property::class)->findAccessibleProperties($this->getUser(), [AccessRoleEnum::MEMBER, AccessRoleEnum::OWNER]),
+                ]);
+            }
+
             $mortgage = $propertyService->getActualMortgages($financialEntry->getProperty())[0] ?? null; //on récupère la première hypothèque si elle existe
 
             $financialEntry->setCreatedBy($this->getUser())
@@ -165,7 +177,7 @@ final class FinancialEntryController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_financial_entry_edit', methods: ['GET', 'POST'], requirements: ['id' => Requirement::POSITIVE_INT])]
-    public function edit(Request $request, FinancialEntry $financialEntry, EntityManagerInterface $entityManager, RequestStack $requestStack): Response
+    public function edit(Request $request, FinancialEntry $financialEntry, EntityManagerInterface $entityManager, RequestStack $requestStack, MortgageService $mortgageService): Response
     {
         $session = $request->getSession(); 
         
@@ -173,6 +185,17 @@ final class FinancialEntryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            if($financialEntry->getCategory()->name === 'MORTGAGE' && $mortgageService->isPaiementDateValid($financialEntry) === false){
+                // Si la date de paiement n'est pas valide pour une hypothèque, on affiche un message d'erreur
+                 $form->get('paidAt')->addError(new FormError('La date de paiement ne correspond pas à une échéance pour l\'hypothèque séléctionnée.'));
+                return $this->render('financial_entry/edit.html.twig', [
+                    'financial_entry' => $financialEntry,
+                    'form' => $form,
+                    'uploaded_file' => $entityManager->getRepository(UploadFile::class)->findOneBy(['entityClass' => FinancialEntry::class, 'entityId' => $financialEntry->getId()]),
+                ]);
+            }
+
             //Si l'utilisateur selectionne un fichier en rapport avec la dépense on le met à jour
             if($form['uploadFile']->getData() !== null){
                 $uploadFile = $form['uploadFile']->getData();

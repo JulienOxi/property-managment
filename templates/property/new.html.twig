@@ -79,4 +79,27 @@ window.addEventListener("load", () => {
     document.getElementById("menu_btn_property").classList.add("menu-btn-active");
 })
 </script>
+
+{# Toogle de l'input d'amortissement en fonction de la valeur du select #}
+{# Si le select est différent de NOTHING, on active le champ d'amortissement, sinon on le désactive et on le vide. #}
+<script>
+document.addEventListener('change', function(e) {
+    if (e.target.matches('select[id$="_amortizationType"]')) {
+        const baseId = e.target.id.replace('_amortizationType', '');
+        const amortizationInput = document.getElementById(`${baseId}_amortization`);
+        if (!amortizationInput) return;
+
+        const selectedValue = e.target.value;
+        if (selectedValue && selectedValue !== 'NOTHING') {
+            amortizationInput.disabled = false;
+            amortizationInput.required = true;
+        } else {
+            amortizationInput.disabled = true;
+            amortizationInput.required = false;
+            amortizationInput.value = '';
+        }
+    }
+});
+</script>
+
 {% endblock %}

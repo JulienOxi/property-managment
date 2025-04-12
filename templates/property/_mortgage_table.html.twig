@@ -14,62 +14,66 @@
                 </tr>
             </thead>
             {% for mortgage in mortgages %}
+                {# on défini les periodes par type d'hypothèque #}
+                {% set periodes = [] %}
+                {% set periodesName = "" %}
                 {% if mortgage.billingPeriod.name == "QUARTERLY" %}
-                    {% set trimestres = [
-                            {'label': '1er Janvier au 31 Mars', 'key': '03-MORTGAGE', 'date': '-03-31', 'description': 'hypotèque du 1er janvier au 31 mars'},
-                            {'label': '1er Avril au 30 Juin', 'key': '06-MORTGAGE', 'date': '-06-30', 'description': 'hypotèque du 1er avril au 30 juin'},
-                            {'label': '1er Juillet au 30 Septembre', 'key': '09-MORTGAGE', 'date': '-09-30', 'description': 'hypotèque du 1er juillet au 30 septembre'},
-                            {'label': '1er Octobre au 31 Décembre', 'key': '12-MORTGAGE', 'date': '-12-31', 'description': 'hypotèque du 1er octobre au 31 décembre'}
+                {% set periodesName = "QUARTERLY" %}
+                    {% set periodes = [
+                            {'label': '1er Janvier au 31 Mars', 'key': '03-MORTGAGE', 'date': '-03-31', 'description': 'hypothèque du 1er janvier au 31 mars'},
+                            {'label': '1er Avril au 30 Juin', 'key': '06-MORTGAGE', 'date': '-06-30', 'description': 'hypothèque du 1er avril au 30 juin'},
+                            {'label': '1er Juillet au 30 Septembre', 'key': '09-MORTGAGE', 'date': '-09-30', 'description': 'hypothèque du 1er juillet au 30 septembre'},
+                            {'label': '1er Octobre au 31 Décembre', 'key': '12-MORTGAGE', 'date': '-12-31', 'description': 'hypothèque du 1er octobre au 31 décembre'}
                         ] %}
+                {% elseif mortgage.billingPeriod.name == "MONTHLY" %}
+                {% set periodesName = "MONTHLY" %}
+                    {% set periodes = [
+                            {'label': 'Janvier', 'key': '01-MORTGAGE', 'date': '-01-31', 'description': 'Hypothèque de janvier'},
+                            {'label': 'Février', 'key': '02-MORTGAGE', 'date': '-02-28', 'description': 'Hypothèque de février'},
+                            {'label': 'Mars', 'key': '03-MORTGAGE', 'date': '-03-31', 'description': 'Hypothèque de mars'},
+                            {'label': 'Avril', 'key': '04-MORTGAGE', 'date': '-04-30', 'description': 'Hypothèque d\'avril'},
+                            {'label': 'Mai', 'key': '05-MORTGAGE', 'date': '-05-31', 'description': 'Hypothèque de mai'},
+                            {'label': 'Juin', 'key': '06-MORTGAGE', 'date': '-06-30', 'description': 'Hypothèque de juin'},
+                            {'label': 'Juillet', 'key': '07-MORTGAGE', 'date': '-07-31', 'description': 'Hypothèque de juillet'},
+                            {'label': 'Août', 'key': '08-MORTGAGE', 'date': '-08-31', 'description': 'Hypothèque d\'août'},
+                            {'label': 'Septembre', 'key': '09-MORTGAGE',  'date': '-09-30' , 'description': "Hypothèque de septembre"},
+                            {'label': "Octobre", 'key': "10-MORTGAGE", 'date': "-10-31", 'description': "Hypothèque d'octobre"},
+                            {'label': "Novembre", 'key': "11-MORTGAGE", 'date': "-11-30", 'description': "Hypothèque de novembre"},
+                            {'label': "Décembre", 'key': "12-MORTGAGE", 'date': "-12-31", 'description': "Hypothèque de décembre"}
+                        ] %}
+
+                {% elseif mortgage.billingPeriod.name == "ANNUAL" %}
+                {% set periodesName = "ANNUAL" %}
+                    {% set periodes = [
+                            {'label': 'Annuel', 'key': '12-MORTGAGE', 'date': '-12-31', 'description': 'hypothèque annuelle'}
+                        ] %}
+                {% endif %}
+
+                {# on affiche les periodes de l'hypothèque dans un tableau #}
                         {% set today = "now"|date("Y-m-d") %}
                         <tbody>
-                            {% for trimestre in trimestres %}
-                                {% set fullDate = (year|default(('now')|date('Y'))) ~ trimestre.date %}
+                            {% for periode in periodes %}
+                                {% set fullDate = (year|default(('now')|date('Y'))) ~ periode.date %}
                                 <tr>
-                                    <td class="text-sm">{{ trimestre.label }}</td>
+                                    <td class="text-sm">{{ periode.label }}</td>
                                     <td class="text-center text-sm">
-                                        {% if shortMortgages[trimestre.key] is not defined and fullDate <= today %}
+                                        {% if shortMortgages[periode.key] is defined and shortMortgages[periode.key].mortgage.billingPeriod.name == periodesName %}
+                                            {{ shortMortgages[periode.key].amount|default('')|number_format(2, '.', '\'') }}
+                                        {% elseif fullDate <= today %}
                                             <a href="{{ path('app_financial_entry_new', {
                                                 'type': 'EXPENSE',
                                                 'property': mortgage.property.id,
                                                 'category': 'MORTGAGE',
-                                                'description': trimestre.description,
+                                                'description': periode.description,
                                                 'paidAt': fullDate
                                             }) }}" class="text-blue-500 hover:underline">
                                                 Ajouter
                                             </a>
-                                        {% elseif shortMortgages[trimestre.key] is defined %}
-                                            {{ shortMortgages[trimestre.key].amount|default('')|number_format(2, '.', '\'') }}
                                         {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
-
-                {% elseif mortgage.billingPeriod.name == "MONTHLY" %}
-                        <tbody>
-                            {% for key, month in months %}
-                                <tr>
-                                    <td class="text-sm">{{ month }}</td>
-                                    <td class="text-center text-sm">
-                                        {{ shortMortgages['{{ key }}-MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
-                                    </td>    
-                                </tr>
-                            {% endfor %}
-
-                        </tbody>
-                {% endif %}
-                {% if mortgage.billingPeriod.name == "ANNUAL" %}
-                    <tbody class="bg-blue-200">
-                        <tr>
-                            <td class="text-sm">Annuel</td>
-                            <td class="text-center text-sm">
-                                {{ shortMortgages['MORTGAGE'].amount|default('')|number_format(2, '.', '\'') }}
-                            </td>    
-                        </tr>
-                    </tbody>
-                {% endif %}
-            {% else %}
             {% endfor %}
         </table>
     </div>

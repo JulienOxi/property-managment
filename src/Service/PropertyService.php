@@ -42,7 +42,7 @@ class PropertyService{
     }
 
     /**
-    * Retourne toutes les hypotèque actuelles
+    * Retourne toutes les hypothèque actuelles
     */
     public function getActualMortgages($property, \DateTimeImmutable|\datetime $now = new \DateTime()){
         $actualMortgages = [];
