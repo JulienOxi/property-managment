@@ -72,8 +72,16 @@ class MortgageType extends AbstractType
                     'class' => 'js-amortization-type', // pour le JS
                 ]
             ])
-            ->add('amortization', null, [
+            ->add('amortizationPercent', null, [
                 'label' => 'Amortissement (%)',
+                'required' => false,
+                'attr' => [
+                    'class' => 'js-amortization-field transition-all duration-300 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed',
+                    'disabled' => true,
+                ],
+            ])
+            ->add('amortizationAmount', null, [
+                'label' => 'Amortissement (montant)',
                 'required' => false,
                 'attr' => [
                     'class' => 'js-amortization-field transition-all duration-300 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed',

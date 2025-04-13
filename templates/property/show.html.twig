@@ -328,8 +328,10 @@
 									{% else %}
 										<p class="ml-4 text-white font-medium">Hypothèque{% if property.mortgages|length > 1 %}s{% endif %}</p>
 										{% for mortgage in property.mortgages %}
-											<p class="ml-8 text-white font-thin">{{ mortgage.bank.name }} - {{ mortgage.mortgageType.value }} ({{ mortgage.rate }}%)</p>
-											<p class="ml-8 text-white font-thin">Ce termine le {{ mortgage.toAt ? mortgage.toAt|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
+											{% if mortgage.fromAt < date('now') and mortgage.toAt > date('now') %}
+												<p class="ml-8 text-white font-thin">{{ mortgage.bank.name }} - {{ mortgage.mortgageType.value }} ({{ mortgage.rate }}%)</p>
+												<p class="ml-8 text-white font-thin">Ce termine le {{ mortgage.toAt ? mortgage.toAt|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
+											{% endif %}
 										{% endfor %}
 									{% endif %}
 									
@@ -338,7 +340,7 @@
 							<div class="md:grid md:grid-cols-2">          
 								<div class="gap-2 ml-3 md:col-span-2">
 									<p class="text-neutral-900 font-semibold">Achat</p>
-									<p class="ml-4 font-thin"><b>{{ property.purchasePrice|format_currency('CHF') }}</b> le {{ property.purchaseDate ? property.purchaseDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
+									<p class="ml-4 font-thin"><b>{{ property.purchasePrice|number_format(2, '.', '\'') }}</b> le {{ property.purchaseDate ? property.purchaseDate|format_datetime(locale='fr',pattern="dd MMMM YYYY") : 'N/A' }}</p>
 								</div>
 							</div>
 						</div>

@@ -56,10 +56,13 @@ class Mortgage
     private ?string $amount = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, nullable: true)]
-    private ?string $amortization = null;
+    private ?string $amortizationPercent = null;
 
     #[ORM\Column(nullable: true, enumType: MortgageAmortizationTypeEnum::class)]
     private ?MortgageAmortizationTypeEnum $amortizationType = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 7, scale: 2, nullable: true)]
+    private ?string $amortizationAmount = null;
 
     public function __construct()
     {
@@ -198,14 +201,14 @@ class Mortgage
         return $this;
     }
 
-    public function getAmortization(): ?string
+    public function getAmortizationPercent(): ?string
     {
-        return $this->amortization;
+        return $this->amortizationPercent;
     }
 
-    public function setAmortization(?string $amortization): static
+    public function setAmortizationPercent(?string $amortizationPercent): static
     {
-        $this->amortization = $amortization;
+        $this->amortizationPercent = $amortizationPercent;
 
         return $this;
     }
@@ -218,6 +221,18 @@ class Mortgage
     public function setAmortizationType(?MortgageAmortizationTypeEnum $amortizationType): static
     {
         $this->amortizationType = $amortizationType;
+
+        return $this;
+    }
+
+    public function getAmortizationAmount(): ?string
+    {
+        return $this->amortizationAmount;
+    }
+
+    public function setAmortizationAmount(?string $amortizationAmount): static
+    {
+        $this->amortizationAmount = $amortizationAmount;
 
         return $this;
     }

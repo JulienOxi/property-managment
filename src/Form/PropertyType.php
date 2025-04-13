@@ -6,6 +6,7 @@ use App\Entity\Bank;
 use App\Entity\Property;
 use App\Enum\MortgageEnum;
 use App\Enum\PropertyEnum;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Bundle\SecurityBundle\Security;

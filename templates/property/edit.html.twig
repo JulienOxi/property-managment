@@ -68,17 +68,56 @@ window.addEventListener("load", () => {
 document.addEventListener('change', function(e) {
     if (e.target.matches('select[id$="_amortizationType"]')) {
         const baseId = e.target.id.replace('_amortizationType', '');
-        const amortizationInput = document.getElementById(`${baseId}_amortization`);
-        if (!amortizationInput) return;
+        const amortizationPercentInput = document.getElementById(`${baseId}_amortizationPercent`);
+        const amortizationAmountInput = document.getElementById(`${baseId}_amortizationAmount`);
+        if (!amortizationPercentInput || !amortizationAmountInput) return;
 
         const selectedValue = e.target.value;
+
         if (selectedValue && selectedValue !== 'NOTHING') {
-            amortizationInput.disabled = false;
-            amortizationInput.required = true;
+            amortizationPercentInput.disabled = false;
+            amortizationAmountInput.disabled = false;
+
+            // Enlever les valeurs pour forcer l'utilisateur à choisir une seule
+            amortizationPercentInput.value = '';
+            amortizationAmountInput.value = '';
+
+            // Ajouter un gestionnaire d'événement pour forcer le choix unique
+            const enforceSingleInput = () => {
+                if (amortizationPercentInput.value) {
+                    amortizationAmountInput.disabled = true;
+                    amortizationAmountInput.required = false;
+                } else {
+                    amortizationAmountInput.disabled = false;
+                }
+
+                if (amortizationAmountInput.value) {
+                    amortizationPercentInput.disabled = true;
+                    amortizationPercentInput.required = false;
+                } else {
+                    amortizationPercentInput.disabled = false;
+                }
+
+                // Marquer au moins un comme required si les deux sont vides
+                if (!amortizationPercentInput.value && !amortizationAmountInput.value) {
+                    amortizationPercentInput.required = true;
+                    amortizationAmountInput.required = true;
+                }
+            };
+
+            amortizationPercentInput.addEventListener('input', enforceSingleInput);
+            amortizationAmountInput.addEventListener('input', enforceSingleInput);
+
+            enforceSingleInput(); // Initialiser l’état
+
         } else {
-            amortizationInput.disabled = true;
-            amortizationInput.required = false;
-            amortizationInput.value = '';
+            amortizationPercentInput.disabled = true;
+            amortizationPercentInput.required = false;
+            amortizationPercentInput.value = '';
+
+            amortizationAmountInput.disabled = true;
+            amortizationAmountInput.required = false;
+            amortizationAmountInput.value = '';
         }
     }
 });

@@ -141,14 +141,9 @@ final class PropertyController extends AbstractController
         $shortMortgages = [];
         $mortgages = $financialEntryRepository->findMortgageByPropertyAndYear($property, $year);
         foreach ($mortgages as $key => $value) {
-            //si il existe dejà une hypothèque pour ce mois, c'est qu'il y a deux hypothèque pour ce bien on ajoute donc une deuxieme hypothèque
-            if (isset($shortMortgages[$value->getPaidAt()->format('m').'-'.$value->getCategory()->name])) {
-                $shortMortgages[$value->getPaidAt()->format('m').'-'.$value->getCategory()->name.'2'] = $value;
-            }else{
-                $shortMortgages[$value->getPaidAt()->format('m').'-'.$value->getCategory()->name] = $value;
-            }
+            $shortMortgages[$value->getPaidAt()->format('m').'-'.$value->getCategory()->name][$value->getId()] = $value; //on met le id comme cela on peux ajouter plusieurs hypothèque pour le même mois
         }
-
+        
         //selection des fichiers
         $uploadsFiles = $uploadFileRepository->findFilesWithoutEntity($property->getId(), 'document');
 

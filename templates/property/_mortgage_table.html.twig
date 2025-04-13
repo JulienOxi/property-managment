@@ -52,13 +52,27 @@
                 {# on affiche les periodes de l'hypothèque dans un tableau #}
                         {% set today = "now"|date("Y-m-d") %}
                         <tbody>
+                        {# On affiche l'hypotéque  #}
+                        <tr class="bg-gray-700">
+                            <td colspan="2" class="text-sm text-gray-100 font-semibold">{{ mortgage.bank.name }} - {{ mortgage.mortgageType.value }} ({{ mortgage.rate }}%) - {{mortgage.amount|number_format(2, '.', '\'')|default('') }} CHF</td>
+                        </tr>
                             {% for periode in periodes %}
                                 {% set fullDate = (year|default(('now')|date('Y'))) ~ periode.date %}
                                 <tr>
-                                    <td class="text-sm">{{ periode.label }}</td>
+                                    <td class="text-sm pl-2">{{ periode.label }}</td>
                                     <td class="text-center text-sm">
-                                        {% if shortMortgages[periode.key] is defined and shortMortgages[periode.key].mortgage.billingPeriod.name == periodesName %}
-                                            {{ shortMortgages[periode.key].amount|default('')|number_format(2, '.', '\'') }}
+                                        {# on s'assure que l'hypothèque est renseignée, qu'elle correspond à la periode mensionnée et qu'elle est de la même hypothèque #}
+                                        {% set found = null %}
+                                        {% if shortMortgages[periode.key] is defined %}
+                                            {% for id, entry in shortMortgages[periode.key] %} {# on boucle sur les [periode.key] pour trouver les id #}
+                                                {% if entry.mortgage == mortgage and entry.mortgage.billingPeriod.name == periodesName %}
+                                                    {% set found = entry %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+
+                                        {% if found %}
+                                            {{ found.amount|default('')|number_format(2, '.', '\'') }}
                                         {% elseif fullDate <= today %}
                                             <a href="{{ path('app_financial_entry_new', {
                                                 'type': 'EXPENSE',

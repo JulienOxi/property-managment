@@ -124,7 +124,7 @@ class FinancialEntryEditType extends AbstractType
                 },
                 'placeholder' => 'Sélectionnez une hypothèque',
                 'choice_label' => function (Mortgage $mortgage) {
-                    return $mortgage->getBank()->getName() . ' - ' . $mortgage->getMortgageType()->value . ' ' . $mortgage->getRate() . '%';
+                    return $mortgage->getBank()->getName() . ' - ' . $mortgage->getMortgageType()->value . ' ' . $mortgage->getRate() . '%'.' - ' . $mortgage->getAmount() . 'CHF';
                 },
                 'required' => true,
             ]);
